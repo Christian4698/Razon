@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" viewBox="0 0 192 192" role="img" aria-label="Razon">
+  <rect width="192" height="192" rx="38" fill="#0d0f11"/>
+  <rect x="24" y="24" width="144" height="144" rx="24" fill="#13221f" stroke="#33d0b3" stroke-width="8"/>
+  <path d="M58 136V56h45c20 0 32 10 32 27 0 12-6 21-18 25l23 28h-29l-20-25H82v25H58Zm24-45h18c8 0 12-3 12-9s-4-9-12-9H82v18Z" fill="#eef4ef"/>
+</svg>

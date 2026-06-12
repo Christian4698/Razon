@@ -1,0 +1,475 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/@fs/C:/Users/PC/Downloads/Razon/frontend/settings/SettingsPage.tsx");const _jsxDEV = __vite__cjsImport4_react_jsxDevRuntime["jsxDEV"];import { connectors } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/app/cockpit-data.ts";
+import { StatusPill } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/CockpitPrimitives.tsx";
+import { TradingModeSelector } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/TradingModeSelector.tsx";
+import { PrivacySafetyPanel } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/settings/PrivacySafetyPanel.tsx";
+var _jsxFileName = "C:/Users/PC/Downloads/Razon/frontend/settings/SettingsPage.tsx";
+import __vite__cjsImport4_react_jsxDevRuntime from "/@fs/C:/Users/PC/Downloads/Razon/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=7ec427b8";
+export function SettingsPage({ state, onDataModeChange, onTradingModeChange, onStrategyModeChange }) {
+	const settings = [
+		{
+			label: "ENABLE_LIVE_TRADING",
+			on: false
+		},
+		{
+			label: "MODE_SIMULATION",
+			on: true
+		},
+		{
+			label: "ALLOW_AUTO_EXECUTION",
+			on: false
+		},
+		{
+			label: "DATA_MODE_VISIBLE",
+			on: true
+		},
+		{
+			label: "KALOS",
+			on: state.kalosEnabled
+		},
+		{
+			label: "Journal",
+			on: true
+		},
+		{
+			label: "Emergency Stop",
+			on: state.emergencyStop
+		}
+	];
+	const connectorSecrets = [
+		"MT5_LOGIN",
+		"MT5_PASSWORD",
+		"DERIV_API_TOKEN",
+		"FOREX_API_KEY",
+		"FOREX_API_SECRET"
+	];
+	const settingsConnectors = connectors.filter((connector) => [
+		"deriv-demo",
+		"deriv-real",
+		"mt5-demo",
+		"mt5-real"
+	].includes(connector.id));
+	return /* @__PURE__ */ _jsxDEV("div", {
+		"data-loc": "frontend\\settings\\SettingsPage.tsx:34",
+		className: "cockpit-grid two",
+		children: [
+			/* @__PURE__ */ _jsxDEV("section", {
+				"data-loc": "frontend\\settings\\SettingsPage.tsx:35",
+				className: "cockpit-panel",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\settings\\SettingsPage.tsx:36",
+					className: "cockpit-panel-header",
+					children: [/* @__PURE__ */ _jsxDEV("h2", {
+						"data-loc": "frontend\\settings\\SettingsPage.tsx:37",
+						children: "Settings"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 37,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+						"data-loc": "frontend\\settings\\SettingsPage.tsx:38",
+						tone: "live-off",
+						children: "LIVE OFF"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 38,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 36,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\settings\\SettingsPage.tsx:40",
+					className: "settings-grid",
+					children: settings.map((setting) => /* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\settings\\SettingsPage.tsx:42",
+						className: "setting-row",
+						children: [/* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\settings\\SettingsPage.tsx:43",
+							children: setting.label
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 43,
+							columnNumber: 15
+						}, this), /* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\settings\\SettingsPage.tsx:44",
+							className: `toggle-state ${setting.on ? "on" : ""}`,
+							children: setting.on ? "ON" : "OFF"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 44,
+							columnNumber: 15
+						}, this)]
+					}, setting.label, true, {
+						fileName: _jsxFileName,
+						lineNumber: 42,
+						columnNumber: 13
+					}, this))
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 40,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 35,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("section", {
+				"data-loc": "frontend\\settings\\SettingsPage.tsx:49",
+				className: "cockpit-panel",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\settings\\SettingsPage.tsx:50",
+					className: "cockpit-panel-header",
+					children: [/* @__PURE__ */ _jsxDEV("h2", {
+						"data-loc": "frontend\\settings\\SettingsPage.tsx:51",
+						children: "Modes"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 51,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+						"data-loc": "frontend\\settings\\SettingsPage.tsx:52",
+						tone: state.dataMode === "REAL_DATA" ? "critical" : "demo",
+						children: state.dataMode
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 52,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 50,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV(TradingModeSelector, {
+					"data-loc": "frontend\\settings\\SettingsPage.tsx:54",
+					strategyMode: state.strategyMode,
+					tradingMode: state.tradingMode,
+					onStrategyModeChange,
+					onTradingModeChange
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 54,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 49,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("section", {
+				"data-loc": "frontend\\settings\\SettingsPage.tsx:61",
+				className: "cockpit-panel",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\settings\\SettingsPage.tsx:62",
+					className: "cockpit-panel-header",
+					children: [/* @__PURE__ */ _jsxDEV("h2", {
+						"data-loc": "frontend\\settings\\SettingsPage.tsx:63",
+						children: "Connector Secrets"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 63,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+						"data-loc": "frontend\\settings\\SettingsPage.tsx:64",
+						tone: "connected",
+						children: "Hidden"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 64,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 62,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\settings\\SettingsPage.tsx:66",
+					className: "cockpit-stack",
+					children: connectorSecrets.map((secret) => /* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\settings\\SettingsPage.tsx:68",
+						className: "setting-row",
+						children: [/* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\settings\\SettingsPage.tsx:69",
+							children: secret
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 69,
+							columnNumber: 15
+						}, this), /* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\settings\\SettingsPage.tsx:70",
+							className: "toggle-state",
+							children: "SERVER"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 70,
+							columnNumber: 15
+						}, this)]
+					}, secret, true, {
+						fileName: _jsxFileName,
+						lineNumber: 68,
+						columnNumber: 13
+					}, this))
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 66,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 61,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("section", {
+				"data-loc": "frontend\\settings\\SettingsPage.tsx:75",
+				className: "cockpit-panel",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\settings\\SettingsPage.tsx:76",
+					className: "cockpit-panel-header",
+					children: [/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\settings\\SettingsPage.tsx:77",
+						children: [/* @__PURE__ */ _jsxDEV("h2", {
+							"data-loc": "frontend\\settings\\SettingsPage.tsx:78",
+							children: "Connectors"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 78,
+							columnNumber: 13
+						}, this), /* @__PURE__ */ _jsxDEV("p", {
+							"data-loc": "frontend\\settings\\SettingsPage.tsx:79",
+							className: "cockpit-muted",
+							children: "Deriv + MT5 Bridge, lecture seule par defaut."
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 79,
+							columnNumber: 13
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 77,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+						"data-loc": "frontend\\settings\\SettingsPage.tsx:81",
+						tone: "live-off",
+						children: "LIVE_BLOCKED"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 81,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 76,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\settings\\SettingsPage.tsx:83",
+					className: "cockpit-stack",
+					children: settingsConnectors.map((connector) => /* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\settings\\SettingsPage.tsx:85",
+						className: "setting-row",
+						children: [/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\settings\\SettingsPage.tsx:86",
+							children: [/* @__PURE__ */ _jsxDEV("strong", {
+								"data-loc": "frontend\\settings\\SettingsPage.tsx:87",
+								children: connector.name
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 87,
+								columnNumber: 17
+							}, this), /* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\settings\\SettingsPage.tsx:88",
+								className: "cockpit-muted",
+								children: [
+									connector.safetyStatus,
+									" | secrets ",
+									connector.secretLocation
+								]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 88,
+								columnNumber: 17
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 86,
+							columnNumber: 15
+						}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+							"data-loc": "frontend\\settings\\SettingsPage.tsx:90",
+							tone: connector.runtimeMode,
+							children: connector.accessMode
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 90,
+							columnNumber: 15
+						}, this)]
+					}, connector.id, true, {
+						fileName: _jsxFileName,
+						lineNumber: 85,
+						columnNumber: 13
+					}, this))
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 83,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 75,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("section", {
+				"data-loc": "frontend\\settings\\SettingsPage.tsx:95",
+				className: "cockpit-panel",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\settings\\SettingsPage.tsx:96",
+					className: "cockpit-panel-header",
+					children: [/* @__PURE__ */ _jsxDEV("h2", {
+						"data-loc": "frontend\\settings\\SettingsPage.tsx:97",
+						children: "Safety Flags"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 97,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+						"data-loc": "frontend\\settings\\SettingsPage.tsx:98",
+						tone: "connected",
+						children: "Locked"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 98,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 96,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\settings\\SettingsPage.tsx:100",
+					className: "cockpit-stack",
+					children: [
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\settings\\SettingsPage.tsx:101",
+							className: "setting-row",
+							children: [/* @__PURE__ */ _jsxDEV("strong", {
+								"data-loc": "frontend\\settings\\SettingsPage.tsx:102",
+								children: "Martingale"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 102,
+								columnNumber: 13
+							}, this), /* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\settings\\SettingsPage.tsx:103",
+								className: "toggle-state",
+								children: "BLOCK"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 103,
+								columnNumber: 13
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 101,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\settings\\SettingsPage.tsx:105",
+							className: "setting-row",
+							children: [/* @__PURE__ */ _jsxDEV("strong", {
+								"data-loc": "frontend\\settings\\SettingsPage.tsx:106",
+								children: "Order without SL"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 106,
+								columnNumber: 13
+							}, this), /* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\settings\\SettingsPage.tsx:107",
+								className: "toggle-state",
+								children: "BLOCK"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 107,
+								columnNumber: 13
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 105,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\settings\\SettingsPage.tsx:109",
+							className: "setting-row",
+							children: [/* @__PURE__ */ _jsxDEV("strong", {
+								"data-loc": "frontend\\settings\\SettingsPage.tsx:110",
+								children: "Order without TP"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 110,
+								columnNumber: 13
+							}, this), /* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\settings\\SettingsPage.tsx:111",
+								className: "toggle-state",
+								children: "BLOCK"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 111,
+								columnNumber: 13
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 109,
+							columnNumber: 11
+						}, this)
+					]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 100,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 95,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV(PrivacySafetyPanel, {
+				"data-loc": "frontend\\settings\\SettingsPage.tsx:115",
+				state,
+				onDataModeChange
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 115,
+				columnNumber: 7
+			}, this)
+		]
+	}, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 34,
+		columnNumber: 5
+	}, this);
+}
+_c = SettingsPage;
+var _c;
+$RefreshReg$(_c, "SettingsPage");
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+import * as __vite_react_currentExports from "/@fs/C:/Users/PC/Downloads/Razon/frontend/settings/SettingsPage.tsx";
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+
+  const currentExports = __vite_react_currentExports;
+  queueMicrotask(() => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/PC/Downloads/Razon/frontend/settings/SettingsPage.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/PC/Downloads/Razon/frontend/settings/SettingsPage.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+function $RefreshReg$(type, id) { return RefreshRuntime.register(type, "C:/Users/PC/Downloads/Razon/frontend/settings/SettingsPage.tsx" + ' ' + id); }
+function $RefreshSig$() { return RefreshRuntime.createSignatureFunctionForTransform(); }
+
+//# sourceMappingURL=data:application/json;base64,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dkM7Ozs7OztNQUNMLHdCQUFDLE9BQUQ7T0FBRztPQUFFLFdBQVU7aUJBQWYsQ0FDRSx3QkFBQyxVQUFEO1FBQU07a0JBQUU7T0FBd0I7Ozs7aUJBQ2hDLHdCQUFDLFFBQUQ7UUFBSTtRQUFFLFdBQVU7a0JBQWU7T0FBVzs7OztlQUN2Qzs7Ozs7O0tBQ0Y7Ozs7O1lBQ0U7Ozs7OztHQUNULHdCQUFDLG9CQUFEO0lBQWtCO0lBQVM7SUFBeUI7R0FBbUI7Ozs7O0VBQ3BFOzs7Ozs7QUFFVCIsIm5hbWVzIjpbXSwiaWdub3JlTGlzdCI6W10sInNvdXJjZXMiOlsiU2V0dGluZ3NQYWdlLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgdHlwZSB7IENvY2twaXRTdGF0ZSwgRGF0YU1vZGUgfSBmcm9tIFwiLi4vYXBwL2NvY2twaXQudHlwZXNcIjtcbmltcG9ydCB7IGNvbm5lY3RvcnMgfSBmcm9tIFwiLi4vYXBwL2NvY2twaXQtZGF0YVwiO1xuaW1wb3J0IHsgU3RhdHVzUGlsbCB9IGZyb20gXCIuLi9jb21wb25lbnRzL0NvY2twaXRQcmltaXRpdmVzXCI7XG5pbXBvcnQgeyBUcmFkaW5nTW9kZVNlbGVjdG9yIH0gZnJvbSBcIi4uL2NvbXBvbmVudHMvVHJhZGluZ01vZGVTZWxlY3RvclwiO1xuaW1wb3J0IHsgUHJpdmFjeVNhZmV0eVBhbmVsIH0gZnJvbSBcIi4vUHJpdmFjeVNhZmV0eVBhbmVsXCI7XG5cbmV4cG9ydCBmdW5jdGlvbiBTZXR0aW5nc1BhZ2Uoe1xuICBzdGF0ZSxcbiAgb25EYXRhTW9kZUNoYW5nZSxcbiAgb25UcmFkaW5nTW9kZUNoYW5nZSxcbiAgb25TdHJhdGVneU1vZGVDaGFuZ2UsXG59OiB7XG4gIHN0YXRlOiBDb2NrcGl0U3RhdGU7XG4gIG9uRGF0YU1vZGVDaGFuZ2U6ICh0YXJnZXRNb2RlOiBEYXRhTW9kZSwgc3RhdHVzOiBcIkFQUExJRURcIiB8IFwiQkxPQ0tFRFwiLCByZWFzb246IHN0cmluZykgPT4gdm9pZDtcbiAgb25UcmFkaW5nTW9kZUNoYW5nZTogUGFyYW1ldGVyczx0eXBlb2YgVHJhZGluZ01vZGVTZWxlY3Rvcj5bMF1bXCJvblRyYWRpbmdNb2RlQ2hhbmdlXCJdO1xuICBvblN0cmF0ZWd5TW9kZUNoYW5nZTogUGFyYW1ldGVyczx0eXBlb2YgVHJhZGluZ01vZGVTZWxlY3Rvcj5bMF1bXCJvblN0cmF0ZWd5TW9kZUNoYW5nZVwiXTtcbn0pIHtcbiAgY29uc3Qgc2V0dGluZ3MgPSBbXG4gICAgeyBsYWJlbDogXCJFTkFCTEVfTElWRV9UUkFESU5HXCIsIG9uOiBmYWxzZSB9LFxuICAgIHsgbGFiZWw6IFwiTU9ERV9TSU1VTEFUSU9OXCIsIG9uOiB0cnVlIH0sXG4gICAgeyBsYWJlbDogXCJBTExPV19BVVRPX0VYRUNVVElPTlwiLCBvbjogZmFsc2UgfSxcbiAgICB7IGxhYmVsOiBcIkRBVEFfTU9ERV9WSVNJQkxFXCIsIG9uOiB0cnVlIH0sXG4gICAgeyBsYWJlbDogXCJLQUxPU1wiLCBvbjogc3RhdGUua2Fsb3NFbmFibGVkIH0sXG4gICAgeyBsYWJlbDogXCJKb3VybmFsXCIsIG9uOiB0cnVlIH0sXG4gICAgeyBsYWJlbDogXCJFbWVyZ2VuY3kgU3RvcFwiLCBvbjogc3RhdGUuZW1lcmdlbmN5U3RvcCB9LFxuICBdO1xuXG4gIGNvbnN0IGNvbm5lY3RvclNlY3JldHMgPSBbXCJNVDVfTE9HSU5cIiwgXCJNVDVfUEFTU1dPUkRcIiwgXCJERVJJVl9BUElfVE9LRU5cIiwgXCJGT1JFWF9BUElfS0VZXCIsIFwiRk9SRVhfQVBJX1NFQ1JFVFwiXTtcbiAgY29uc3Qgc2V0dGluZ3NDb25uZWN0b3JzID0gY29ubmVjdG9ycy5maWx0ZXIoY29ubmVjdG9yID0+XG4gICAgW1wiZGVyaXYtZGVtb1wiLCBcImRlcml2LXJlYWxcIiwgXCJtdDUtZGVtb1wiLCBcIm10NS1yZWFsXCJdLmluY2x1ZGVzKGNvbm5lY3Rvci5pZClcbiAgKTtcblxuICByZXR1cm4gKFxuICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1ncmlkIHR3b1wiPlxuICAgICAgPHNlY3Rpb24gY2xhc3NOYW1lPVwiY29ja3BpdC1wYW5lbFwiPlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWwtaGVhZGVyXCI+XG4gICAgICAgICAgPGgyPlNldHRpbmdzPC9oMj5cbiAgICAgICAgICA8U3RhdHVzUGlsbCB0b25lPVwibGl2ZS1vZmZcIj5MSVZFIE9GRjwvU3RhdHVzUGlsbD5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic2V0dGluZ3MtZ3JpZFwiPlxuICAgICAgICAgIHtzZXR0aW5ncy5tYXAoc2V0dGluZyA9PiAoXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNldHRpbmctcm93XCIga2V5PXtzZXR0aW5nLmxhYmVsfT5cbiAgICAgICAgICAgICAgPHN0cm9uZz57c2V0dGluZy5sYWJlbH08L3N0cm9uZz5cbiAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPXtgdG9nZ2xlLXN0YXRlICR7c2V0dGluZy5vbiA/IFwib25cIiA6IFwiXCJ9YH0+e3NldHRpbmcub24gPyBcIk9OXCIgOiBcIk9GRlwifTwvc3Bhbj5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICkpfVxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvc2VjdGlvbj5cbiAgICAgIDxzZWN0aW9uIGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWxcIj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXBhbmVsLWhlYWRlclwiPlxuICAgICAgICAgIDxoMj5Nb2RlczwvaDI+XG4gICAgICAgICAgPFN0YXR1c1BpbGwgdG9uZT17c3RhdGUuZGF0YU1vZGUgPT09IFwiUkVBTF9EQVRBXCIgPyBcImNyaXRpY2FsXCIgOiBcImRlbW9cIn0+e3N0YXRlLmRhdGFNb2RlfTwvU3RhdHVzUGlsbD5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxUcmFkaW5nTW9kZVNlbGVjdG9yXG4gICAgICAgICAgc3RyYXRlZ3lNb2RlPXtzdGF0ZS5zdHJhdGVneU1vZGV9XG4gICAgICAgICAgdHJhZGluZ01vZGU9e3N0YXRlLnRyYWRpbmdNb2RlfVxuICAgICAgICAgIG9uU3RyYXRlZ3lNb2RlQ2hhbmdlPXtvblN0cmF0ZWd5TW9kZUNoYW5nZX1cbiAgICAgICAgICBvblRyYWRpbmdNb2RlQ2hhbmdlPXtvblRyYWRpbmdNb2RlQ2hhbmdlfVxuICAgICAgICAvPlxuICAgICAgPC9zZWN0aW9uPlxuICAgICAgPHNlY3Rpb24gY2xhc3NOYW1lPVwiY29ja3BpdC1wYW5lbFwiPlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWwtaGVhZGVyXCI+XG4gICAgICAgICAgPGgyPkNvbm5lY3RvciBTZWNyZXRzPC9oMj5cbiAgICAgICAgICA8U3RhdHVzUGlsbCB0b25lPVwiY29ubmVjdGVkXCI+SGlkZGVuPC9TdGF0dXNQaWxsPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXN0YWNrXCI+XG4gICAgICAgICAge2Nvbm5lY3RvclNlY3JldHMubWFwKHNlY3JldCA9PiAoXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNldHRpbmctcm93XCIga2V5PXtzZWNyZXR9PlxuICAgICAgICAgICAgICA8c3Ryb25nPntzZWNyZXR9PC9zdHJvbmc+XG4gICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRvZ2dsZS1zdGF0ZVwiPlNFUlZFUjwvc3Bhbj5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICkpfVxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvc2VjdGlvbj5cbiAgICAgIDxzZWN0aW9uIGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWxcIj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXBhbmVsLWhlYWRlclwiPlxuICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICA8aDI+Q29ubmVjdG9yczwvaDI+XG4gICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJjb2NrcGl0LW11dGVkXCI+RGVyaXYgKyBNVDUgQnJpZGdlLCBsZWN0dXJlIHNldWxlIHBhciBkZWZhdXQuPC9wPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxTdGF0dXNQaWxsIHRvbmU9XCJsaXZlLW9mZlwiPkxJVkVfQkxPQ0tFRDwvU3RhdHVzUGlsbD5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1zdGFja1wiPlxuICAgICAgICAgIHtzZXR0aW5nc0Nvbm5lY3RvcnMubWFwKGNvbm5lY3RvciA9PiAoXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNldHRpbmctcm93XCIga2V5PXtjb25uZWN0b3IuaWR9PlxuICAgICAgICAgICAgICA8c3Bhbj5cbiAgICAgICAgICAgICAgICA8c3Ryb25nPntjb25uZWN0b3IubmFtZX08L3N0cm9uZz5cbiAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LW11dGVkXCI+e2Nvbm5lY3Rvci5zYWZldHlTdGF0dXN9IHwgc2VjcmV0cyB7Y29ubmVjdG9yLnNlY3JldExvY2F0aW9ufTwvc3Bhbj5cbiAgICAgICAgICAgICAgPC9zcGFuPlxuICAgICAgICAgICAgICA8U3RhdHVzUGlsbCB0b25lPXtjb25uZWN0b3IucnVudGltZU1vZGV9Pntjb25uZWN0b3IuYWNjZXNzTW9kZX08L1N0YXR1c1BpbGw+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICApKX1cbiAgICAgICAgPC9kaXY+XG4gICAgICA8L3NlY3Rpb24+XG4gICAgICA8c2VjdGlvbiBjbGFzc05hbWU9XCJjb2NrcGl0LXBhbmVsXCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1wYW5lbC1oZWFkZXJcIj5cbiAgICAgICAgICA8aDI+U2FmZXR5IEZsYWdzPC9oMj5cbiAgICAgICAgICA8U3RhdHVzUGlsbCB0b25lPVwiY29ubmVjdGVkXCI+TG9ja2VkPC9TdGF0dXNQaWxsPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXN0YWNrXCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJzZXR0aW5nLXJvd1wiPlxuICAgICAgICAgICAgPHN0cm9uZz5NYXJ0aW5nYWxlPC9zdHJvbmc+XG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJ0b2dnbGUtc3RhdGVcIj5CTE9DSzwvc3Bhbj5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInNldHRpbmctcm93XCI+XG4gICAgICAgICAgICA8c3Ryb25nPk9yZGVyIHdpdGhvdXQgU0w8L3N0cm9uZz5cbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cInRvZ2dsZS1zdGF0ZVwiPkJMT0NLPC9zcGFuPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwic2V0dGluZy1yb3dcIj5cbiAgICAgICAgICAgIDxzdHJvbmc+T3JkZXIgd2l0aG91dCBUUDwvc3Ryb25nPlxuICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwidG9nZ2xlLXN0YXRlXCI+QkxPQ0s8L3NwYW4+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9zZWN0aW9uPlxuICAgICAgPFByaXZhY3lTYWZldHlQYW5lbCBzdGF0ZT17c3RhdGV9IG9uRGF0YU1vZGVDaGFuZ2U9e29uRGF0YU1vZGVDaGFuZ2V9IC8+XG4gICAgPC9kaXY+XG4gICk7XG59XG4iXSwiZmlsZSI6IkM6L1VzZXJzL1BDL0Rvd25sb2Fkcy9SYXpvbi9mcm9udGVuZC9zZXR0aW5ncy9TZXR0aW5nc1BhZ2UudHN4In0=

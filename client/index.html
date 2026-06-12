@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+    <meta
+      name="description"
+      content="RAZON - AI Trading Analysis Platform" />
+    <meta name="theme-color" content="#0d1424" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Razon" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="apple-touch-icon" href="/icons/razon-icon-192.svg" />
+    <script>
+      (() => {
+        try {
+          const key = "razon.theme";
+          const allowed = ["AUTO_SYSTEM", "LIGHT", "DARK", "OBSCURE"];
+          const stored = localStorage.getItem(key);
+          const preference = allowed.includes(stored) ? stored : "AUTO_SYSTEM";
+          const systemLight = matchMedia("(prefers-color-scheme: light)").matches;
+          const resolved = preference === "AUTO_SYSTEM" ? (systemLight ? "LIGHT" : "DARK") : preference;
+          const root = document.documentElement;
+          root.dataset.razonThemePreference = preference;
+          root.dataset.razonTheme = resolved.toLowerCase();
+          root.classList.toggle("dark", resolved !== "LIGHT");
+          root.style.colorScheme = resolved === "LIGHT" ? "light" : "dark";
+        } catch {
+          document.documentElement.dataset.razonTheme = "dark";
+        }
+      })();
+    </script>
+    <title>RAZON - AI Trading Analysis Platform</title>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+
+</html>

@@ -1,0 +1,351 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/@fs/C:/Users/PC/Downloads/Razon/frontend/trading/RiskStatusPage.tsx");const _jsxDEV = __vite__cjsImport3_react_jsxDevRuntime["jsxDEV"];import { RiskScoreCard } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/RiskScoreCard.tsx";
+import { TradingModeSelector } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/TradingModeSelector.tsx";
+import { StatusPill } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/CockpitPrimitives.tsx";
+var _jsxFileName = "C:/Users/PC/Downloads/Razon/frontend/trading/RiskStatusPage.tsx";
+import __vite__cjsImport3_react_jsxDevRuntime from "/@fs/C:/Users/PC/Downloads/Razon/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=7ec427b8";
+export function RiskStatusPage({ risk, state, onTradingModeChange, onStrategyModeChange }) {
+	const rules = [
+		{
+			label: "confidence >= 80",
+			ok: true
+		},
+		{
+			label: "RR >= 1:2",
+			ok: risk.rr >= 2
+		},
+		{
+			label: "SL present",
+			ok: risk.slPresent
+		},
+		{
+			label: "TP present",
+			ok: risk.tpPresent
+		},
+		{
+			label: "Journal ready",
+			ok: risk.journalReady
+		},
+		{
+			label: "LIVE disabled by default",
+			ok: !risk.liveEnabled
+		},
+		{
+			label: "MOCK execution blocked",
+			ok: true
+		},
+		{
+			label: "Martingale blocked",
+			ok: true
+		}
+	];
+	return /* @__PURE__ */ _jsxDEV("div", {
+		"data-loc": "frontend\\trading\\RiskStatusPage.tsx:29",
+		className: "cockpit-grid two",
+		children: [/* @__PURE__ */ _jsxDEV("div", {
+			"data-loc": "frontend\\trading\\RiskStatusPage.tsx:30",
+			className: "cockpit-stack",
+			children: [/* @__PURE__ */ _jsxDEV(RiskScoreCard, {
+				"data-loc": "frontend\\trading\\RiskStatusPage.tsx:31",
+				risk
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 31,
+				columnNumber: 9
+			}, this), /* @__PURE__ */ _jsxDEV("section", {
+				"data-loc": "frontend\\trading\\RiskStatusPage.tsx:32",
+				className: "cockpit-panel",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\trading\\RiskStatusPage.tsx:33",
+					className: "cockpit-panel-header",
+					children: [/* @__PURE__ */ _jsxDEV("h2", {
+						"data-loc": "frontend\\trading\\RiskStatusPage.tsx:34",
+						children: "Risk Rules"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 34,
+						columnNumber: 13
+					}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+						"data-loc": "frontend\\trading\\RiskStatusPage.tsx:35",
+						tone: "connected",
+						children: "Enforced"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 35,
+						columnNumber: 13
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 33,
+					columnNumber: 11
+				}, this), /* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\trading\\RiskStatusPage.tsx:37",
+					className: "cockpit-stack",
+					children: rules.map((rule) => /* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\trading\\RiskStatusPage.tsx:39",
+						className: "cockpit-rule-row",
+						children: /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\trading\\RiskStatusPage.tsx:40",
+							className: "cockpit-row",
+							children: [/* @__PURE__ */ _jsxDEV("strong", {
+								"data-loc": "frontend\\trading\\RiskStatusPage.tsx:41",
+								children: rule.label
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 41,
+								columnNumber: 19
+							}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+								"data-loc": "frontend\\trading\\RiskStatusPage.tsx:42",
+								tone: rule.ok ? "connected" : "critical",
+								children: rule.ok ? "OK" : "BLOCK"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 42,
+								columnNumber: 19
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 40,
+							columnNumber: 17
+						}, this)
+					}, rule.label, false, {
+						fileName: _jsxFileName,
+						lineNumber: 39,
+						columnNumber: 15
+					}, this))
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 37,
+					columnNumber: 11
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 32,
+				columnNumber: 9
+			}, this)]
+		}, void 0, true, {
+			fileName: _jsxFileName,
+			lineNumber: 30,
+			columnNumber: 7
+		}, this), /* @__PURE__ */ _jsxDEV("div", {
+			"data-loc": "frontend\\trading\\RiskStatusPage.tsx:49",
+			className: "cockpit-stack",
+			children: [/* @__PURE__ */ _jsxDEV("section", {
+				"data-loc": "frontend\\trading\\RiskStatusPage.tsx:50",
+				className: "cockpit-panel",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\trading\\RiskStatusPage.tsx:51",
+					className: "cockpit-panel-header",
+					children: [/* @__PURE__ */ _jsxDEV("h2", {
+						"data-loc": "frontend\\trading\\RiskStatusPage.tsx:52",
+						children: "Trading Modes"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 52,
+						columnNumber: 13
+					}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+						"data-loc": "frontend\\trading\\RiskStatusPage.tsx:53",
+						tone: "live-off",
+						children: "LIVE OFF"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 53,
+						columnNumber: 13
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 51,
+					columnNumber: 11
+				}, this), /* @__PURE__ */ _jsxDEV(TradingModeSelector, {
+					"data-loc": "frontend\\trading\\RiskStatusPage.tsx:55",
+					strategyMode: state.strategyMode,
+					tradingMode: state.tradingMode,
+					onStrategyModeChange,
+					onTradingModeChange
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 55,
+					columnNumber: 11
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 50,
+				columnNumber: 9
+			}, this), /* @__PURE__ */ _jsxDEV("section", {
+				"data-loc": "frontend\\trading\\RiskStatusPage.tsx:62",
+				className: "cockpit-panel",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\trading\\RiskStatusPage.tsx:63",
+					className: "cockpit-panel-header",
+					children: [/* @__PURE__ */ _jsxDEV("h2", {
+						"data-loc": "frontend\\trading\\RiskStatusPage.tsx:64",
+						children: "Drawdown"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 64,
+						columnNumber: 13
+					}, this), /* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\trading\\RiskStatusPage.tsx:65",
+						className: "cockpit-pill demo",
+						children: "DEMO"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 65,
+						columnNumber: 13
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 63,
+					columnNumber: 11
+				}, this), /* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\trading\\RiskStatusPage.tsx:67",
+					className: "cockpit-kpi-row",
+					children: [
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\trading\\RiskStatusPage.tsx:68",
+							className: "cockpit-kpi",
+							children: [/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\trading\\RiskStatusPage.tsx:69",
+								className: "cockpit-label",
+								children: "Daily"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 69,
+								columnNumber: 15
+							}, this), /* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\trading\\RiskStatusPage.tsx:70",
+								className: "cockpit-value",
+								children: [risk.dailyDrawdown, "%"]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 70,
+								columnNumber: 15
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 68,
+							columnNumber: 13
+						}, this),
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\trading\\RiskStatusPage.tsx:72",
+							className: "cockpit-kpi",
+							children: [/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\trading\\RiskStatusPage.tsx:73",
+								className: "cockpit-label",
+								children: "Weekly"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 73,
+								columnNumber: 15
+							}, this), /* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\trading\\RiskStatusPage.tsx:74",
+								className: "cockpit-value",
+								children: [risk.weeklyDrawdown, "%"]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 74,
+								columnNumber: 15
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 72,
+							columnNumber: 13
+						}, this),
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\trading\\RiskStatusPage.tsx:76",
+							className: "cockpit-kpi",
+							children: [/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\trading\\RiskStatusPage.tsx:77",
+								className: "cockpit-label",
+								children: "Total"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 77,
+								columnNumber: 15
+							}, this), /* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\trading\\RiskStatusPage.tsx:78",
+								className: "cockpit-value",
+								children: [risk.totalDrawdown, "%"]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 78,
+								columnNumber: 15
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 76,
+							columnNumber: 13
+						}, this),
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\trading\\RiskStatusPage.tsx:80",
+							className: "cockpit-kpi",
+							children: [/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\trading\\RiskStatusPage.tsx:81",
+								className: "cockpit-label",
+								children: "Emergency"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 81,
+								columnNumber: 15
+							}, this), /* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\trading\\RiskStatusPage.tsx:82",
+								className: state.emergencyStop ? "cockpit-value cockpit-negative" : "cockpit-value cockpit-positive",
+								children: state.emergencyStop ? "ON" : "OFF"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 82,
+								columnNumber: 15
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 80,
+							columnNumber: 13
+						}, this)
+					]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 67,
+					columnNumber: 11
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 62,
+				columnNumber: 9
+			}, this)]
+		}, void 0, true, {
+			fileName: _jsxFileName,
+			lineNumber: 49,
+			columnNumber: 7
+		}, this)]
+	}, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 29,
+		columnNumber: 5
+	}, this);
+}
+_c = RiskStatusPage;
+var _c;
+$RefreshReg$(_c, "RiskStatusPage");
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+import * as __vite_react_currentExports from "/@fs/C:/Users/PC/Downloads/Razon/frontend/trading/RiskStatusPage.tsx";
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+
+  const currentExports = __vite_react_currentExports;
+  queueMicrotask(() => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/PC/Downloads/Razon/frontend/trading/RiskStatusPage.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/PC/Downloads/Razon/frontend/trading/RiskStatusPage.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+function $RefreshReg$(type, id) { return RefreshRuntime.register(type, "C:/Users/PC/Downloads/Razon/frontend/trading/RiskStatusPage.tsx" + ' ' + id); }
+function $RefreshSig$() { return RefreshRuntime.createSignatureFunctionForTransform(); }
+
+//# sourceMappingURL=data:application/json;base64,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TTs7Ozs7ZUFDdkQ7Ozs7OztNQUNMLHdCQUFDLE9BQUQ7T0FBRztPQUFFLFdBQVU7aUJBQWYsQ0FDRSx3QkFBQyxRQUFEO1FBQUk7UUFBRSxXQUFVO2tCQUFnQjtPQUFXOzs7O2lCQUMzQyx3QkFBQyxPQUFEO1FBQUc7UUFBRSxXQUFVO2tCQUFmLENBQWdDLEtBQUssZUFBYyxHQUFNOzs7OztlQUN0RDs7Ozs7O01BQ0wsd0JBQUMsT0FBRDtPQUFHO09BQUUsV0FBVTtpQkFBZixDQUNFLHdCQUFDLFFBQUQ7UUFBSTtRQUFFLFdBQVU7a0JBQWdCO09BQWU7Ozs7aUJBQy9DLHdCQUFDLE9BQUQ7UUFBRztRQUFFLFdBQVcsTUFBTSxnQkFBZ0IsbUNBQW1DO2tCQUN0RSxNQUFNLGdCQUFnQixPQUFPO09BQzNCOzs7O2VBQ0Y7Ozs7OztLQUNGOzs7OztZQUNFOzs7OztXQUNOOzs7OztVQUNGOzs7Ozs7QUFFVCIsIm5hbWVzIjpbXSwiaWdub3JlTGlzdCI6W10sInNvdXJjZXMiOlsiUmlza1N0YXR1c1BhZ2UudHN4Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB0eXBlIHsgQ29ja3BpdFN0YXRlLCBSaXNrU3RhdHVzIH0gZnJvbSBcIi4uL2FwcC9jb2NrcGl0LnR5cGVzXCI7XG5pbXBvcnQgeyBSaXNrU2NvcmVDYXJkIH0gZnJvbSBcIi4uL2NvbXBvbmVudHMvUmlza1Njb3JlQ2FyZFwiO1xuaW1wb3J0IHsgVHJhZGluZ01vZGVTZWxlY3RvciB9IGZyb20gXCIuLi9jb21wb25lbnRzL1RyYWRpbmdNb2RlU2VsZWN0b3JcIjtcbmltcG9ydCB7IFN0YXR1c1BpbGwgfSBmcm9tIFwiLi4vY29tcG9uZW50cy9Db2NrcGl0UHJpbWl0aXZlc1wiO1xuXG5leHBvcnQgZnVuY3Rpb24gUmlza1N0YXR1c1BhZ2Uoe1xuICByaXNrLFxuICBzdGF0ZSxcbiAgb25UcmFkaW5nTW9kZUNoYW5nZSxcbiAgb25TdHJhdGVneU1vZGVDaGFuZ2UsXG59OiB7XG4gIHJpc2s6IFJpc2tTdGF0dXM7XG4gIHN0YXRlOiBDb2NrcGl0U3RhdGU7XG4gIG9uVHJhZGluZ01vZGVDaGFuZ2U6IFBhcmFtZXRlcnM8dHlwZW9mIFRyYWRpbmdNb2RlU2VsZWN0b3I+WzBdW1wib25UcmFkaW5nTW9kZUNoYW5nZVwiXTtcbiAgb25TdHJhdGVneU1vZGVDaGFuZ2U6IFBhcmFtZXRlcnM8dHlwZW9mIFRyYWRpbmdNb2RlU2VsZWN0b3I+WzBdW1wib25TdHJhdGVneU1vZGVDaGFuZ2VcIl07XG59KSB7XG4gIGNvbnN0IHJ1bGVzID0gW1xuICAgIHsgbGFiZWw6IFwiY29uZmlkZW5jZSA+PSA4MFwiLCBvazogdHJ1ZSB9LFxuICAgIHsgbGFiZWw6IFwiUlIgPj0gMToyXCIsIG9rOiByaXNrLnJyID49IDIgfSxcbiAgICB7IGxhYmVsOiBcIlNMIHByZXNlbnRcIiwgb2s6IHJpc2suc2xQcmVzZW50IH0sXG4gICAgeyBsYWJlbDogXCJUUCBwcmVzZW50XCIsIG9rOiByaXNrLnRwUHJlc2VudCB9LFxuICAgIHsgbGFiZWw6IFwiSm91cm5hbCByZWFkeVwiLCBvazogcmlzay5qb3VybmFsUmVhZHkgfSxcbiAgICB7IGxhYmVsOiBcIkxJVkUgZGlzYWJsZWQgYnkgZGVmYXVsdFwiLCBvazogIXJpc2subGl2ZUVuYWJsZWQgfSxcbiAgICB7IGxhYmVsOiBcIk1PQ0sgZXhlY3V0aW9uIGJsb2NrZWRcIiwgb2s6IHRydWUgfSxcbiAgICB7IGxhYmVsOiBcIk1hcnRpbmdhbGUgYmxvY2tlZFwiLCBvazogdHJ1ZSB9LFxuICBdO1xuXG4gIHJldHVybiAoXG4gICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LWdyaWQgdHdvXCI+XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtc3RhY2tcIj5cbiAgICAgICAgPFJpc2tTY29yZUNhcmQgcmlzaz17cmlza30gLz5cbiAgICAgICAgPHNlY3Rpb24gY2xhc3NOYW1lPVwiY29ja3BpdC1wYW5lbFwiPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1wYW5lbC1oZWFkZXJcIj5cbiAgICAgICAgICAgIDxoMj5SaXNrIFJ1bGVzPC9oMj5cbiAgICAgICAgICAgIDxTdGF0dXNQaWxsIHRvbmU9XCJjb25uZWN0ZWRcIj5FbmZvcmNlZDwvU3RhdHVzUGlsbD5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtc3RhY2tcIj5cbiAgICAgICAgICAgIHtydWxlcy5tYXAocnVsZSA9PiAoXG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1ydWxlLXJvd1wiIGtleT17cnVsZS5sYWJlbH0+XG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXJvd1wiPlxuICAgICAgICAgICAgICAgICAgPHN0cm9uZz57cnVsZS5sYWJlbH08L3N0cm9uZz5cbiAgICAgICAgICAgICAgICAgIDxTdGF0dXNQaWxsIHRvbmU9e3J1bGUub2sgPyBcImNvbm5lY3RlZFwiIDogXCJjcml0aWNhbFwifT57cnVsZS5vayA/IFwiT0tcIiA6IFwiQkxPQ0tcIn08L1N0YXR1c1BpbGw+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgKSl9XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgIDwvc2VjdGlvbj5cbiAgICAgIDwvZGl2PlxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXN0YWNrXCI+XG4gICAgICAgIDxzZWN0aW9uIGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWxcIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWwtaGVhZGVyXCI+XG4gICAgICAgICAgICA8aDI+VHJhZGluZyBNb2RlczwvaDI+XG4gICAgICAgICAgICA8U3RhdHVzUGlsbCB0b25lPVwibGl2ZS1vZmZcIj5MSVZFIE9GRjwvU3RhdHVzUGlsbD5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8VHJhZGluZ01vZGVTZWxlY3RvclxuICAgICAgICAgICAgc3RyYXRlZ3lNb2RlPXtzdGF0ZS5zdHJhdGVneU1vZGV9XG4gICAgICAgICAgICB0cmFkaW5nTW9kZT17c3RhdGUudHJhZGluZ01vZGV9XG4gICAgICAgICAgICBvblN0cmF0ZWd5TW9kZUNoYW5nZT17b25TdHJhdGVneU1vZGVDaGFuZ2V9XG4gICAgICAgICAgICBvblRyYWRpbmdNb2RlQ2hhbmdlPXtvblRyYWRpbmdNb2RlQ2hhbmdlfVxuICAgICAgICAgIC8+XG4gICAgICAgIDwvc2VjdGlvbj5cbiAgICAgICAgPHNlY3Rpb24gY2xhc3NOYW1lPVwiY29ja3BpdC1wYW5lbFwiPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1wYW5lbC1oZWFkZXJcIj5cbiAgICAgICAgICAgIDxoMj5EcmF3ZG93bjwvaDI+XG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LXBpbGwgZGVtb1wiPkRFTU88L3NwYW4+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LWtwaS1yb3dcIj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPkRhaWx5PC9zcGFuPlxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtdmFsdWVcIj57cmlzay5kYWlseURyYXdkb3dufSU8L2Rpdj5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LWtwaVwiPlxuICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LWxhYmVsXCI+V2Vla2x5PC9zcGFuPlxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtdmFsdWVcIj57cmlzay53ZWVrbHlEcmF3ZG93bn0lPC9kaXY+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPlRvdGFsPC9zcGFuPlxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtdmFsdWVcIj57cmlzay50b3RhbERyYXdkb3dufSU8L2Rpdj5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LWtwaVwiPlxuICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LWxhYmVsXCI+RW1lcmdlbmN5PC9zcGFuPlxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT17c3RhdGUuZW1lcmdlbmN5U3RvcCA/IFwiY29ja3BpdC12YWx1ZSBjb2NrcGl0LW5lZ2F0aXZlXCIgOiBcImNvY2twaXQtdmFsdWUgY29ja3BpdC1wb3NpdGl2ZVwifT5cbiAgICAgICAgICAgICAgICB7c3RhdGUuZW1lcmdlbmN5U3RvcCA/IFwiT05cIiA6IFwiT0ZGXCJ9XG4gICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgIDwvc2VjdGlvbj5cbiAgICAgIDwvZGl2PlxuICAgIDwvZGl2PlxuICApO1xufVxuIl0sImZpbGUiOiJDOi9Vc2Vycy9QQy9Eb3dubG9hZHMvUmF6b24vZnJvbnRlbmQvdHJhZGluZy9SaXNrU3RhdHVzUGFnZS50c3gifQ==

@@ -1,0 +1,582 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/@fs/C:/Users/PC/Downloads/Razon/frontend/kalos/KalosMarketReplayPanel.tsx");const useEffect = __vite__cjsImport1_react["useEffect"]; const useMemo = __vite__cjsImport1_react["useMemo"]; const useState = __vite__cjsImport1_react["useState"];const _jsxDEV = __vite__cjsImport3_react_jsxDevRuntime["jsxDEV"];import { FastForward, Pause, Play, Rewind } from "/@fs/C:/Users/PC/Downloads/Razon/node_modules/.vite/deps/lucide-react.js?v=765c9e56";
+import __vite__cjsImport1_react from "/@fs/C:/Users/PC/Downloads/Razon/node_modules/.vite/deps/react.js?v=7ec427b8";
+import { formatPrice, StatusPill } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/CockpitPrimitives.tsx";
+var _jsxFileName = "C:/Users/PC/Downloads/Razon/frontend/kalos/KalosMarketReplayPanel.tsx";
+import __vite__cjsImport3_react_jsxDevRuntime from "/@fs/C:/Users/PC/Downloads/Razon/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=7ec427b8";
+var _s = $RefreshSig$();
+const replaySpeeds = [
+	1,
+	2,
+	4
+];
+function outcomeTone(outcome) {
+	if (outcome === "WIN_SIMULATION") return "connected";
+	if (outcome === "LOSS_SIMULATION") return "critical";
+	return "delayed";
+}
+export function KalosMarketReplayPanel({ replay }) {
+	_s();
+	const [frameIndex, setFrameIndex] = useState(0);
+	const [playing, setPlaying] = useState(false);
+	const [speedIndex, setSpeedIndex] = useState(0);
+	const speed = replaySpeeds[speedIndex];
+	const frameCount = replay.frames.length;
+	const frame = replay.frames[Math.min(frameIndex, Math.max(frameCount - 1, 0))];
+	useEffect(() => {
+		if (!playing || frameCount <= 1) return undefined;
+		const interval = window.setInterval(() => {
+			setFrameIndex((current) => current + 1 >= frameCount ? 0 : current + 1);
+		}, 1400 / speed);
+		return () => window.clearInterval(interval);
+	}, [
+		frameCount,
+		playing,
+		speed
+	]);
+	const progress = useMemo(() => {
+		if (frameCount <= 1) return 0;
+		return Math.round(frameIndex / (frameCount - 1) * 100);
+	}, [frameCount, frameIndex]);
+	if (!frame) {
+		return /* @__PURE__ */ _jsxDEV("section", {
+			"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:39",
+			className: "cockpit-panel",
+			children: [/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:40",
+				className: "cockpit-panel-header",
+				children: [/* @__PURE__ */ _jsxDEV("h2", {
+					"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:41",
+					children: "Market Replay"
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 41,
+					columnNumber: 11
+				}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+					"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:42",
+					tone: "live-off",
+					children: "NO EXECUTION"
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 42,
+					columnNumber: 11
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 40,
+				columnNumber: 9
+			}, this), /* @__PURE__ */ _jsxDEV("p", {
+				"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:44",
+				className: "cockpit-muted",
+				children: "No replay frames available."
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 44,
+				columnNumber: 9
+			}, this)]
+		}, void 0, true, {
+			fileName: _jsxFileName,
+			lineNumber: 39,
+			columnNumber: 7
+		}, this);
+	}
+	return /* @__PURE__ */ _jsxDEV("section", {
+		"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:50",
+		className: "cockpit-panel",
+		children: [
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:51",
+				className: "cockpit-panel-header",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:52",
+					children: [/* @__PURE__ */ _jsxDEV("h2", {
+						"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:53",
+						children: "Market Replay"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 53,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV("p", {
+						"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:54",
+						className: "cockpit-muted",
+						children: "Ce que KALOS voyait a cet instant precis."
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 54,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 52,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+					"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:56",
+					tone: "live-off",
+					children: "NO REAL EXECUTION"
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 56,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 51,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:59",
+				className: "replay-controls",
+				"aria-label": "Market replay controls",
+				children: [
+					/* @__PURE__ */ _jsxDEV("button", {
+						"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:60",
+						className: "cockpit-control",
+						type: "button",
+						onClick: () => setPlaying(true),
+						title: "Rejouer marche",
+						children: [/* @__PURE__ */ _jsxDEV(Play, {
+							"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:61",
+							size: 15
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 61,
+							columnNumber: 11
+						}, this), "Replay"]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 60,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("button", {
+						"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:64",
+						className: "cockpit-control",
+						type: "button",
+						onClick: () => setFrameIndex((current) => Math.max(current - 1, 0)),
+						title: "Revenir",
+						children: [/* @__PURE__ */ _jsxDEV(Rewind, {
+							"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:65",
+							size: 15
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 65,
+							columnNumber: 11
+						}, this), "Back"]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 64,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("button", {
+						"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:68",
+						className: "cockpit-control",
+						type: "button",
+						onClick: () => setSpeedIndex((current) => (current + 1) % replaySpeeds.length),
+						title: "Accelerer",
+						children: [
+							/* @__PURE__ */ _jsxDEV(FastForward, {
+								"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:69",
+								size: 15
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 69,
+								columnNumber: 11
+							}, this),
+							speed,
+							"x"
+						]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 68,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("button", {
+						"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:72",
+						className: "cockpit-control",
+						type: "button",
+						onClick: () => setPlaying(false),
+						title: "Pause",
+						children: [/* @__PURE__ */ _jsxDEV(Pause, {
+							"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:73",
+							size: 15
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 73,
+							columnNumber: 11
+						}, this), "Pause"]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 72,
+						columnNumber: 9
+					}, this)
+				]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 59,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:78",
+				className: "replay-progress",
+				"aria-label": "Replay progress",
+				children: /* @__PURE__ */ _jsxDEV("span", {
+					"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:79",
+					style: { width: `${progress}%` }
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 79,
+					columnNumber: 9
+				}, this)
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 78,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:82",
+				className: "cockpit-kpi-row",
+				children: [
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:83",
+						className: "cockpit-kpi",
+						children: [/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:84",
+							className: "cockpit-label",
+							children: "Win simulation"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 84,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:85",
+							className: "cockpit-value cockpit-positive",
+							children: replay.metrics.winSimulation
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 85,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 83,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:87",
+						className: "cockpit-kpi",
+						children: [/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:88",
+							className: "cockpit-label",
+							children: "Loss simulation"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 88,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:89",
+							className: "cockpit-value cockpit-negative",
+							children: replay.metrics.lossSimulation
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 89,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 87,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:91",
+						className: "cockpit-kpi",
+						children: [/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:92",
+							className: "cockpit-label",
+							children: "Drawdown"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 92,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:93",
+							className: "cockpit-value",
+							children: replay.metrics.drawdown
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 93,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 91,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:95",
+						className: "cockpit-kpi",
+						children: [/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:96",
+							className: "cockpit-label",
+							children: "Precision"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 96,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:97",
+							className: "cockpit-value",
+							children: [replay.metrics.precision, "%"]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 97,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 95,
+						columnNumber: 9
+					}, this)
+				]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 82,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:101",
+				className: "replay-comparison-grid",
+				children: [
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:102",
+						className: "replay-card",
+						children: [
+							/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:103",
+								className: "cockpit-row",
+								children: [/* @__PURE__ */ _jsxDEV("strong", {
+									"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:104",
+									children: "Prediction"
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 104,
+									columnNumber: 13
+								}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+									"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:105",
+									tone: frame.prediction.signal,
+									children: frame.prediction.signal
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 105,
+									columnNumber: 13
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 103,
+								columnNumber: 11
+							}, this),
+							/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:107",
+								className: "cockpit-muted",
+								children: frame.timestamp
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 107,
+								columnNumber: 11
+							}, this),
+							/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:108",
+								className: "replay-value",
+								children: formatPrice(frame.prediction.seenPrice)
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 108,
+								columnNumber: 11
+							}, this),
+							/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:109",
+								className: "overlay-chip-grid",
+								children: frame.prediction.kalosSaw.map((item) => /* @__PURE__ */ _jsxDEV("span", {
+									"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:111",
+									className: "overlay-chip",
+									children: item
+								}, item, false, {
+									fileName: _jsxFileName,
+									lineNumber: 111,
+									columnNumber: 15
+								}, this))
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 109,
+								columnNumber: 11
+							}, this)
+						]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 102,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:116",
+						className: "replay-card",
+						children: [
+							/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:117",
+								className: "cockpit-row",
+								children: [/* @__PURE__ */ _jsxDEV("strong", {
+									"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:118",
+									children: "Actual Result"
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 118,
+									columnNumber: 13
+								}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+									"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:119",
+									tone: outcomeTone(frame.actualResult.outcome),
+									children: frame.actualResult.outcome
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 119,
+									columnNumber: 13
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 117,
+								columnNumber: 11
+							}, this),
+							/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:121",
+								className: "cockpit-muted",
+								children: frame.actualResult.direction
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 121,
+								columnNumber: 11
+							}, this),
+							/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:122",
+								className: "replay-value",
+								children: formatPrice(frame.actualResult.closePrice)
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 122,
+								columnNumber: 11
+							}, this),
+							/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:123",
+								className: "cockpit-muted",
+								children: ["Movement ", frame.actualResult.movement]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 123,
+								columnNumber: 11
+							}, this)
+						]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 116,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:126",
+						className: "replay-card",
+						children: [
+							/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:127",
+								className: "cockpit-row",
+								children: [/* @__PURE__ */ _jsxDEV("strong", {
+									"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:128",
+									children: "Difference"
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 128,
+									columnNumber: 13
+								}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+									"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:129",
+									tone: frame.difference.matched ? "connected" : "critical",
+									children: frame.difference.matched ? "MATCH" : "DIFF"
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 129,
+									columnNumber: 13
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 127,
+								columnNumber: 11
+							}, this),
+							/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:133",
+								className: "cockpit-muted",
+								children: [
+									frame.difference.expectedDirection,
+									" vs ",
+									frame.difference.actualDirection
+								]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 133,
+								columnNumber: 11
+							}, this),
+							/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:136",
+								className: "replay-value",
+								children: frame.difference.priceDelta
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 136,
+								columnNumber: 11
+							}, this),
+							/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\kalos\\KalosMarketReplayPanel.tsx:137",
+								className: "cockpit-muted",
+								children: frame.difference.note
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 137,
+								columnNumber: 11
+							}, this)
+						]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 126,
+						columnNumber: 9
+					}, this)
+				]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 101,
+				columnNumber: 7
+			}, this)
+		]
+	}, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 50,
+		columnNumber: 5
+	}, this);
+}
+_s(KalosMarketReplayPanel, "xymEqYhE506vF2SYh4ZR3/hLed0=");
+_c = KalosMarketReplayPanel;
+var _c;
+$RefreshReg$(_c, "KalosMarketReplayPanel");
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+import * as __vite_react_currentExports from "/@fs/C:/Users/PC/Downloads/Razon/frontend/kalos/KalosMarketReplayPanel.tsx";
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+
+  const currentExports = __vite_react_currentExports;
+  queueMicrotask(() => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/PC/Downloads/Razon/frontend/kalos/KalosMarketReplayPanel.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/PC/Downloads/Razon/frontend/kalos/KalosMarketReplayPanel.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+function $RefreshReg$(type, id) { return RefreshRuntime.register(type, "C:/Users/PC/Downloads/Razon/frontend/kalos/KalosMarketReplayPanel.tsx" + ' ' + id); }
+function $RefreshSig$() { return RefreshRuntime.createSignatureFunctionForTransform(); }
+
+//# sourceMappingURL=data:application/json;base64,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O1FBQUk7UUFBRSxXQUFVO2tCQUFoQixDQUFnQyxhQUFVLE1BQU0sYUFBYSxRQUFlOzs7Ozs7TUFDekU7Ozs7OztLQUVMLHdCQUFDLE9BQUQ7TUFBRztNQUFFLFdBQVU7Z0JBQWY7T0FDRSx3QkFBQyxPQUFEO1FBQUc7UUFBRSxXQUFVO2tCQUFmLENBQ0Usd0JBQUMsVUFBRDtTQUFNO21CQUFFO1FBQWtCOzs7O2tCQUMxQix3QkFBQyxZQUFEO1NBQVU7U0FBRSxNQUFNLE1BQU0sV0FBVyxVQUFVLGNBQWM7bUJBQ3hELE1BQU0sV0FBVyxVQUFVLFVBQVU7UUFDNUI7Ozs7Z0JBQ1Q7Ozs7OztPQUNMLHdCQUFDLFFBQUQ7UUFBSTtRQUFFLFdBQVU7a0JBQWhCO1NBQ0csTUFBTSxXQUFXO1NBQWtCO1NBQUssTUFBTSxXQUFXO1FBQ3REOzs7Ozs7T0FDTix3QkFBQyxPQUFEO1FBQUc7UUFBRSxXQUFVO2tCQUFnQixNQUFNLFdBQVc7T0FBZ0I7Ozs7O09BQ2hFLHdCQUFDLFFBQUQ7UUFBSTtRQUFFLFdBQVU7a0JBQWlCLE1BQU0sV0FBVztPQUFXOzs7OztNQUMxRDs7Ozs7O0lBQ0Y7Ozs7OztFQUNFOzs7Ozs7QUFFYiIsIm5hbWVzIjpbXSwiaWdub3JlTGlzdCI6W10sInNvdXJjZXMiOlsiS2Fsb3NNYXJrZXRSZXBsYXlQYW5lbC50c3giXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgRmFzdEZvcndhcmQsIFBhdXNlLCBQbGF5LCBSZXdpbmQgfSBmcm9tIFwibHVjaWRlLXJlYWN0XCI7XG5pbXBvcnQgeyB1c2VFZmZlY3QsIHVzZU1lbW8sIHVzZVN0YXRlIH0gZnJvbSBcInJlYWN0XCI7XG5pbXBvcnQgdHlwZSB7IE1hcmtldFJlcGxheSB9IGZyb20gXCIuLi9hcHAvY29ja3BpdC50eXBlc1wiO1xuaW1wb3J0IHsgZm9ybWF0UHJpY2UsIFN0YXR1c1BpbGwgfSBmcm9tIFwiLi4vY29tcG9uZW50cy9Db2NrcGl0UHJpbWl0aXZlc1wiO1xuXG5jb25zdCByZXBsYXlTcGVlZHMgPSBbMSwgMiwgNF0gYXMgY29uc3Q7XG5cbmZ1bmN0aW9uIG91dGNvbWVUb25lKG91dGNvbWU6IHN0cmluZykge1xuICBpZiAob3V0Y29tZSA9PT0gXCJXSU5fU0lNVUxBVElPTlwiKSByZXR1cm4gXCJjb25uZWN0ZWRcIiBhcyBjb25zdDtcbiAgaWYgKG91dGNvbWUgPT09IFwiTE9TU19TSU1VTEFUSU9OXCIpIHJldHVybiBcImNyaXRpY2FsXCIgYXMgY29uc3Q7XG4gIHJldHVybiBcImRlbGF5ZWRcIiBhcyBjb25zdDtcbn1cblxuZXhwb3J0IGZ1bmN0aW9uIEthbG9zTWFya2V0UmVwbGF5UGFuZWwoeyByZXBsYXkgfTogeyByZXBsYXk6IE1hcmtldFJlcGxheSB9KSB7XG4gIGNvbnN0IFtmcmFtZUluZGV4LCBzZXRGcmFtZUluZGV4XSA9IHVzZVN0YXRlKDApO1xuICBjb25zdCBbcGxheWluZywgc2V0UGxheWluZ10gPSB1c2VTdGF0ZShmYWxzZSk7XG4gIGNvbnN0IFtzcGVlZEluZGV4LCBzZXRTcGVlZEluZGV4XSA9IHVzZVN0YXRlKDApO1xuICBjb25zdCBzcGVlZCA9IHJlcGxheVNwZWVkc1tzcGVlZEluZGV4XTtcbiAgY29uc3QgZnJhbWVDb3VudCA9IHJlcGxheS5mcmFtZXMubGVuZ3RoO1xuICBjb25zdCBmcmFtZSA9IHJlcGxheS5mcmFtZXNbTWF0aC5taW4oZnJhbWVJbmRleCwgTWF0aC5tYXgoZnJhbWVDb3VudCAtIDEsIDApKV07XG5cbiAgdXNlRWZmZWN0KCgpID0+IHtcbiAgICBpZiAoIXBsYXlpbmcgfHwgZnJhbWVDb3VudCA8PSAxKSByZXR1cm4gdW5kZWZpbmVkO1xuXG4gICAgY29uc3QgaW50ZXJ2YWwgPSB3aW5kb3cuc2V0SW50ZXJ2YWwoKCkgPT4ge1xuICAgICAgc2V0RnJhbWVJbmRleChjdXJyZW50ID0+IChjdXJyZW50ICsgMSA+PSBmcmFtZUNvdW50ID8gMCA6IGN1cnJlbnQgKyAxKSk7XG4gICAgfSwgMTQwMCAvIHNwZWVkKTtcblxuICAgIHJldHVybiAoKSA9PiB3aW5kb3cuY2xlYXJJbnRlcnZhbChpbnRlcnZhbCk7XG4gIH0sIFtmcmFtZUNvdW50LCBwbGF5aW5nLCBzcGVlZF0pO1xuXG4gIGNvbnN0IHByb2dyZXNzID0gdXNlTWVtbygoKSA9PiB7XG4gICAgaWYgKGZyYW1lQ291bnQgPD0gMSkgcmV0dXJuIDA7XG4gICAgcmV0dXJuIE1hdGgucm91bmQoKGZyYW1lSW5kZXggLyAoZnJhbWVDb3VudCAtIDEpKSAqIDEwMCk7XG4gIH0sIFtmcmFtZUNvdW50LCBmcmFtZUluZGV4XSk7XG5cbiAgaWYgKCFmcmFtZSkge1xuICAgIHJldHVybiAoXG4gICAgICA8c2VjdGlvbiBjbGFzc05hbWU9XCJjb2NrcGl0LXBhbmVsXCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1wYW5lbC1oZWFkZXJcIj5cbiAgICAgICAgICA8aDI+TWFya2V0IFJlcGxheTwvaDI+XG4gICAgICAgICAgPFN0YXR1c1BpbGwgdG9uZT1cImxpdmUtb2ZmXCI+Tk8gRVhFQ1VUSU9OPC9TdGF0dXNQaWxsPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICAgPHAgY2xhc3NOYW1lPVwiY29ja3BpdC1tdXRlZFwiPk5vIHJlcGxheSBmcmFtZXMgYXZhaWxhYmxlLjwvcD5cbiAgICAgIDwvc2VjdGlvbj5cbiAgICApO1xuICB9XG5cbiAgcmV0dXJuIChcbiAgICA8c2VjdGlvbiBjbGFzc05hbWU9XCJjb2NrcGl0LXBhbmVsXCI+XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWwtaGVhZGVyXCI+XG4gICAgICAgIDxkaXY+XG4gICAgICAgICAgPGgyPk1hcmtldCBSZXBsYXk8L2gyPlxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImNvY2twaXQtbXV0ZWRcIj5DZSBxdWUgS0FMT1Mgdm95YWl0IGEgY2V0IGluc3RhbnQgcHJlY2lzLjwvcD5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxTdGF0dXNQaWxsIHRvbmU9XCJsaXZlLW9mZlwiPk5PIFJFQUwgRVhFQ1VUSU9OPC9TdGF0dXNQaWxsPlxuICAgICAgPC9kaXY+XG5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwicmVwbGF5LWNvbnRyb2xzXCIgYXJpYS1sYWJlbD1cIk1hcmtldCByZXBsYXkgY29udHJvbHNcIj5cbiAgICAgICAgPGJ1dHRvbiBjbGFzc05hbWU9XCJjb2NrcGl0LWNvbnRyb2xcIiB0eXBlPVwiYnV0dG9uXCIgb25DbGljaz17KCkgPT4gc2V0UGxheWluZyh0cnVlKX0gdGl0bGU9XCJSZWpvdWVyIG1hcmNoZVwiPlxuICAgICAgICAgIDxQbGF5IHNpemU9ezE1fSAvPlxuICAgICAgICAgIFJlcGxheVxuICAgICAgICA8L2J1dHRvbj5cbiAgICAgICAgPGJ1dHRvbiBjbGFzc05hbWU9XCJjb2NrcGl0LWNvbnRyb2xcIiB0eXBlPVwiYnV0dG9uXCIgb25DbGljaz17KCkgPT4gc2V0RnJhbWVJbmRleChjdXJyZW50ID0+IE1hdGgubWF4KGN1cnJlbnQgLSAxLCAwKSl9IHRpdGxlPVwiUmV2ZW5pclwiPlxuICAgICAgICAgIDxSZXdpbmQgc2l6ZT17MTV9IC8+XG4gICAgICAgICAgQmFja1xuICAgICAgICA8L2J1dHRvbj5cbiAgICAgICAgPGJ1dHRvbiBjbGFzc05hbWU9XCJjb2NrcGl0LWNvbnRyb2xcIiB0eXBlPVwiYnV0dG9uXCIgb25DbGljaz17KCkgPT4gc2V0U3BlZWRJbmRleChjdXJyZW50ID0+IChjdXJyZW50ICsgMSkgJSByZXBsYXlTcGVlZHMubGVuZ3RoKX0gdGl0bGU9XCJBY2NlbGVyZXJcIj5cbiAgICAgICAgICA8RmFzdEZvcndhcmQgc2l6ZT17MTV9IC8+XG4gICAgICAgICAge3NwZWVkfXhcbiAgICAgICAgPC9idXR0b24+XG4gICAgICAgIDxidXR0b24gY2xhc3NOYW1lPVwiY29ja3BpdC1jb250cm9sXCIgdHlwZT1cImJ1dHRvblwiIG9uQ2xpY2s9eygpID0+IHNldFBsYXlpbmcoZmFsc2UpfSB0aXRsZT1cIlBhdXNlXCI+XG4gICAgICAgICAgPFBhdXNlIHNpemU9ezE1fSAvPlxuICAgICAgICAgIFBhdXNlXG4gICAgICAgIDwvYnV0dG9uPlxuICAgICAgPC9kaXY+XG5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwicmVwbGF5LXByb2dyZXNzXCIgYXJpYS1sYWJlbD1cIlJlcGxheSBwcm9ncmVzc1wiPlxuICAgICAgICA8c3BhbiBzdHlsZT17eyB3aWR0aDogYCR7cHJvZ3Jlc3N9JWAgfX0gLz5cbiAgICAgIDwvZGl2PlxuXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpLXJvd1wiPlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpXCI+XG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPldpbiBzaW11bGF0aW9uPC9zcGFuPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC12YWx1ZSBjb2NrcGl0LXBvc2l0aXZlXCI+e3JlcGxheS5tZXRyaWNzLndpblNpbXVsYXRpb259PC9kaXY+XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpXCI+XG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPkxvc3Mgc2ltdWxhdGlvbjwvc3Bhbj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtdmFsdWUgY29ja3BpdC1uZWdhdGl2ZVwiPntyZXBsYXkubWV0cmljcy5sb3NzU2ltdWxhdGlvbn08L2Rpdj5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LWxhYmVsXCI+RHJhd2Rvd248L3NwYW4+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlXCI+e3JlcGxheS5tZXRyaWNzLmRyYXdkb3dufTwvZGl2PlxuICAgICAgICA8L2Rpdj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LWtwaVwiPlxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5QcmVjaXNpb248L3NwYW4+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlXCI+e3JlcGxheS5tZXRyaWNzLnByZWNpc2lvbn0lPC9kaXY+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9kaXY+XG5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwicmVwbGF5LWNvbXBhcmlzb24tZ3JpZFwiPlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInJlcGxheS1jYXJkXCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXJvd1wiPlxuICAgICAgICAgICAgPHN0cm9uZz5QcmVkaWN0aW9uPC9zdHJvbmc+XG4gICAgICAgICAgICA8U3RhdHVzUGlsbCB0b25lPXtmcmFtZS5wcmVkaWN0aW9uLnNpZ25hbH0+e2ZyYW1lLnByZWRpY3Rpb24uc2lnbmFsfTwvU3RhdHVzUGlsbD5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LW11dGVkXCI+e2ZyYW1lLnRpbWVzdGFtcH08L3NwYW4+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJyZXBsYXktdmFsdWVcIj57Zm9ybWF0UHJpY2UoZnJhbWUucHJlZGljdGlvbi5zZWVuUHJpY2UpfTwvZGl2PlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwib3ZlcmxheS1jaGlwLWdyaWRcIj5cbiAgICAgICAgICAgIHtmcmFtZS5wcmVkaWN0aW9uLmthbG9zU2F3Lm1hcChpdGVtID0+IChcbiAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwib3ZlcmxheS1jaGlwXCIga2V5PXtpdGVtfT57aXRlbX08L3NwYW4+XG4gICAgICAgICAgICApKX1cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJyZXBsYXktY2FyZFwiPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1yb3dcIj5cbiAgICAgICAgICAgIDxzdHJvbmc+QWN0dWFsIFJlc3VsdDwvc3Ryb25nPlxuICAgICAgICAgICAgPFN0YXR1c1BpbGwgdG9uZT17b3V0Y29tZVRvbmUoZnJhbWUuYWN0dWFsUmVzdWx0Lm91dGNvbWUpfT57ZnJhbWUuYWN0dWFsUmVzdWx0Lm91dGNvbWV9PC9TdGF0dXNQaWxsPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbXV0ZWRcIj57ZnJhbWUuYWN0dWFsUmVzdWx0LmRpcmVjdGlvbn08L3NwYW4+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJyZXBsYXktdmFsdWVcIj57Zm9ybWF0UHJpY2UoZnJhbWUuYWN0dWFsUmVzdWx0LmNsb3NlUHJpY2UpfTwvZGl2PlxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbXV0ZWRcIj5Nb3ZlbWVudCB7ZnJhbWUuYWN0dWFsUmVzdWx0Lm1vdmVtZW50fTwvc3Bhbj5cbiAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJyZXBsYXktY2FyZFwiPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1yb3dcIj5cbiAgICAgICAgICAgIDxzdHJvbmc+RGlmZmVyZW5jZTwvc3Ryb25nPlxuICAgICAgICAgICAgPFN0YXR1c1BpbGwgdG9uZT17ZnJhbWUuZGlmZmVyZW5jZS5tYXRjaGVkID8gXCJjb25uZWN0ZWRcIiA6IFwiY3JpdGljYWxcIn0+XG4gICAgICAgICAgICAgIHtmcmFtZS5kaWZmZXJlbmNlLm1hdGNoZWQgPyBcIk1BVENIXCIgOiBcIkRJRkZcIn1cbiAgICAgICAgICAgIDwvU3RhdHVzUGlsbD5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LW11dGVkXCI+XG4gICAgICAgICAgICB7ZnJhbWUuZGlmZmVyZW5jZS5leHBlY3RlZERpcmVjdGlvbn0gdnMge2ZyYW1lLmRpZmZlcmVuY2UuYWN0dWFsRGlyZWN0aW9ufVxuICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cInJlcGxheS12YWx1ZVwiPntmcmFtZS5kaWZmZXJlbmNlLnByaWNlRGVsdGF9PC9kaXY+XG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1tdXRlZFwiPntmcmFtZS5kaWZmZXJlbmNlLm5vdGV9PC9zcGFuPlxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvZGl2PlxuICAgIDwvc2VjdGlvbj5cbiAgKTtcbn1cbiJdLCJmaWxlIjoiQzovVXNlcnMvUEMvRG93bmxvYWRzL1Jhem9uL2Zyb250ZW5kL2thbG9zL0thbG9zTWFya2V0UmVwbGF5UGFuZWwudHN4In0=

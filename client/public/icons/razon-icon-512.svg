@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Razon">
+  <rect width="512" height="512" rx="112" fill="#0d0f11"/>
+  <rect x="64" y="64" width="384" height="384" rx="72" fill="#13221f" stroke="#33d0b3" stroke-width="22"/>
+  <path d="M152 362V150h121c53 0 86 28 86 72 0 33-17 56-49 68l62 72h-78l-54-66h-24v66h-64Zm64-120h49c20 0 31-8 31-24 0-15-11-23-31-23h-49v47Z" fill="#eef4ef"/>
+  <path d="M341 150h40v40h-40zM341 322h40v40h-40z" fill="#33d0b3"/>
+</svg>

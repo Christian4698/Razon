@@ -1,0 +1,411 @@
+- generic [ref=e2]:
+  - region "Notifications alt+T"
+  - generic [ref=e4]:
+    - complementary [ref=e5]:
+      - generic [ref=e6]:
+        - generic [ref=e7]: R
+        - generic [ref=e8]:
+          - strong [ref=e9]: RAZON
+          - text: Trading cockpit
+      - navigation "Cockpit navigation" [ref=e10]:
+        - button "Dashboard" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - text: Dashboard
+        - button "KALOS" [ref=e14] [cursor=pointer]:
+          - img [ref=e15]
+          - text: KALOS
+        - button "Market Chart" [ref=e18] [cursor=pointer]:
+          - img [ref=e19]
+          - text: Market Chart
+        - button "Connectors" [ref=e22] [cursor=pointer]:
+          - img [ref=e23]
+          - text: Connectors
+        - button "Journal" [ref=e29] [cursor=pointer]:
+          - img [ref=e30]
+          - text: Journal
+        - button "Risk Status" [ref=e32] [cursor=pointer]:
+          - img [ref=e33]
+          - text: Risk Status
+        - button "Settings" [ref=e35] [cursor=pointer]:
+          - img [ref=e36]
+          - text: Settings
+      - generic [ref=e39]:
+        - generic [ref=e40]: DEMO_DATA
+        - generic [ref=e41]: DEMO_MODE
+        - generic [ref=e42]: NO REAL IMPACT
+        - generic [ref=e43]: LIVE DISABLED
+        - generic [ref=e44]: MOCK DATA VISIBLE
+    - main [ref=e45]:
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - heading "Dashboard principal" [level=1] [ref=e48]
+          - paragraph [ref=e49]: Controle central Razon en lecture et simulation.
+        - generic [ref=e50]:
+          - generic [ref=e51]: LIVE OFF
+          - generic [ref=e52]: DEMO_DATA
+          - generic [ref=e53]: DEMO_MODE
+          - generic [ref=e54]: MOCK
+          - generic [ref=e55]: MOCK ACTIVE
+          - generic [ref=e56]: SAFE
+          - generic [ref=e57]: SIM 10,000 USD
+          - generic [ref=e58]:
+            - img [ref=e59]
+            - text: Cockpit initialise
+          - button "EMERGENCY STOP" [ref=e62] [cursor=pointer]:
+            - img [ref=e63]
+            - text: EMERGENCY STOP
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - generic [ref=e72]:
+              - heading "Deriv Synthetic Indices" [level=2] [ref=e73]
+              - paragraph [ref=e74]: Selection du marche d'analyse, lecture seule.
+            - generic [ref=e75]: NO REAL EXECUTION
+          - radiogroup "Deriv synthetic market selector" [ref=e76]:
+            - radio "Boom 500" [checked] [ref=e77] [cursor=pointer]
+            - radio "Boom 1000" [ref=e78] [cursor=pointer]
+            - radio "Crash 500" [ref=e79] [cursor=pointer]
+            - radio "Crash 1000" [ref=e80] [cursor=pointer]
+            - radio "Volatility 10" [ref=e81] [cursor=pointer]
+            - radio "Volatility 25" [ref=e82] [cursor=pointer]
+            - radio "Volatility 50" [ref=e83] [cursor=pointer]
+            - radio "Volatility 75" [ref=e84] [cursor=pointer]
+            - radio "Volatility 100" [ref=e85] [cursor=pointer]
+        - generic [ref=e86]:
+          - generic [ref=e88]:
+            - generic [ref=e89]:
+              - generic [ref=e90]:
+                - heading "Market Chart" [level=2] [ref=e91]
+                - paragraph [ref=e92]: Boom 500 | M5 | MOCK_DATA | UNKNOWN | fallback NONE | prix 5,504.41 | spread 0.42 | volume 6,811
+              - generic [ref=e93]: BUY
+            - generic "Chart engine controls" [ref=e94]:
+              - generic "Chart type" [ref=e95]:
+                - button "CANDLE" [ref=e96] [cursor=pointer]
+                - button "OHLC" [ref=e97] [cursor=pointer]
+                - button "HOLLOW" [ref=e98] [cursor=pointer]
+                - button "AREA" [ref=e99] [cursor=pointer]
+              - generic "Timeframe" [ref=e100]:
+                - button "M1" [ref=e101] [cursor=pointer]
+                - button "M5" [ref=e102] [cursor=pointer]
+                - button "M15" [ref=e103] [cursor=pointer]
+                - button "H1" [ref=e104] [cursor=pointer]
+                - button "H4" [ref=e105] [cursor=pointer]
+                - button "D1" [ref=e106] [cursor=pointer]
+              - generic "Smart zoom mode" [ref=e107]:
+                - button "AUTO" [ref=e108] [cursor=pointer]
+                - button "MANUAL" [ref=e109] [cursor=pointer]
+                - button "HYBRID" [ref=e110] [cursor=pointer]
+              - generic "Zoom actions" [ref=e111]:
+                - button "Fit Screen" [ref=e112] [cursor=pointer]:
+                  - img [ref=e113]
+                  - text: Fit Screen
+                - button "Reset Zoom" [ref=e118] [cursor=pointer]:
+                  - img [ref=e119]
+                  - text: Reset Zoom
+            - generic "Indicators" [ref=e122]:
+              - generic [ref=e123]:
+                - generic [ref=e124]:
+                  - text: Indicators
+                  - generic [ref=e125]: 0/5
+                - generic [ref=e126]: Calc 1
+              - generic [ref=e127]:
+                - button "RSI" [ref=e128] [cursor=pointer]
+                - button "MACD" [ref=e129] [cursor=pointer]
+                - button "ROC" [ref=e130] [cursor=pointer]
+                - button "Bollinger" [ref=e131] [cursor=pointer]
+                - button "Donchian" [ref=e132] [cursor=pointer]
+                - button "SMA" [ref=e133] [cursor=pointer]
+                - button "EMA" [ref=e134] [cursor=pointer]
+            - generic "Drawing tools" [ref=e136]:
+              - button "Select" [ref=e137] [cursor=pointer]:
+                - img [ref=e138]
+              - button "Horizontal line" [ref=e140] [cursor=pointer]:
+                - img [ref=e141]
+              - button "Vertical line" [ref=e142] [cursor=pointer]:
+                - img [ref=e143]
+              - button "Trendline" [ref=e146] [cursor=pointer]:
+                - img [ref=e147]
+              - button "Ray" [ref=e150] [cursor=pointer]:
+                - img [ref=e151]
+              - button "Segment" [ref=e154] [cursor=pointer]:
+                - img [ref=e155]
+              - button "Rectangle" [ref=e157] [cursor=pointer]:
+                - img [ref=e158]
+              - button "Measure" [ref=e160] [cursor=pointer]:
+                - img [ref=e161]
+              - button "Text annotation" [ref=e167] [cursor=pointer]:
+                - img [ref=e168]
+            - generic [ref=e171]:
+              - generic [ref=e172]:
+                - text: Engine
+                - generic [ref=e173]: lightweight-charts canvas
+              - generic [ref=e174]:
+                - text: Layers
+                - generic [ref=e175]: Price / Indicator / Drawing / Overlay
+              - generic [ref=e176]:
+                - text: Smart Zoom
+                - generic [ref=e177]: HYBRID
+              - generic [ref=e178]:
+                - text: Visible
+                - generic [ref=e179]: "20"
+              - generic [ref=e180]:
+                - text: Vertical
+                - generic [ref=e181]: 1.00x
+              - generic [ref=e182]:
+                - text: FPS
+                - generic [ref=e183]: "60"
+              - generic [ref=e184]:
+                - text: API on zoom
+                - generic [ref=e185]: "0"
+              - generic [ref=e186]:
+                - text: Tool
+                - generic [ref=e187]: Select
+              - generic [ref=e188]:
+                - text: Drawings
+                - generic [ref=e189]: "0"
+              - generic [ref=e190]:
+                - text: Indicators
+                - generic [ref=e191]: 0/5
+              - generic [ref=e192]:
+                - text: Calc
+                - generic [ref=e193]: "1"
+              - generic [ref=e194]:
+                - text: API on draw
+                - generic [ref=e195]: "0"
+              - generic [ref=e196]:
+                - text: LIVE
+                - generic [ref=e197]: "OFF"
+              - generic [ref=e198]:
+                - text: AUTO EXECUTION
+                - generic [ref=e199]: "OFF"
+          - complementary "KALOS and risk summaries" [ref=e200]:
+            - generic [ref=e201]:
+              - generic [ref=e202]:
+                - generic [ref=e203]:
+                  - heading "KALOS Summary" [level=2] [ref=e204]
+                  - paragraph [ref=e205]: Analyse uniquement, aucun ordre route.
+                - generic [ref=e206]: LIVE OFF
+              - generic [ref=e207]:
+                - generic [ref=e208]: Symbole selectionne
+                - strong [ref=e209]: Boom 500
+                - generic [ref=e210]: M5 | prix 5,504.41
+              - generic [ref=e211]:
+                - generic [ref=e212]:
+                  - generic [ref=e213]: Source
+                  - generic [ref=e214]: MOCK_DATA
+                - generic [ref=e215]:
+                  - generic [ref=e216]: Statut flux
+                  - generic [ref=e217]: MOCK
+                - generic [ref=e218]:
+                  - generic [ref=e219]: Decision
+                  - strong [ref=e220]: BUY
+                - generic [ref=e221]:
+                  - generic [ref=e222]: Confiance
+                  - strong [ref=e223]: 78%
+              - generic [ref=e224]:
+                - generic [ref=e225]:
+                  - generic [ref=e226]: DATA SOURCE
+                  - strong [ref=e227]: MOCK_DATA
+                - generic [ref=e228]: MOCK_DATA FALLBACK
+              - generic [ref=e229]:
+                - generic [ref=e230]:
+                  - generic [ref=e231]: KALOS Source
+                  - strong [ref=e232]: Deriv Synthetic read-only
+                - generic [ref=e233]:
+                  - generic [ref=e234]: Fallback
+                  - generic [ref=e235]: NONE
+                - generic [ref=e236]:
+                  - generic [ref=e237]: KALOS Quality
+                  - generic [ref=e238]: UNKNOWN
+                - generic [ref=e239]:
+                  - generic [ref=e240]: Last Tick
+                  - strong [ref=e241]: n/a
+                - generic [ref=e242]:
+                  - generic [ref=e243]: Last Candle
+                  - strong [ref=e244]: n/a
+                - generic [ref=e245]:
+                  - generic [ref=e246]: Latence
+                  - strong [ref=e247]: n/a
+                - generic [ref=e248]:
+                  - generic [ref=e249]: Freshness
+                  - strong [ref=e250]: n/a
+              - generic [ref=e251]:
+                - generic [ref=e252]: LIVE OFF
+                - generic [ref=e253]: AUTO EXECUTION OFF
+            - generic [ref=e254]:
+              - generic [ref=e255]:
+                - generic [ref=e256]:
+                  - heading "Risk Summary" [level=2] [ref=e257]
+                  - paragraph [ref=e258]: Blocages actifs avant toute execution.
+                - generic [ref=e259]: VALID
+              - generic [ref=e261]:
+                - generic [ref=e262]:
+                  - generic [ref=e263]: Risk score
+                  - strong [ref=e264]: 42/100
+                - generic "Risk score 42" [ref=e265]
+              - generic [ref=e267]:
+                - generic [ref=e268]:
+                  - generic [ref=e269]: RR
+                  - strong [ref=e270]: 1:2.35
+                - generic [ref=e271]:
+                  - generic [ref=e272]: Risque/trade
+                  - strong [ref=e273]: 1%
+                - generic [ref=e274]:
+                  - generic [ref=e275]: DD jour
+                  - strong [ref=e276]: 0.4%
+                - generic [ref=e277]:
+                  - generic [ref=e278]: LIVE
+                  - strong [ref=e279]: "OFF"
+        - generic [ref=e280]:
+          - tablist "Dashboard detail views" [ref=e281]:
+            - tab "Vue rapide" [selected] [ref=e282] [cursor=pointer]
+            - tab "Analyse KALOS" [ref=e283] [cursor=pointer]
+            - tab "Graphique" [ref=e284] [cursor=pointer]
+            - tab "Risque" [ref=e285] [cursor=pointer]
+            - tab "Journal" [ref=e286] [cursor=pointer]
+            - tab "Replay" [ref=e287] [cursor=pointer]
+            - tab "Connecteurs" [ref=e288] [cursor=pointer]
+          - tabpanel [ref=e289]:
+            - generic [ref=e290]:
+              - generic [ref=e291]:
+                - generic [ref=e292]:
+                  - heading "Market Status" [level=2] [ref=e293]
+                  - generic [ref=e294]:
+                    - generic [ref=e295]: DEMO_DATA
+                    - generic [ref=e296]: MOCK_DATA
+                - generic [ref=e297]:
+                  - generic [ref=e298]:
+                    - text: DATA SOURCE
+                    - generic [ref=e299]: MOCK_DATA
+                    - text: Fallback visible only in DEMO_DATA
+                  - generic [ref=e300]:
+                    - generic [ref=e301]:
+                      - generic [ref=e302]: Symbole
+                      - img [ref=e303]
+                    - generic [ref=e306]: Boom 500
+                    - text: M5
+                  - generic [ref=e307]:
+                    - generic [ref=e308]:
+                      - generic [ref=e309]: Prix actuel
+                      - img [ref=e310]
+                    - generic [ref=e312]: 5,504.41
+                    - generic [ref=e313]: Spread 0.42
+                  - generic [ref=e314]:
+                    - generic [ref=e315]:
+                      - generic [ref=e316]: Volume
+                      - img [ref=e317]
+                    - generic [ref=e321]: 6,811
+                    - text: Disponible si feed actif
+                  - generic [ref=e322]:
+                    - generic [ref=e323]:
+                      - generic [ref=e324]: Session
+                      - img [ref=e325]
+                    - generic [ref=e328]: Deriv Synthetic read-only
+                    - generic [ref=e329]: Source MOCK_DATA | DEMO_MODE / MOCK / NO REAL IMPACT
+                  - generic [ref=e330]:
+                    - text: Data Quality
+                    - generic [ref=e331]: UNKNOWN
+                    - generic [ref=e332]: Flux MOCK
+                  - generic [ref=e333]:
+                    - text: Last Candle
+                    - generic [ref=e334]: n/a
+                    - generic [ref=e335]: Last Tick n/a
+                  - generic [ref=e336]:
+                    - text: Latence
+                    - generic [ref=e337]: n/a
+                    - generic [ref=e338]: Freshness n/a
+              - generic [ref=e339]:
+                - generic [ref=e340]:
+                  - heading "Modes" [level=2] [ref=e341]
+                  - generic [ref=e342]: AUTO EXECUTION OFF
+                - generic [ref=e343]:
+                  - generic [ref=e344]:
+                    - generic [ref=e345]: Mode trading
+                    - generic [ref=e346]:
+                      - button "ANALYSE SEULEMENT" [ref=e347] [cursor=pointer]:
+                        - img [ref=e348]
+                        - text: ANALYSE SEULEMENT
+                      - button "MANUEL" [ref=e350] [cursor=pointer]:
+                        - img [ref=e351]
+                        - text: MANUEL
+                      - button "SEMI-AUTO" [ref=e356] [cursor=pointer]:
+                        - img [ref=e357]
+                        - text: SEMI-AUTO
+                      - button "AUTO" [ref=e360] [cursor=pointer]:
+                        - img [ref=e361]
+                        - text: AUTO
+                  - generic [ref=e364]:
+                    - generic [ref=e365]: Horizon
+                    - generic [ref=e366]:
+                      - button "SCALPING" [ref=e367] [cursor=pointer]:
+                        - img [ref=e368]
+                        - text: SCALPING
+                      - button "COURT TERME" [ref=e370] [cursor=pointer]:
+                        - img [ref=e371]
+                        - text: COURT TERME
+                      - button "LONG TERME" [ref=e373] [cursor=pointer]:
+                        - img [ref=e374]
+                        - text: LONG TERME
+              - generic [ref=e376]:
+                - heading "Watchlist Market Radar" [level=2] [ref=e378]
+                - generic [ref=e379]:
+                  - generic [ref=e380]:
+                    - generic [ref=e381]:
+                      - generic [ref=e382]:
+                        - strong [ref=e383]: Boom 500
+                        - generic [ref=e384]: BUY
+                      - generic [ref=e385]: Spread 0.42 | SIM ARCHIVE
+                    - generic [ref=e386]:
+                      - strong [ref=e387]: 5,483.2
+                      - generic [ref=e388]: +0.44%
+                  - generic [ref=e389]:
+                    - generic [ref=e390]:
+                      - generic [ref=e391]:
+                        - strong [ref=e392]: Boom 1000
+                        - generic [ref=e393]: BUY
+                      - generic [ref=e394]: Spread 0.85 | DEMO
+                    - generic [ref=e395]:
+                      - strong [ref=e396]: 11,395.23
+                      - generic [ref=e397]: +0.52%
+                  - generic [ref=e398]:
+                    - generic [ref=e399]:
+                      - generic [ref=e400]:
+                        - strong [ref=e401]: Crash 500
+                        - generic [ref=e402]: SELL
+                      - generic [ref=e403]: Spread 0.48 | SIM ARCHIVE
+                    - generic [ref=e404]:
+                      - strong [ref=e405]: 7,137.43
+                      - generic [ref=e406]: "-0.12%"
+                  - generic [ref=e407]:
+                    - generic [ref=e408]:
+                      - generic [ref=e409]:
+                        - strong [ref=e410]: Crash 1000
+                        - generic [ref=e411]: SELL
+                      - generic [ref=e412]: Spread 0.9 | DEMO
+                    - generic [ref=e413]:
+                      - strong [ref=e414]: 10,724.11
+                      - generic [ref=e415]: "-0.24%"
+                  - generic [ref=e416]:
+                    - generic [ref=e417]:
+                      - generic [ref=e418]:
+                        - strong [ref=e419]: Volatility 10
+                        - generic [ref=e420]: WAIT
+                      - generic [ref=e421]: Spread 0.19 | SIM ARCHIVE
+                    - generic [ref=e422]:
+                      - strong [ref=e423]: 3,847.77
+                      - generic [ref=e424]: +0.15%
+              - generic [ref=e425]:
+                - heading "Alert Engine" [level=2] [ref=e427]
+                - generic [ref=e428]:
+                  - generic [ref=e429]:
+                    - generic [ref=e430]:
+                      - strong [ref=e431]: DEMO_MODE active
+                      - generic [ref=e432]: CRITICAL
+                    - paragraph [ref=e433]: ENABLE_LIVE_TRADING is false
+                    - generic [ref=e434]: 13:49
+                  - generic [ref=e435]:
+                    - generic [ref=e436]:
+                      - strong [ref=e437]: Forex data delayed
+                      - generic [ref=e438]: WARNING
+                    - paragraph [ref=e439]: MODE_SIMULATION fallback active
+                    - generic [ref=e440]: 13:45

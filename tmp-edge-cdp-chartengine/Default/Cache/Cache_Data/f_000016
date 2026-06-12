@@ -1,0 +1,420 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/@fs/C:/Users/PC/Downloads/Razon/frontend/components/KalosSignalCard.tsx");const _jsxDEV = __vite__cjsImport3_react_jsxDevRuntime["jsxDEV"];import { Eye, Target, XCircle } from "/@fs/C:/Users/PC/Downloads/Razon/node_modules/.vite/deps/lucide-react.js?v=765c9e56";
+import { formatDecision, formatPrice, Panel, StatusPill } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/CockpitPrimitives.tsx";
+import { ConfidenceGauge } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/ConfidenceGauge.tsx";
+var _jsxFileName = "C:/Users/PC/Downloads/Razon/frontend/components/KalosSignalCard.tsx";
+import __vite__cjsImport3_react_jsxDevRuntime from "/@fs/C:/Users/PC/Downloads/Razon/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=7ec427b8";
+function kalosSourceLabel(signal) {
+	if (signal.dataSource === "DEMO" && signal.sourceStatus === "CONNECTED" && signal.dataSourceLabel?.toLowerCase().includes("deriv")) {
+		return "DERIV DEMO";
+	}
+	if (signal.dataSource === "MOCK") return "MOCK_DATA";
+	return signal.dataSourceLabel ?? signal.dataSource ?? "UNKNOWN";
+}
+export function KalosSignalCard({ signal, enabled, onToggle }) {
+	const sourceLabel = kalosSourceLabel(signal);
+	return /* @__PURE__ */ _jsxDEV(Panel, {
+		"data-loc": "frontend\\components\\KalosSignalCard.tsx:27",
+		title: "KALOS Panel",
+		action: /* @__PURE__ */ _jsxDEV("button", {
+			"data-loc": "frontend\\components\\KalosSignalCard.tsx:30",
+			className: `cockpit-control ${enabled ? "is-active" : ""}`,
+			onClick: onToggle,
+			type: "button",
+			children: [/* @__PURE__ */ _jsxDEV(Eye, {
+				"data-loc": "frontend\\components\\KalosSignalCard.tsx:31",
+				size: 16
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 31,
+				columnNumber: 11
+			}, this), "KALOS ON/OFF"]
+		}, void 0, true, {
+			fileName: _jsxFileName,
+			lineNumber: 30,
+			columnNumber: 9
+		}, this),
+		children: [
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\components\\KalosSignalCard.tsx:36",
+				className: "cockpit-row",
+				style: { alignItems: "flex-start" },
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\components\\KalosSignalCard.tsx:37",
+					className: "cockpit-stack",
+					children: [/* @__PURE__ */ _jsxDEV(StatusPill, {
+						"data-loc": "frontend\\components\\KalosSignalCard.tsx:38",
+						tone: signal.decision,
+						children: formatDecision(signal.decision)
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 38,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\components\\KalosSignalCard.tsx:39",
+						children: [
+							/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\components\\KalosSignalCard.tsx:40",
+								className: "cockpit-label",
+								children: "Symbole"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 40,
+								columnNumber: 13
+							}, this),
+							/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\components\\KalosSignalCard.tsx:41",
+								className: "cockpit-value",
+								children: signal.symbol
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 41,
+								columnNumber: 13
+							}, this),
+							/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\components\\KalosSignalCard.tsx:42",
+								className: "cockpit-muted",
+								children: [
+									signal.timeframe,
+									" | Volatilite ",
+									signal.volatility
+								]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 42,
+								columnNumber: 13
+							}, this)
+						]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 39,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 37,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV(ConfidenceGauge, {
+					"data-loc": "frontend\\components\\KalosSignalCard.tsx:47",
+					value: signal.confidence
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 47,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 36,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\components\\KalosSignalCard.tsx:50",
+				className: "cockpit-kpi-row",
+				style: { marginTop: 12 },
+				children: [
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\components\\KalosSignalCard.tsx:51",
+						className: "cockpit-kpi",
+						children: [
+							/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\components\\KalosSignalCard.tsx:52",
+								className: "cockpit-label",
+								children: "KALOS Source"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 52,
+								columnNumber: 11
+							}, this),
+							/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\components\\KalosSignalCard.tsx:53",
+								className: "cockpit-value",
+								style: { fontSize: 18 },
+								children: sourceLabel
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 53,
+								columnNumber: 11
+							}, this),
+							/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\components\\KalosSignalCard.tsx:54",
+								className: "cockpit-muted",
+								children: signal.sourceStatus ?? "UNKNOWN"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 54,
+								columnNumber: 11
+							}, this)
+						]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 51,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\components\\KalosSignalCard.tsx:56",
+						className: "cockpit-kpi",
+						children: [
+							/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\components\\KalosSignalCard.tsx:57",
+								className: "cockpit-label",
+								children: "Data Quality"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 57,
+								columnNumber: 11
+							}, this),
+							/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\components\\KalosSignalCard.tsx:58",
+								className: "cockpit-value",
+								style: { fontSize: 18 },
+								children: signal.dataQuality ?? "UNKNOWN"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 58,
+								columnNumber: 11
+							}, this),
+							/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\components\\KalosSignalCard.tsx:59",
+								className: "cockpit-muted",
+								children: ["Freshness ", signal.freshnessSeconds === undefined || signal.freshnessSeconds === null ? "n/a" : `${signal.freshnessSeconds}s`]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 59,
+								columnNumber: 11
+							}, this)
+						]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 56,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\components\\KalosSignalCard.tsx:63",
+						className: "cockpit-kpi",
+						children: [/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\components\\KalosSignalCard.tsx:64",
+							className: "cockpit-label",
+							children: "TP"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 64,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\components\\KalosSignalCard.tsx:65",
+							className: "cockpit-value cockpit-positive",
+							children: formatPrice(signal.tp)
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 65,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 63,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\components\\KalosSignalCard.tsx:67",
+						className: "cockpit-kpi",
+						children: [/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\components\\KalosSignalCard.tsx:68",
+							className: "cockpit-label",
+							children: "SL"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 68,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\components\\KalosSignalCard.tsx:69",
+							className: "cockpit-value cockpit-negative",
+							children: formatPrice(signal.sl)
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 69,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 67,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\components\\KalosSignalCard.tsx:71",
+						className: "cockpit-kpi",
+						children: [/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\components\\KalosSignalCard.tsx:72",
+							className: "cockpit-label",
+							children: "Invalidation"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 72,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\components\\KalosSignalCard.tsx:73",
+							className: "cockpit-value",
+							style: { fontSize: 20 },
+							children: formatPrice(signal.invalidation)
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 73,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 71,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\components\\KalosSignalCard.tsx:75",
+						className: "cockpit-kpi",
+						children: [/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\components\\KalosSignalCard.tsx:76",
+							className: "cockpit-label",
+							children: "Risk score"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 76,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\components\\KalosSignalCard.tsx:77",
+							className: "cockpit-value",
+							children: signal.riskScore
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 77,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 75,
+						columnNumber: 9
+					}, this)
+				]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 50,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\components\\KalosSignalCard.tsx:81",
+				className: "cockpit-grid two",
+				style: { marginTop: 12 },
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\components\\KalosSignalCard.tsx:82",
+					className: "cockpit-stack",
+					children: [/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\components\\KalosSignalCard.tsx:83",
+						className: "cockpit-row",
+						style: { justifyContent: "flex-start" },
+						children: [/* @__PURE__ */ _jsxDEV(Target, {
+							"data-loc": "frontend\\components\\KalosSignalCard.tsx:84",
+							size: 16,
+							color: "#63e6a6"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 84,
+							columnNumber: 13
+						}, this), /* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\components\\KalosSignalCard.tsx:85",
+							children: "Raisons validees"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 85,
+							columnNumber: 13
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 83,
+						columnNumber: 11
+					}, this), signal.reasons.map((reason) => /* @__PURE__ */ _jsxDEV("p", {
+						"data-loc": "frontend\\components\\KalosSignalCard.tsx:88",
+						className: "cockpit-muted",
+						children: reason
+					}, reason, false, {
+						fileName: _jsxFileName,
+						lineNumber: 88,
+						columnNumber: 13
+					}, this))]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 82,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\components\\KalosSignalCard.tsx:91",
+					className: "cockpit-stack",
+					children: [/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\components\\KalosSignalCard.tsx:92",
+						className: "cockpit-row",
+						style: { justifyContent: "flex-start" },
+						children: [/* @__PURE__ */ _jsxDEV(XCircle, {
+							"data-loc": "frontend\\components\\KalosSignalCard.tsx:93",
+							size: 16,
+							color: "#f4c86a"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 93,
+							columnNumber: 13
+						}, this), /* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\components\\KalosSignalCard.tsx:94",
+							children: "Raisons refusees"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 94,
+							columnNumber: 13
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 92,
+						columnNumber: 11
+					}, this), signal.rejectedReasons.map((reason) => /* @__PURE__ */ _jsxDEV("p", {
+						"data-loc": "frontend\\components\\KalosSignalCard.tsx:97",
+						className: "cockpit-muted",
+						children: reason
+					}, reason, false, {
+						fileName: _jsxFileName,
+						lineNumber: 97,
+						columnNumber: 13
+					}, this))]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 91,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 81,
+				columnNumber: 7
+			}, this)
+		]
+	}, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 27,
+		columnNumber: 5
+	}, this);
+}
+_c = KalosSignalCard;
+var _c;
+$RefreshReg$(_c, "KalosSignalCard");
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+import * as __vite_react_currentExports from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/KalosSignalCard.tsx";
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+
+  const currentExports = __vite_react_currentExports;
+  queueMicrotask(() => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/PC/Downloads/Razon/frontend/components/KalosSignalCard.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/PC/Downloads/Razon/frontend/components/KalosSignalCard.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+function $RefreshReg$(type, id) { return RefreshRuntime.register(type, "C:/Users/PC/Downloads/Razon/frontend/components/KalosSignalCard.tsx" + ' ' + id); }
+function $RefreshSig$() { return RefreshRuntime.createSignatureFunctionForTransform(); }
+
+//# sourceMappingURL=data:application/json;base64,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O09BQUUsTUFBTTtPQUFJLE9BQU07TUFBVzs7OztnQkFDcEMsd0JBQUMsVUFBRDtPQUFNO2lCQUFFO01BQXdCOzs7O2NBQzdCOzs7OztlQUNKLE9BQU8sZ0JBQWdCLEtBQUksV0FDMUIsd0JBQUMsS0FBRDtNQUFDO01BQUUsV0FBVTtnQkFBOEI7S0FBVSxHQUFuQjs7OztZQUFtQixDQUN0RCxDQUNFOzs7OztZQUNGOzs7Ozs7RUFDQTs7Ozs7O0FBRVgiLCJuYW1lcyI6W10sImlnbm9yZUxpc3QiOltdLCJzb3VyY2VzIjpbIkthbG9zU2lnbmFsQ2FyZC50c3giXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgRXllLCBUYXJnZXQsIFhDaXJjbGUgfSBmcm9tIFwibHVjaWRlLXJlYWN0XCI7XG5pbXBvcnQgdHlwZSB7IEthbG9zU2lnbmFsIH0gZnJvbSBcIi4uL2FwcC9jb2NrcGl0LnR5cGVzXCI7XG5pbXBvcnQgeyBmb3JtYXREZWNpc2lvbiwgZm9ybWF0UHJpY2UsIFBhbmVsLCBTdGF0dXNQaWxsIH0gZnJvbSBcIi4vQ29ja3BpdFByaW1pdGl2ZXNcIjtcbmltcG9ydCB7IENvbmZpZGVuY2VHYXVnZSB9IGZyb20gXCIuL0NvbmZpZGVuY2VHYXVnZVwiO1xuXG5mdW5jdGlvbiBrYWxvc1NvdXJjZUxhYmVsKHNpZ25hbDogS2Fsb3NTaWduYWwpIHtcbiAgaWYgKHNpZ25hbC5kYXRhU291cmNlID09PSBcIkRFTU9cIiAmJiBzaWduYWwuc291cmNlU3RhdHVzID09PSBcIkNPTk5FQ1RFRFwiICYmIHNpZ25hbC5kYXRhU291cmNlTGFiZWw/LnRvTG93ZXJDYXNlKCkuaW5jbHVkZXMoXCJkZXJpdlwiKSkge1xuICAgIHJldHVybiBcIkRFUklWIERFTU9cIjtcbiAgfVxuXG4gIGlmIChzaWduYWwuZGF0YVNvdXJjZSA9PT0gXCJNT0NLXCIpIHJldHVybiBcIk1PQ0tfREFUQVwiO1xuICByZXR1cm4gc2lnbmFsLmRhdGFTb3VyY2VMYWJlbCA/PyBzaWduYWwuZGF0YVNvdXJjZSA/PyBcIlVOS05PV05cIjtcbn1cblxuZXhwb3J0IGZ1bmN0aW9uIEthbG9zU2lnbmFsQ2FyZCh7XG4gIHNpZ25hbCxcbiAgZW5hYmxlZCxcbiAgb25Ub2dnbGUsXG59OiB7XG4gIHNpZ25hbDogS2Fsb3NTaWduYWw7XG4gIGVuYWJsZWQ6IGJvb2xlYW47XG4gIG9uVG9nZ2xlOiAoKSA9PiB2b2lkO1xufSkge1xuICBjb25zdCBzb3VyY2VMYWJlbCA9IGthbG9zU291cmNlTGFiZWwoc2lnbmFsKTtcblxuICByZXR1cm4gKFxuICAgIDxQYW5lbFxuICAgICAgdGl0bGU9XCJLQUxPUyBQYW5lbFwiXG4gICAgICBhY3Rpb249e1xuICAgICAgICA8YnV0dG9uIGNsYXNzTmFtZT17YGNvY2twaXQtY29udHJvbCAke2VuYWJsZWQgPyBcImlzLWFjdGl2ZVwiIDogXCJcIn1gfSBvbkNsaWNrPXtvblRvZ2dsZX0gdHlwZT1cImJ1dHRvblwiPlxuICAgICAgICAgIDxFeWUgc2l6ZT17MTZ9IC8+XG4gICAgICAgICAgS0FMT1MgT04vT0ZGXG4gICAgICAgIDwvYnV0dG9uPlxuICAgICAgfVxuICAgID5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1yb3dcIiBzdHlsZT17eyBhbGlnbkl0ZW1zOiBcImZsZXgtc3RhcnRcIiB9fT5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXN0YWNrXCI+XG4gICAgICAgICAgPFN0YXR1c1BpbGwgdG9uZT17c2lnbmFsLmRlY2lzaW9ufT57Zm9ybWF0RGVjaXNpb24oc2lnbmFsLmRlY2lzaW9uKX08L1N0YXR1c1BpbGw+XG4gICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPlN5bWJvbGU8L2Rpdj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC12YWx1ZVwiPntzaWduYWwuc3ltYm9sfTwvZGl2PlxuICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1tdXRlZFwiPlxuICAgICAgICAgICAgICB7c2lnbmFsLnRpbWVmcmFtZX0gfCBWb2xhdGlsaXRlIHtzaWduYWwudm9sYXRpbGl0eX1cbiAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxDb25maWRlbmNlR2F1Z2UgdmFsdWU9e3NpZ25hbC5jb25maWRlbmNlfSAvPlxuICAgICAgPC9kaXY+XG5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGktcm93XCIgc3R5bGU9e3sgbWFyZ2luVG9wOiAxMiB9fT5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LWtwaVwiPlxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5LQUxPUyBTb3VyY2U8L3NwYW4+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlXCIgc3R5bGU9e3sgZm9udFNpemU6IDE4IH19Pntzb3VyY2VMYWJlbH08L2Rpdj5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LW11dGVkXCI+e3NpZ25hbC5zb3VyY2VTdGF0dXMgPz8gXCJVTktOT1dOXCJ9PC9zcGFuPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LWtwaVwiPlxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5EYXRhIFF1YWxpdHk8L3NwYW4+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlXCIgc3R5bGU9e3sgZm9udFNpemU6IDE4IH19PntzaWduYWwuZGF0YVF1YWxpdHkgPz8gXCJVTktOT1dOXCJ9PC9kaXY+XG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1tdXRlZFwiPlxuICAgICAgICAgICAgRnJlc2huZXNzIHtzaWduYWwuZnJlc2huZXNzU2Vjb25kcyA9PT0gdW5kZWZpbmVkIHx8IHNpZ25hbC5mcmVzaG5lc3NTZWNvbmRzID09PSBudWxsID8gXCJuL2FcIiA6IGAke3NpZ25hbC5mcmVzaG5lc3NTZWNvbmRzfXNgfVxuICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LWxhYmVsXCI+VFA8L3NwYW4+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlIGNvY2twaXQtcG9zaXRpdmVcIj57Zm9ybWF0UHJpY2Uoc2lnbmFsLnRwKX08L2Rpdj5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LWxhYmVsXCI+U0w8L3NwYW4+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlIGNvY2twaXQtbmVnYXRpdmVcIj57Zm9ybWF0UHJpY2Uoc2lnbmFsLnNsKX08L2Rpdj5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LWxhYmVsXCI+SW52YWxpZGF0aW9uPC9zcGFuPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC12YWx1ZVwiIHN0eWxlPXt7IGZvbnRTaXplOiAyMCB9fT57Zm9ybWF0UHJpY2Uoc2lnbmFsLmludmFsaWRhdGlvbil9PC9kaXY+XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpXCI+XG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPlJpc2sgc2NvcmU8L3NwYW4+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlXCI+e3NpZ25hbC5yaXNrU2NvcmV9PC9kaXY+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9kaXY+XG5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1ncmlkIHR3b1wiIHN0eWxlPXt7IG1hcmdpblRvcDogMTIgfX0+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1zdGFja1wiPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1yb3dcIiBzdHlsZT17eyBqdXN0aWZ5Q29udGVudDogXCJmbGV4LXN0YXJ0XCIgfX0+XG4gICAgICAgICAgICA8VGFyZ2V0IHNpemU9ezE2fSBjb2xvcj1cIiM2M2U2YTZcIiAvPlxuICAgICAgICAgICAgPHN0cm9uZz5SYWlzb25zIHZhbGlkZWVzPC9zdHJvbmc+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgICAge3NpZ25hbC5yZWFzb25zLm1hcChyZWFzb24gPT4gKFxuICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwiY29ja3BpdC1tdXRlZFwiIGtleT17cmVhc29ufT57cmVhc29ufTwvcD5cbiAgICAgICAgICApKX1cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1zdGFja1wiPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1yb3dcIiBzdHlsZT17eyBqdXN0aWZ5Q29udGVudDogXCJmbGV4LXN0YXJ0XCIgfX0+XG4gICAgICAgICAgICA8WENpcmNsZSBzaXplPXsxNn0gY29sb3I9XCIjZjRjODZhXCIgLz5cbiAgICAgICAgICAgIDxzdHJvbmc+UmFpc29ucyByZWZ1c2Vlczwvc3Ryb25nPlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIHtzaWduYWwucmVqZWN0ZWRSZWFzb25zLm1hcChyZWFzb24gPT4gKFxuICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwiY29ja3BpdC1tdXRlZFwiIGtleT17cmVhc29ufT57cmVhc29ufTwvcD5cbiAgICAgICAgICApKX1cbiAgICAgICAgPC9kaXY+XG4gICAgICA8L2Rpdj5cbiAgICA8L1BhbmVsPlxuICApO1xufVxuIl0sImZpbGUiOiJDOi9Vc2Vycy9QQy9Eb3dubG9hZHMvUmF6b24vZnJvbnRlbmQvY29tcG9uZW50cy9LYWxvc1NpZ25hbENhcmQudHN4In0=

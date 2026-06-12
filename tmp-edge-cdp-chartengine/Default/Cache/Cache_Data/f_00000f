@@ -1,0 +1,1856 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/@fs/C:/Users/PC/Downloads/Razon/frontend/dashboard/DashboardPage.tsx");const useMemo = __vite__cjsImport0_react["useMemo"]; const useState = __vite__cjsImport0_react["useState"];const _jsxDEV = __vite__cjsImport16_react_jsxDevRuntime["jsxDEV"];import __vite__cjsImport0_react from "/@fs/C:/Users/PC/Downloads/Razon/node_modules/.vite/deps/react.js?v=7ec427b8";
+import { chartContextActions, syntheticIndexSymbols } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/app/cockpit-data.ts";
+import { MarketStatusCard } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/MarketStatusCard.tsx";
+import { KalosSignalCard } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/KalosSignalCard.tsx";
+import { RiskScoreCard } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/RiskScoreCard.tsx";
+import { TradingModeSelector } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/TradingModeSelector.tsx";
+import { WatchlistPanel } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/WatchlistPanel.tsx";
+import { AlertPanel } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/AlertPanel.tsx";
+import { JournalTable } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/JournalTable.tsx";
+import { ConnectionStatusCard } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/ConnectionStatusCard.tsx";
+import { formatDecision, formatPrice, StatusPill } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/CockpitPrimitives.tsx";
+import { KalosFuturePathPanel } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/kalos/KalosFuturePathPanel.tsx";
+import { KalosMarketBrainPanel } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/kalos/KalosMarketBrainPanel.tsx";
+import { KalosMarketReplayPanel } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/kalos/KalosMarketReplayPanel.tsx";
+import { KalosVisualIntelligencePanel } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/kalos/KalosVisualIntelligencePanel.tsx";
+import { LiveMarketChart } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/trading/LiveMarketChart.tsx?t=1781007204897";
+var _jsxFileName = "C:/Users/PC/Downloads/Razon/frontend/dashboard/DashboardPage.tsx";
+import __vite__cjsImport16_react_jsxDevRuntime from "/@fs/C:/Users/PC/Downloads/Razon/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=7ec427b8";
+var _s = $RefreshSig$();
+const dashboardTabs = [
+	{
+		id: "quick",
+		label: "Vue rapide"
+	},
+	{
+		id: "kalos",
+		label: "Analyse KALOS"
+	},
+	{
+		id: "chart",
+		label: "Graphique"
+	},
+	{
+		id: "risk",
+		label: "Risque"
+	},
+	{
+		id: "journal",
+		label: "Journal"
+	},
+	{
+		id: "replay",
+		label: "Replay"
+	},
+	{
+		id: "connectors",
+		label: "Connecteurs"
+	}
+];
+function displaySource(state, market) {
+	if (state.dataMode === "REAL_DATA" || market.source === "LIVE") return "REAL_DATA";
+	return market.source;
+}
+function feedStatus(state, market) {
+	if (market.sourceStatus) return market.sourceStatus;
+	if (state.dataMode === "REAL_DATA") return "DELAYED";
+	if (market.source === "DEMO") return "CONNECTED";
+	return "MOCK";
+}
+function marketDataSourceLabel(market) {
+	if (market.source === "DEMO" && market.sourceStatus === "CONNECTED" && market.session.toLowerCase().includes("deriv")) {
+		return "DERIV DEMO";
+	}
+	if (market.source === "MOCK") return "MOCK_DATA";
+	return market.source;
+}
+function feedTone(status) {
+	if (status === "CONNECTED") return "connected";
+	if (status === "DELAYED") return "delayed";
+	if (status === "DISCONNECTED" || status === "UNKNOWN") return "disconnected";
+	return "MOCK";
+}
+function qualityTone(quality) {
+	if (quality === "HEALTHY") return "connected";
+	if (quality === "DEGRADED" || quality === "STALE") return "delayed";
+	if (quality === "INVALID" || quality === "DISCONNECTED") return "critical";
+	return "MOCK";
+}
+function formatSourceTimestamp(timestamp) {
+	if (!timestamp) return "n/a";
+	return new Date(timestamp).toLocaleTimeString("fr-FR", {
+		hour: "2-digit",
+		minute: "2-digit"
+	});
+}
+function kalosDataSourceLabel(signal, market, state) {
+	const source = signal.dataSource ?? displaySource(state, market);
+	const label = signal.dataSourceLabel ?? market.session;
+	const isDerivDemo = source === "DEMO" && (signal.sourceStatus ?? market.sourceStatus) === "CONNECTED" && label.toLowerCase().includes("deriv");
+	if (isDerivDemo) return "DERIV DEMO";
+	if (source === "MOCK" || market.source === "MOCK") return "MOCK_DATA";
+	return source;
+}
+function mockPolicyLabel(dataSourceLabel, market) {
+	if (dataSourceLabel === "DERIV DEMO" && market.sourceStatus === "CONNECTED") return "MOCK_DATA BLOCKED";
+	if (dataSourceLabel === "MOCK_DATA") return "MOCK_DATA FALLBACK";
+	return "MOCK_DATA OFF";
+}
+function SyntheticMarketSelector({ selectedSymbol, onChange }) {
+	return /* @__PURE__ */ _jsxDEV("section", {
+		"data-loc": "frontend\\dashboard\\DashboardPage.tsx:109",
+		className: "cockpit-panel dashboard-selector-panel",
+		children: [/* @__PURE__ */ _jsxDEV("div", {
+			"data-loc": "frontend\\dashboard\\DashboardPage.tsx:110",
+			className: "cockpit-panel-header",
+			children: [/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:111",
+				children: [/* @__PURE__ */ _jsxDEV("h2", {
+					"data-loc": "frontend\\dashboard\\DashboardPage.tsx:112",
+					children: "Deriv Synthetic Indices"
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 112,
+					columnNumber: 11
+				}, this), /* @__PURE__ */ _jsxDEV("p", {
+					"data-loc": "frontend\\dashboard\\DashboardPage.tsx:113",
+					className: "cockpit-muted",
+					children: "Selection du marche d'analyse, lecture seule."
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 113,
+					columnNumber: 11
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 111,
+				columnNumber: 9
+			}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:115",
+				tone: "live-off",
+				children: "NO REAL EXECUTION"
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 115,
+				columnNumber: 9
+			}, this)]
+		}, void 0, true, {
+			fileName: _jsxFileName,
+			lineNumber: 110,
+			columnNumber: 7
+		}, this), /* @__PURE__ */ _jsxDEV("div", {
+			"data-loc": "frontend\\dashboard\\DashboardPage.tsx:117",
+			className: "synthetic-market-selector",
+			role: "radiogroup",
+			"aria-label": "Deriv synthetic market selector",
+			children: syntheticIndexSymbols.map((symbol) => /* @__PURE__ */ _jsxDEV("button", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:119",
+				"aria-checked": symbol === selectedSymbol,
+				className: `cockpit-control ${symbol === selectedSymbol ? "is-active" : ""}`,
+				onClick: () => onChange(symbol),
+				role: "radio",
+				type: "button",
+				children: symbol
+			}, symbol, false, {
+				fileName: _jsxFileName,
+				lineNumber: 119,
+				columnNumber: 11
+			}, this))
+		}, void 0, false, {
+			fileName: _jsxFileName,
+			lineNumber: 117,
+			columnNumber: 7
+		}, this)]
+	}, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 109,
+		columnNumber: 5
+	}, this);
+}
+_c = SyntheticMarketSelector;
+function KalosDashboardSummary({ market, selectedSymbol, signal, state }) {
+	const status = feedStatus(state, market);
+	const dataSourceLabel = kalosDataSourceLabel(signal, market, state);
+	const mockPolicy = mockPolicyLabel(dataSourceLabel, market);
+	const dataQuality = signal.dataQuality ?? market.dataQuality;
+	const freshnessSeconds = signal.freshnessSeconds ?? market.freshnessSeconds;
+	const latencyMs = signal.latencyMs ?? market.latencyMs;
+	return /* @__PURE__ */ _jsxDEV("section", {
+		"data-loc": "frontend\\dashboard\\DashboardPage.tsx:154",
+		className: "cockpit-panel dashboard-summary-panel",
+		children: [
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:155",
+				className: "cockpit-panel-header",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\dashboard\\DashboardPage.tsx:156",
+					children: [/* @__PURE__ */ _jsxDEV("h2", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:157",
+						children: "KALOS Summary"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 157,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV("p", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:158",
+						className: "cockpit-muted",
+						children: "Analyse uniquement, aucun ordre route."
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 158,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 156,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+					"data-loc": "frontend\\dashboard\\DashboardPage.tsx:160",
+					tone: "live-off",
+					children: "LIVE OFF"
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 160,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 155,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:163",
+				className: "dashboard-summary-symbol",
+				children: [
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:164",
+						className: "cockpit-label",
+						children: "Symbole selectionne"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 164,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("strong", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:165",
+						children: selectedSymbol
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 165,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:166",
+						className: "cockpit-muted",
+						children: [
+							market.timeframe,
+							" | prix ",
+							formatPrice(market.price)
+						]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 166,
+						columnNumber: 9
+					}, this)
+				]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 163,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:171",
+				className: "dashboard-mini-grid",
+				children: [
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:172",
+						children: [/* @__PURE__ */ _jsxDEV("b", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:173",
+							children: "Source"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 173,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:174",
+							tone: dataSourceLabel === "DERIV DEMO" ? "connected" : dataSourceLabel === "MOCK_DATA" ? "MOCK" : "demo",
+							children: dataSourceLabel
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 174,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 172,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:178",
+						children: [/* @__PURE__ */ _jsxDEV("b", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:179",
+							children: "Statut flux"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 179,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:180",
+							tone: feedTone(status),
+							children: status
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 180,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 178,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:182",
+						children: [/* @__PURE__ */ _jsxDEV("b", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:183",
+							children: "Decision"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 183,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:184",
+							children: formatDecision(signal.decision)
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 184,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 182,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:186",
+						children: [/* @__PURE__ */ _jsxDEV("b", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:187",
+							children: "Confiance"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 187,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:188",
+							children: [signal.confidence, "%"]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 188,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 186,
+						columnNumber: 9
+					}, this)
+				]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 171,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:192",
+				className: "dashboard-data-source-banner",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\dashboard\\DashboardPage.tsx:193",
+					children: [/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:194",
+						className: "cockpit-label",
+						children: "DATA SOURCE"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 194,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV("strong", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:195",
+						children: dataSourceLabel
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 195,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 193,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+					"data-loc": "frontend\\dashboard\\DashboardPage.tsx:197",
+					tone: dataSourceLabel === "DERIV DEMO" ? "connected" : dataSourceLabel === "MOCK_DATA" ? "MOCK" : "demo",
+					children: mockPolicy
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 197,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 192,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:202",
+				className: "dashboard-mini-grid",
+				children: [
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:203",
+						children: [/* @__PURE__ */ _jsxDEV("b", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:204",
+							children: "KALOS Source"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 204,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:205",
+							children: signal.dataSourceLabel ?? market.session
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 205,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 203,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:207",
+						children: [/* @__PURE__ */ _jsxDEV("b", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:208",
+							children: "Fallback"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 208,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:209",
+							tone: market.fallback === "MOCK_DATA" ? "MOCK" : "connected",
+							children: market.fallback ?? "NONE"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 209,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 207,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:211",
+						children: [/* @__PURE__ */ _jsxDEV("b", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:212",
+							children: "KALOS Quality"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 212,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:213",
+							tone: qualityTone(dataQuality),
+							children: dataQuality ?? "UNKNOWN"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 213,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 211,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:215",
+						children: [/* @__PURE__ */ _jsxDEV("b", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:216",
+							children: "Last Tick"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 216,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:217",
+							children: formatSourceTimestamp(signal.lastTickAt ?? market.lastTickAt)
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 217,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 215,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:219",
+						children: [/* @__PURE__ */ _jsxDEV("b", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:220",
+							children: "Last Candle"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 220,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:221",
+							children: formatSourceTimestamp(signal.lastCandleAt ?? market.lastCandleAt)
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 221,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 219,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:223",
+						children: [/* @__PURE__ */ _jsxDEV("b", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:224",
+							children: "Latence"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 224,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:225",
+							children: latencyMs === undefined || latencyMs === null ? "n/a" : `${latencyMs} ms`
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 225,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 223,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:227",
+						children: [/* @__PURE__ */ _jsxDEV("b", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:228",
+							children: "Freshness"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 228,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:229",
+							children: freshnessSeconds === undefined || freshnessSeconds === null ? "n/a" : `${freshnessSeconds}s`
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 229,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 227,
+						columnNumber: 9
+					}, this)
+				]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 202,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:233",
+				className: "dashboard-safety-row",
+				children: [/* @__PURE__ */ _jsxDEV(StatusPill, {
+					"data-loc": "frontend\\dashboard\\DashboardPage.tsx:234",
+					tone: "live-off",
+					children: "LIVE OFF"
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 234,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+					"data-loc": "frontend\\dashboard\\DashboardPage.tsx:235",
+					tone: "live-off",
+					children: "AUTO EXECUTION OFF"
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 235,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 233,
+				columnNumber: 7
+			}, this)
+		]
+	}, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 154,
+		columnNumber: 5
+	}, this);
+}
+_c2 = KalosDashboardSummary;
+function RiskDashboardSummary({ risk }) {
+	const accepted = risk.score < 50 && risk.slPresent && risk.tpPresent && risk.journalReady && !risk.liveEnabled;
+	return /* @__PURE__ */ _jsxDEV("section", {
+		"data-loc": "frontend\\dashboard\\DashboardPage.tsx:245",
+		className: "cockpit-panel dashboard-summary-panel",
+		children: [
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:246",
+				className: "cockpit-panel-header",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\dashboard\\DashboardPage.tsx:247",
+					children: [/* @__PURE__ */ _jsxDEV("h2", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:248",
+						children: "Risk Summary"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 248,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV("p", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:249",
+						className: "cockpit-muted",
+						children: "Blocages actifs avant toute execution."
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 249,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 247,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+					"data-loc": "frontend\\dashboard\\DashboardPage.tsx:251",
+					tone: accepted ? "connected" : "critical",
+					children: accepted ? "VALID" : "BLOCK"
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 251,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 246,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:254",
+				className: "risk-score compact",
+				children: /* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\dashboard\\DashboardPage.tsx:255",
+					style: { flex: 1 },
+					children: [/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:256",
+						className: "cockpit-row",
+						children: [/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:257",
+							className: "cockpit-label",
+							children: "Risk score"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 257,
+							columnNumber: 13
+						}, this), /* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:258",
+							children: [risk.score, "/100"]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 258,
+							columnNumber: 13
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 256,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:260",
+						className: "risk-meter",
+						"aria-label": `Risk score ${risk.score}`,
+						children: /* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:261",
+							style: { width: `${risk.score}%` }
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 261,
+							columnNumber: 13
+						}, this)
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 260,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 255,
+					columnNumber: 9
+				}, this)
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 254,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:266",
+				className: "dashboard-mini-grid",
+				children: [
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:267",
+						children: [/* @__PURE__ */ _jsxDEV("b", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:268",
+							children: "RR"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 268,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:269",
+							children: ["1:", risk.rr]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 269,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 267,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:271",
+						children: [/* @__PURE__ */ _jsxDEV("b", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:272",
+							children: "Risque/trade"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 272,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:273",
+							children: [risk.riskPerTrade, "%"]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 273,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 271,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:275",
+						children: [/* @__PURE__ */ _jsxDEV("b", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:276",
+							children: "DD jour"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 276,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:277",
+							children: [risk.dailyDrawdown, "%"]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 277,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 275,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("span", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:279",
+						children: [/* @__PURE__ */ _jsxDEV("b", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:280",
+							children: "LIVE"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 280,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:281",
+							className: "cockpit-negative",
+							children: "OFF"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 281,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 279,
+						columnNumber: 9
+					}, this)
+				]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 266,
+				columnNumber: 7
+			}, this)
+		]
+	}, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 245,
+		columnNumber: 5
+	}, this);
+}
+_c3 = RiskDashboardSummary;
+function RiskRulesPanel({ risk }) {
+	const rules = [
+		{
+			label: "confidence >= 80",
+			ok: true
+		},
+		{
+			label: "RR >= 1:2",
+			ok: risk.rr >= 2
+		},
+		{
+			label: "SL present",
+			ok: risk.slPresent
+		},
+		{
+			label: "TP present",
+			ok: risk.tpPresent
+		},
+		{
+			label: "Journal ready",
+			ok: risk.journalReady
+		},
+		{
+			label: "LIVE disabled by default",
+			ok: !risk.liveEnabled
+		},
+		{
+			label: "AUTO execution blocked",
+			ok: true
+		}
+	];
+	return /* @__PURE__ */ _jsxDEV("section", {
+		"data-loc": "frontend\\dashboard\\DashboardPage.tsx:300",
+		className: "cockpit-panel",
+		children: [/* @__PURE__ */ _jsxDEV("div", {
+			"data-loc": "frontend\\dashboard\\DashboardPage.tsx:301",
+			className: "cockpit-panel-header",
+			children: [/* @__PURE__ */ _jsxDEV("h2", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:302",
+				children: "Risk Rules"
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 302,
+				columnNumber: 9
+			}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:303",
+				tone: "connected",
+				children: "Enforced"
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 303,
+				columnNumber: 9
+			}, this)]
+		}, void 0, true, {
+			fileName: _jsxFileName,
+			lineNumber: 301,
+			columnNumber: 7
+		}, this), /* @__PURE__ */ _jsxDEV("div", {
+			"data-loc": "frontend\\dashboard\\DashboardPage.tsx:305",
+			className: "cockpit-stack",
+			children: rules.map((rule) => /* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:307",
+				className: "cockpit-rule-row",
+				children: /* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\dashboard\\DashboardPage.tsx:308",
+					className: "cockpit-row",
+					children: [/* @__PURE__ */ _jsxDEV("strong", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:309",
+						children: rule.label
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 309,
+						columnNumber: 15
+					}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:310",
+						tone: rule.ok ? "connected" : "critical",
+						children: rule.ok ? "OK" : "BLOCK"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 310,
+						columnNumber: 15
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 308,
+					columnNumber: 13
+				}, this)
+			}, rule.label, false, {
+				fileName: _jsxFileName,
+				lineNumber: 307,
+				columnNumber: 11
+			}, this))
+		}, void 0, false, {
+			fileName: _jsxFileName,
+			lineNumber: 305,
+			columnNumber: 7
+		}, this)]
+	}, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 300,
+		columnNumber: 5
+	}, this);
+}
+_c4 = RiskRulesPanel;
+function BacktestPreview({ backtests }) {
+	return /* @__PURE__ */ _jsxDEV("section", {
+		"data-loc": "frontend\\dashboard\\DashboardPage.tsx:321",
+		className: "cockpit-panel",
+		children: [/* @__PURE__ */ _jsxDEV("div", {
+			"data-loc": "frontend\\dashboard\\DashboardPage.tsx:322",
+			className: "cockpit-panel-header",
+			children: [/* @__PURE__ */ _jsxDEV("h2", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:323",
+				children: "Backtests demo"
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 323,
+				columnNumber: 9
+			}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:324",
+				tone: "MOCK",
+				children: "Read only"
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 324,
+				columnNumber: 9
+			}, this)]
+		}, void 0, true, {
+			fileName: _jsxFileName,
+			lineNumber: 322,
+			columnNumber: 7
+		}, this), /* @__PURE__ */ _jsxDEV("div", {
+			"data-loc": "frontend\\dashboard\\DashboardPage.tsx:326",
+			className: "demo-backtest-grid compact",
+			children: backtests.slice(0, 2).map((backtest) => /* @__PURE__ */ _jsxDEV("article", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:328",
+				className: "demo-backtest-card",
+				children: [
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:329",
+						className: "cockpit-row",
+						children: [/* @__PURE__ */ _jsxDEV("strong", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:330",
+							children: backtest.id
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 330,
+							columnNumber: 15
+						}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:331",
+							tone: backtest.dataSource,
+							children: backtest.dataSource
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 331,
+							columnNumber: 15
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 329,
+						columnNumber: 13
+					}, this),
+					/* @__PURE__ */ _jsxDEV("p", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:333",
+						className: "cockpit-muted",
+						children: [
+							backtest.symbol,
+							" | ",
+							backtest.timeframe,
+							" | ",
+							backtest.mode
+						]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 333,
+						columnNumber: 13
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:336",
+						className: "demo-metric-row",
+						children: [
+							/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\dashboard\\DashboardPage.tsx:337",
+								children: ["Win", /* @__PURE__ */ _jsxDEV("strong", {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:339",
+									children: [backtest.winRate.toFixed(1), "%"]
+								}, void 0, true, {
+									fileName: _jsxFileName,
+									lineNumber: 339,
+									columnNumber: 17
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 337,
+								columnNumber: 15
+							}, this),
+							/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\dashboard\\DashboardPage.tsx:341",
+								children: ["PF", /* @__PURE__ */ _jsxDEV("strong", {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:343",
+									children: backtest.profitFactor.toFixed(2)
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 343,
+									columnNumber: 17
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 341,
+								columnNumber: 15
+							}, this),
+							/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\dashboard\\DashboardPage.tsx:345",
+								children: ["Net", /* @__PURE__ */ _jsxDEV("strong", {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:347",
+									className: backtest.netProfit >= 0 ? "cockpit-positive" : "cockpit-negative",
+									children: backtest.netProfit.toFixed(1)
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 347,
+									columnNumber: 17
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 345,
+								columnNumber: 15
+							}, this)
+						]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 336,
+						columnNumber: 13
+					}, this)
+				]
+			}, backtest.id, true, {
+				fileName: _jsxFileName,
+				lineNumber: 328,
+				columnNumber: 11
+			}, this))
+		}, void 0, false, {
+			fileName: _jsxFileName,
+			lineNumber: 326,
+			columnNumber: 7
+		}, this)]
+	}, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 321,
+		columnNumber: 5
+	}, this);
+}
+_c5 = BacktestPreview;
+export function DashboardPage({ state, market, signal, risk, candles, connectors, journalRows, watchlist, alerts, backtests, selectedSyntheticSymbol, onSyntheticSymbolChange, onToggleKalos, onTradingModeChange, onStrategyModeChange }) {
+	_s();
+	const [activeTab, setActiveTab] = useState("quick");
+	const marketSourceLabel = marketDataSourceLabel(market);
+	const journalForSymbol = useMemo(() => {
+		const selectedRows = journalRows.filter((row) => row.symbol === selectedSyntheticSymbol);
+		const syntheticRow = {
+			id: `SYN-${selectedSyntheticSymbol.replace(/\s/g, "-").toUpperCase()}`,
+			timestamp: new Date().toISOString(),
+			symbol: selectedSyntheticSymbol,
+			timeframe: market.timeframe,
+			mode: state.strategyMode,
+			decision: signal.decision,
+			confidence: signal.confidence,
+			riskScore: risk.score,
+			source: market.source,
+			module: "KALOS",
+			sourceLabel: market.source === "DEMO" && market.sourceStatus === "CONNECTED" ? "DERIV DEMO" : undefined,
+			fallback: market.fallback,
+			result: `Synthetic index analysis only; ${market.sourceStatus ?? "UNKNOWN"}; fallback ${market.fallback ?? "n/a"}; LIVE OFF and AUTO execution OFF`
+		};
+		return [
+			syntheticRow,
+			...selectedRows,
+			...journalRows.filter((row) => row.symbol !== selectedSyntheticSymbol)
+		].slice(0, 6);
+	}, [
+		journalRows,
+		market.fallback,
+		market.source,
+		market.sourceStatus,
+		market.timeframe,
+		risk.score,
+		selectedSyntheticSymbol,
+		signal.confidence,
+		signal.decision,
+		state.strategyMode
+	]);
+	return /* @__PURE__ */ _jsxDEV("div", {
+		"data-loc": "frontend\\dashboard\\DashboardPage.tsx:427",
+		className: "dashboard-shell",
+		children: [
+			/* @__PURE__ */ _jsxDEV(SyntheticMarketSelector, {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:428",
+				selectedSymbol: selectedSyntheticSymbol,
+				onChange: onSyntheticSymbolChange
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 428,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:430",
+				className: "dashboard-main-grid",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\dashboard\\DashboardPage.tsx:431",
+					className: "dashboard-chart-column",
+					children: /* @__PURE__ */ _jsxDEV(LiveMarketChart, {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:432",
+						candles,
+						market,
+						signal
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 432,
+						columnNumber: 11
+					}, this)
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 431,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV("aside", {
+					"data-loc": "frontend\\dashboard\\DashboardPage.tsx:434",
+					className: "dashboard-summary-column",
+					"aria-label": "KALOS and risk summaries",
+					children: [/* @__PURE__ */ _jsxDEV(KalosDashboardSummary, {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:435",
+						market,
+						selectedSymbol: selectedSyntheticSymbol,
+						signal,
+						state
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 435,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV(RiskDashboardSummary, {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:441",
+						risk
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 441,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 434,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 430,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("section", {
+				"data-loc": "frontend\\dashboard\\DashboardPage.tsx:445",
+				className: "cockpit-panel dashboard-tabs-panel",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\dashboard\\DashboardPage.tsx:446",
+					className: "dashboard-tab-list",
+					role: "tablist",
+					"aria-label": "Dashboard detail views",
+					children: dashboardTabs.map((tab) => /* @__PURE__ */ _jsxDEV("button", {
+						"data-loc": "frontend\\dashboard\\DashboardPage.tsx:448",
+						"aria-selected": tab.id === activeTab,
+						className: `dashboard-tab ${tab.id === activeTab ? "is-active" : ""}`,
+						onClick: () => setActiveTab(tab.id),
+						role: "tab",
+						type: "button",
+						children: tab.label
+					}, tab.id, false, {
+						fileName: _jsxFileName,
+						lineNumber: 448,
+						columnNumber: 13
+					}, this))
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 446,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\dashboard\\DashboardPage.tsx:461",
+					className: "dashboard-tab-body",
+					role: "tabpanel",
+					children: [
+						activeTab === "quick" ? /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:463",
+							className: "dashboard-tab-grid",
+							children: [
+								/* @__PURE__ */ _jsxDEV(MarketStatusCard, {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:464",
+									dataMode: state.dataMode,
+									market
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 464,
+									columnNumber: 15
+								}, this),
+								/* @__PURE__ */ _jsxDEV("section", {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:465",
+									className: "cockpit-panel",
+									children: [/* @__PURE__ */ _jsxDEV("div", {
+										"data-loc": "frontend\\dashboard\\DashboardPage.tsx:466",
+										className: "cockpit-panel-header",
+										children: [/* @__PURE__ */ _jsxDEV("h2", {
+											"data-loc": "frontend\\dashboard\\DashboardPage.tsx:467",
+											children: "Modes"
+										}, void 0, false, {
+											fileName: _jsxFileName,
+											lineNumber: 467,
+											columnNumber: 19
+										}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+											"data-loc": "frontend\\dashboard\\DashboardPage.tsx:468",
+											tone: "live-off",
+											children: "AUTO EXECUTION OFF"
+										}, void 0, false, {
+											fileName: _jsxFileName,
+											lineNumber: 468,
+											columnNumber: 19
+										}, this)]
+									}, void 0, true, {
+										fileName: _jsxFileName,
+										lineNumber: 466,
+										columnNumber: 17
+									}, this), /* @__PURE__ */ _jsxDEV(TradingModeSelector, {
+										"data-loc": "frontend\\dashboard\\DashboardPage.tsx:470",
+										strategyMode: state.strategyMode,
+										tradingMode: state.tradingMode,
+										onStrategyModeChange,
+										onTradingModeChange
+									}, void 0, false, {
+										fileName: _jsxFileName,
+										lineNumber: 470,
+										columnNumber: 17
+									}, this)]
+								}, void 0, true, {
+									fileName: _jsxFileName,
+									lineNumber: 465,
+									columnNumber: 15
+								}, this),
+								/* @__PURE__ */ _jsxDEV(WatchlistPanel, {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:477",
+									items: watchlist.slice(0, 5)
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 477,
+									columnNumber: 15
+								}, this),
+								/* @__PURE__ */ _jsxDEV(AlertPanel, {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:478",
+									alerts: alerts.slice(0, 2)
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 478,
+									columnNumber: 15
+								}, this)
+							]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 463,
+							columnNumber: 13
+						}, this) : null,
+						activeTab === "kalos" ? /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:483",
+							className: "dashboard-tab-grid",
+							children: [
+								/* @__PURE__ */ _jsxDEV(KalosSignalCard, {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:484",
+									enabled: state.kalosEnabled,
+									onToggle: onToggleKalos,
+									signal
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 484,
+									columnNumber: 15
+								}, this),
+								/* @__PURE__ */ _jsxDEV(KalosMarketBrainPanel, {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:485",
+									brain: signal.marketBrain
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 485,
+									columnNumber: 15
+								}, this),
+								/* @__PURE__ */ _jsxDEV(KalosVisualIntelligencePanel, {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:486",
+									signal
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 486,
+									columnNumber: 15
+								}, this),
+								/* @__PURE__ */ _jsxDEV(KalosFuturePathPanel, {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:487",
+									futurePath: signal.futurePath
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 487,
+									columnNumber: 15
+								}, this)
+							]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 483,
+							columnNumber: 13
+						}, this) : null,
+						activeTab === "chart" ? /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:492",
+							className: "dashboard-tab-grid",
+							children: [/* @__PURE__ */ _jsxDEV("section", {
+								"data-loc": "frontend\\dashboard\\DashboardPage.tsx:493",
+								className: "cockpit-panel",
+								children: [/* @__PURE__ */ _jsxDEV("div", {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:494",
+									className: "cockpit-panel-header",
+									children: [/* @__PURE__ */ _jsxDEV("div", {
+										"data-loc": "frontend\\dashboard\\DashboardPage.tsx:495",
+										children: [/* @__PURE__ */ _jsxDEV("h2", {
+											"data-loc": "frontend\\dashboard\\DashboardPage.tsx:496",
+											children: "Chart Context"
+										}, void 0, false, {
+											fileName: _jsxFileName,
+											lineNumber: 496,
+											columnNumber: 21
+										}, this), /* @__PURE__ */ _jsxDEV("p", {
+											"data-loc": "frontend\\dashboard\\DashboardPage.tsx:497",
+											className: "cockpit-muted",
+											children: [
+												selectedSyntheticSymbol,
+												" | ",
+												market.timeframe,
+												" | ",
+												marketSourceLabel,
+												" | flux ",
+												feedStatus(state, market),
+												" | fallback",
+												" ",
+												market.fallback ?? "NONE"
+											]
+										}, void 0, true, {
+											fileName: _jsxFileName,
+											lineNumber: 497,
+											columnNumber: 21
+										}, this)]
+									}, void 0, true, {
+										fileName: _jsxFileName,
+										lineNumber: 495,
+										columnNumber: 19
+									}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+										"data-loc": "frontend\\dashboard\\DashboardPage.tsx:502",
+										tone: "live-off",
+										children: "NO EXECUTION"
+									}, void 0, false, {
+										fileName: _jsxFileName,
+										lineNumber: 502,
+										columnNumber: 19
+									}, this)]
+								}, void 0, true, {
+									fileName: _jsxFileName,
+									lineNumber: 494,
+									columnNumber: 17
+								}, this), /* @__PURE__ */ _jsxDEV("div", {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:504",
+									className: "cockpit-kpi-row",
+									children: [
+										/* @__PURE__ */ _jsxDEV("div", {
+											"data-loc": "frontend\\dashboard\\DashboardPage.tsx:505",
+											className: "cockpit-kpi",
+											children: [/* @__PURE__ */ _jsxDEV("span", {
+												"data-loc": "frontend\\dashboard\\DashboardPage.tsx:506",
+												className: "cockpit-label",
+												children: "Prix"
+											}, void 0, false, {
+												fileName: _jsxFileName,
+												lineNumber: 506,
+												columnNumber: 21
+											}, this), /* @__PURE__ */ _jsxDEV("div", {
+												"data-loc": "frontend\\dashboard\\DashboardPage.tsx:507",
+												className: "cockpit-value",
+												children: formatPrice(market.price)
+											}, void 0, false, {
+												fileName: _jsxFileName,
+												lineNumber: 507,
+												columnNumber: 21
+											}, this)]
+										}, void 0, true, {
+											fileName: _jsxFileName,
+											lineNumber: 505,
+											columnNumber: 19
+										}, this),
+										/* @__PURE__ */ _jsxDEV("div", {
+											"data-loc": "frontend\\dashboard\\DashboardPage.tsx:509",
+											className: "cockpit-kpi",
+											children: [/* @__PURE__ */ _jsxDEV("span", {
+												"data-loc": "frontend\\dashboard\\DashboardPage.tsx:510",
+												className: "cockpit-label",
+												children: "Spread"
+											}, void 0, false, {
+												fileName: _jsxFileName,
+												lineNumber: 510,
+												columnNumber: 21
+											}, this), /* @__PURE__ */ _jsxDEV("div", {
+												"data-loc": "frontend\\dashboard\\DashboardPage.tsx:511",
+												className: "cockpit-value",
+												children: market.spread
+											}, void 0, false, {
+												fileName: _jsxFileName,
+												lineNumber: 511,
+												columnNumber: 21
+											}, this)]
+										}, void 0, true, {
+											fileName: _jsxFileName,
+											lineNumber: 509,
+											columnNumber: 19
+										}, this),
+										/* @__PURE__ */ _jsxDEV("div", {
+											"data-loc": "frontend\\dashboard\\DashboardPage.tsx:513",
+											className: "cockpit-kpi",
+											children: [/* @__PURE__ */ _jsxDEV("span", {
+												"data-loc": "frontend\\dashboard\\DashboardPage.tsx:514",
+												className: "cockpit-label",
+												children: "Volume"
+											}, void 0, false, {
+												fileName: _jsxFileName,
+												lineNumber: 514,
+												columnNumber: 21
+											}, this), /* @__PURE__ */ _jsxDEV("div", {
+												"data-loc": "frontend\\dashboard\\DashboardPage.tsx:515",
+												className: "cockpit-value",
+												children: market.volume.toLocaleString("en-US")
+											}, void 0, false, {
+												fileName: _jsxFileName,
+												lineNumber: 515,
+												columnNumber: 21
+											}, this)]
+										}, void 0, true, {
+											fileName: _jsxFileName,
+											lineNumber: 513,
+											columnNumber: 19
+										}, this),
+										/* @__PURE__ */ _jsxDEV("div", {
+											"data-loc": "frontend\\dashboard\\DashboardPage.tsx:517",
+											className: "cockpit-kpi",
+											children: [/* @__PURE__ */ _jsxDEV("span", {
+												"data-loc": "frontend\\dashboard\\DashboardPage.tsx:518",
+												className: "cockpit-label",
+												children: "Data Quality"
+											}, void 0, false, {
+												fileName: _jsxFileName,
+												lineNumber: 518,
+												columnNumber: 21
+											}, this), /* @__PURE__ */ _jsxDEV("div", {
+												"data-loc": "frontend\\dashboard\\DashboardPage.tsx:519",
+												className: "cockpit-value",
+												style: { fontSize: 18 },
+												children: market.dataQuality ?? "UNKNOWN"
+											}, void 0, false, {
+												fileName: _jsxFileName,
+												lineNumber: 519,
+												columnNumber: 21
+											}, this)]
+										}, void 0, true, {
+											fileName: _jsxFileName,
+											lineNumber: 517,
+											columnNumber: 19
+										}, this),
+										/* @__PURE__ */ _jsxDEV("div", {
+											"data-loc": "frontend\\dashboard\\DashboardPage.tsx:521",
+											className: "cockpit-kpi",
+											children: [/* @__PURE__ */ _jsxDEV("span", {
+												"data-loc": "frontend\\dashboard\\DashboardPage.tsx:522",
+												className: "cockpit-label",
+												children: "Sync"
+											}, void 0, false, {
+												fileName: _jsxFileName,
+												lineNumber: 522,
+												columnNumber: 21
+											}, this), /* @__PURE__ */ _jsxDEV("div", {
+												"data-loc": "frontend\\dashboard\\DashboardPage.tsx:523",
+												className: "cockpit-value",
+												style: { fontSize: 18 },
+												children: market.syncStatus ?? "UNKNOWN"
+											}, void 0, false, {
+												fileName: _jsxFileName,
+												lineNumber: 523,
+												columnNumber: 21
+											}, this)]
+										}, void 0, true, {
+											fileName: _jsxFileName,
+											lineNumber: 521,
+											columnNumber: 19
+										}, this)
+									]
+								}, void 0, true, {
+									fileName: _jsxFileName,
+									lineNumber: 504,
+									columnNumber: 17
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 493,
+								columnNumber: 15
+							}, this), /* @__PURE__ */ _jsxDEV("section", {
+								"data-loc": "frontend\\dashboard\\DashboardPage.tsx:527",
+								className: "cockpit-panel",
+								children: [/* @__PURE__ */ _jsxDEV("div", {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:528",
+									className: "cockpit-panel-header",
+									children: [/* @__PURE__ */ _jsxDEV("h2", {
+										"data-loc": "frontend\\dashboard\\DashboardPage.tsx:529",
+										children: "Chart Actions"
+									}, void 0, false, {
+										fileName: _jsxFileName,
+										lineNumber: 529,
+										columnNumber: 19
+									}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+										"data-loc": "frontend\\dashboard\\DashboardPage.tsx:530",
+										tone: "MOCK",
+										children: "Read only"
+									}, void 0, false, {
+										fileName: _jsxFileName,
+										lineNumber: 530,
+										columnNumber: 19
+									}, this)]
+								}, void 0, true, {
+									fileName: _jsxFileName,
+									lineNumber: 528,
+									columnNumber: 17
+								}, this), /* @__PURE__ */ _jsxDEV("div", {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:532",
+									className: "overlay-chip-grid",
+									children: chartContextActions.map((action) => /* @__PURE__ */ _jsxDEV("span", {
+										"data-loc": "frontend\\dashboard\\DashboardPage.tsx:534",
+										className: "overlay-chip",
+										children: action.label
+									}, action.id, false, {
+										fileName: _jsxFileName,
+										lineNumber: 534,
+										columnNumber: 21
+									}, this))
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 532,
+									columnNumber: 17
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 527,
+								columnNumber: 15
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 492,
+							columnNumber: 13
+						}, this) : null,
+						activeTab === "risk" ? /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:542",
+							className: "dashboard-tab-grid",
+							children: [
+								/* @__PURE__ */ _jsxDEV(RiskScoreCard, {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:543",
+									risk
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 543,
+									columnNumber: 15
+								}, this),
+								/* @__PURE__ */ _jsxDEV(RiskRulesPanel, {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:544",
+									risk
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 544,
+									columnNumber: 15
+								}, this),
+								/* @__PURE__ */ _jsxDEV("section", {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:545",
+									className: "cockpit-panel",
+									children: [/* @__PURE__ */ _jsxDEV("div", {
+										"data-loc": "frontend\\dashboard\\DashboardPage.tsx:546",
+										className: "cockpit-panel-header",
+										children: [/* @__PURE__ */ _jsxDEV("h2", {
+											"data-loc": "frontend\\dashboard\\DashboardPage.tsx:547",
+											children: "Drawdown"
+										}, void 0, false, {
+											fileName: _jsxFileName,
+											lineNumber: 547,
+											columnNumber: 19
+										}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+											"data-loc": "frontend\\dashboard\\DashboardPage.tsx:548",
+											tone: "demo",
+											children: "DEMO"
+										}, void 0, false, {
+											fileName: _jsxFileName,
+											lineNumber: 548,
+											columnNumber: 19
+										}, this)]
+									}, void 0, true, {
+										fileName: _jsxFileName,
+										lineNumber: 546,
+										columnNumber: 17
+									}, this), /* @__PURE__ */ _jsxDEV("div", {
+										"data-loc": "frontend\\dashboard\\DashboardPage.tsx:550",
+										className: "cockpit-kpi-row",
+										children: [
+											/* @__PURE__ */ _jsxDEV("div", {
+												"data-loc": "frontend\\dashboard\\DashboardPage.tsx:551",
+												className: "cockpit-kpi",
+												children: [/* @__PURE__ */ _jsxDEV("span", {
+													"data-loc": "frontend\\dashboard\\DashboardPage.tsx:552",
+													className: "cockpit-label",
+													children: "Daily"
+												}, void 0, false, {
+													fileName: _jsxFileName,
+													lineNumber: 552,
+													columnNumber: 21
+												}, this), /* @__PURE__ */ _jsxDEV("div", {
+													"data-loc": "frontend\\dashboard\\DashboardPage.tsx:553",
+													className: "cockpit-value",
+													children: [risk.dailyDrawdown, "%"]
+												}, void 0, true, {
+													fileName: _jsxFileName,
+													lineNumber: 553,
+													columnNumber: 21
+												}, this)]
+											}, void 0, true, {
+												fileName: _jsxFileName,
+												lineNumber: 551,
+												columnNumber: 19
+											}, this),
+											/* @__PURE__ */ _jsxDEV("div", {
+												"data-loc": "frontend\\dashboard\\DashboardPage.tsx:555",
+												className: "cockpit-kpi",
+												children: [/* @__PURE__ */ _jsxDEV("span", {
+													"data-loc": "frontend\\dashboard\\DashboardPage.tsx:556",
+													className: "cockpit-label",
+													children: "Weekly"
+												}, void 0, false, {
+													fileName: _jsxFileName,
+													lineNumber: 556,
+													columnNumber: 21
+												}, this), /* @__PURE__ */ _jsxDEV("div", {
+													"data-loc": "frontend\\dashboard\\DashboardPage.tsx:557",
+													className: "cockpit-value",
+													children: [risk.weeklyDrawdown, "%"]
+												}, void 0, true, {
+													fileName: _jsxFileName,
+													lineNumber: 557,
+													columnNumber: 21
+												}, this)]
+											}, void 0, true, {
+												fileName: _jsxFileName,
+												lineNumber: 555,
+												columnNumber: 19
+											}, this),
+											/* @__PURE__ */ _jsxDEV("div", {
+												"data-loc": "frontend\\dashboard\\DashboardPage.tsx:559",
+												className: "cockpit-kpi",
+												children: [/* @__PURE__ */ _jsxDEV("span", {
+													"data-loc": "frontend\\dashboard\\DashboardPage.tsx:560",
+													className: "cockpit-label",
+													children: "Total"
+												}, void 0, false, {
+													fileName: _jsxFileName,
+													lineNumber: 560,
+													columnNumber: 21
+												}, this), /* @__PURE__ */ _jsxDEV("div", {
+													"data-loc": "frontend\\dashboard\\DashboardPage.tsx:561",
+													className: "cockpit-value",
+													children: [risk.totalDrawdown, "%"]
+												}, void 0, true, {
+													fileName: _jsxFileName,
+													lineNumber: 561,
+													columnNumber: 21
+												}, this)]
+											}, void 0, true, {
+												fileName: _jsxFileName,
+												lineNumber: 559,
+												columnNumber: 19
+											}, this),
+											/* @__PURE__ */ _jsxDEV("div", {
+												"data-loc": "frontend\\dashboard\\DashboardPage.tsx:563",
+												className: "cockpit-kpi",
+												children: [/* @__PURE__ */ _jsxDEV("span", {
+													"data-loc": "frontend\\dashboard\\DashboardPage.tsx:564",
+													className: "cockpit-label",
+													children: "Execution"
+												}, void 0, false, {
+													fileName: _jsxFileName,
+													lineNumber: 564,
+													columnNumber: 21
+												}, this), /* @__PURE__ */ _jsxDEV("div", {
+													"data-loc": "frontend\\dashboard\\DashboardPage.tsx:565",
+													className: "cockpit-value cockpit-negative",
+													children: "OFF"
+												}, void 0, false, {
+													fileName: _jsxFileName,
+													lineNumber: 565,
+													columnNumber: 21
+												}, this)]
+											}, void 0, true, {
+												fileName: _jsxFileName,
+												lineNumber: 563,
+												columnNumber: 19
+											}, this)
+										]
+									}, void 0, true, {
+										fileName: _jsxFileName,
+										lineNumber: 550,
+										columnNumber: 17
+									}, this)]
+								}, void 0, true, {
+									fileName: _jsxFileName,
+									lineNumber: 545,
+									columnNumber: 15
+								}, this)
+							]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 542,
+							columnNumber: 13
+						}, this) : null,
+						activeTab === "journal" ? /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:573",
+							className: "dashboard-tab-grid single",
+							children: [/* @__PURE__ */ _jsxDEV("section", {
+								"data-loc": "frontend\\dashboard\\DashboardPage.tsx:574",
+								className: "cockpit-panel",
+								children: [/* @__PURE__ */ _jsxDEV("div", {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:575",
+									className: "cockpit-panel-header",
+									children: [/* @__PURE__ */ _jsxDEV("h2", {
+										"data-loc": "frontend\\dashboard\\DashboardPage.tsx:576",
+										children: "Journal"
+									}, void 0, false, {
+										fileName: _jsxFileName,
+										lineNumber: 576,
+										columnNumber: 19
+									}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+										"data-loc": "frontend\\dashboard\\DashboardPage.tsx:577",
+										tone: "connected",
+										children: "NO_TRADE logged"
+									}, void 0, false, {
+										fileName: _jsxFileName,
+										lineNumber: 577,
+										columnNumber: 19
+									}, this)]
+								}, void 0, true, {
+									fileName: _jsxFileName,
+									lineNumber: 575,
+									columnNumber: 17
+								}, this), /* @__PURE__ */ _jsxDEV(JournalTable, {
+									"data-loc": "frontend\\dashboard\\DashboardPage.tsx:579",
+									rows: journalForSymbol
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 579,
+									columnNumber: 17
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 574,
+								columnNumber: 15
+							}, this), /* @__PURE__ */ _jsxDEV(BacktestPreview, {
+								"data-loc": "frontend\\dashboard\\DashboardPage.tsx:581",
+								backtests
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 581,
+								columnNumber: 15
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 573,
+							columnNumber: 13
+						}, this) : null,
+						activeTab === "replay" ? /* @__PURE__ */ _jsxDEV(KalosMarketReplayPanel, {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:585",
+							replay: signal.marketReplay
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 585,
+							columnNumber: 37
+						}, this) : null,
+						activeTab === "connectors" ? /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\dashboard\\DashboardPage.tsx:588",
+							className: "dashboard-tab-grid connectors",
+							children: connectors.slice(0, 4).map((connector) => /* @__PURE__ */ _jsxDEV(ConnectionStatusCard, {
+								"data-loc": "frontend\\dashboard\\DashboardPage.tsx:590",
+								connector
+							}, connector.id, false, {
+								fileName: _jsxFileName,
+								lineNumber: 590,
+								columnNumber: 17
+							}, this))
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 588,
+							columnNumber: 13
+						}, this) : null
+					]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 461,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 445,
+				columnNumber: 7
+			}, this)
+		]
+	}, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 427,
+		columnNumber: 5
+	}, this);
+}
+_s(DashboardPage, "GrBSS28B3v5qBJoYpZOX7kQgr9E=");
+_c6 = DashboardPage;
+var _c, _c2, _c3, _c4, _c5, _c6;
+$RefreshReg$(_c, "SyntheticMarketSelector");
+$RefreshReg$(_c2, "KalosDashboardSummary");
+$RefreshReg$(_c3, "RiskDashboardSummary");
+$RefreshReg$(_c4, "RiskRulesPanel");
+$RefreshReg$(_c5, "BacktestPreview");
+$RefreshReg$(_c6, "DashboardPage");
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+import * as __vite_react_currentExports from "/@fs/C:/Users/PC/Downloads/Razon/frontend/dashboard/DashboardPage.tsx?t=1781007204897";
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+
+  const currentExports = __vite_react_currentExports;
+  queueMicrotask(() => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/PC/Downloads/Razon/frontend/dashboard/DashboardPage.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/PC/Downloads/Razon/frontend/dashboard/DashboardPage.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+function $RefreshReg$(type, id) { return RefreshRuntime.register(type, "C:/Users/PC/Downloads/Razon/frontend/dashboard/DashboardPage.tsx" + ' ' + id); }
+function $RefreshSig$() { return RefreshRuntime.createSignatureFunctionForTransform(); }
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJtYXBwaW5ncyI6IkFBQUEsU0FBUyxTQUFTLGdCQUFnQjtBQWNsQyxTQUFTLHFCQUFxQiw2QkFBNkI7QUFDM0QsU0FBUyx3QkFBd0I7QUFDakMsU0FBUyx1QkFBdUI7QUFDaEMsU0FBUyxxQkFBcUI7QUFDOUIsU0FBUywyQkFBMkI7QUFDcEMsU0FBUyxzQkFBc0I7QUFDL0IsU0FBUyxrQkFBa0I7QUFDM0IsU0FBUyxvQkFBb0I7QUFDN0IsU0FBUyw0QkFBNEI7QUFDckMsU0FBUyxnQkFBZ0IsYUFBYSxrQkFBa0I7QUFDeEQsU0FBUyw0QkFBNEI7QUFDckMsU0FBUyw2QkFBNkI7QUFDdEMsU0FBUyw4QkFBOEI7QUFDdkMsU0FBUyxvQ0FBb0M7QUFDN0MsU0FBUyx1QkFBdUI7Ozs7QUFJaEMsTUFBTSxnQkFBZ0U7Q0FDcEU7RUFBRSxJQUFJO0VBQVMsT0FBTztDQUFhO0NBQ25DO0VBQUUsSUFBSTtFQUFTLE9BQU87Q0FBZ0I7Q0FDdEM7RUFBRSxJQUFJO0VBQVMsT0FBTztDQUFZO0NBQ2xDO0VBQUUsSUFBSTtFQUFRLE9BQU87Q0FBUztDQUM5QjtFQUFFLElBQUk7RUFBVyxPQUFPO0NBQVU7Q0FDbEM7RUFBRSxJQUFJO0VBQVUsT0FBTztDQUFTO0NBQ2hDO0VBQUUsSUFBSTtFQUFjLE9BQU87Q0FBYztBQUMzQztBQUVBLFNBQVMsY0FBYyxPQUFxQixRQUFxRDtDQUMvRixJQUFJLE1BQU0sYUFBYSxlQUFlLE9BQU8sV0FBVyxRQUFRLE9BQU87Q0FDdkUsT0FBTyxPQUFPO0FBQ2hCO0FBRUEsU0FBUyxXQUFXLE9BQXFCLFFBQXFGO0NBQzVILElBQUksT0FBTyxjQUFjLE9BQU8sT0FBTztDQUN2QyxJQUFJLE1BQU0sYUFBYSxhQUFhLE9BQU87Q0FDM0MsSUFBSSxPQUFPLFdBQVcsUUFBUSxPQUFPO0NBQ3JDLE9BQU87QUFDVDtBQUVBLFNBQVMsc0JBQXNCLFFBQXNCO0NBQ25ELElBQUksT0FBTyxXQUFXLFVBQVUsT0FBTyxpQkFBaUIsZUFBZSxPQUFPLFFBQVEsWUFBWSxFQUFFLFNBQVMsT0FBTyxHQUFHO0VBQ3JILE9BQU87Q0FDVDtDQUNBLElBQUksT0FBTyxXQUFXLFFBQVEsT0FBTztDQUNyQyxPQUFPLE9BQU87QUFDaEI7QUFFQSxTQUFTLFNBQVMsUUFBdUU7Q0FDdkYsSUFBSSxXQUFXLGFBQWEsT0FBTztDQUNuQyxJQUFJLFdBQVcsV0FBVyxPQUFPO0NBQ2pDLElBQUksV0FBVyxrQkFBa0IsV0FBVyxXQUFXLE9BQU87Q0FDOUQsT0FBTztBQUNUO0FBRUEsU0FBUyxZQUFZLFNBQXNDO0NBQ3pELElBQUksWUFBWSxXQUFXLE9BQU87Q0FDbEMsSUFBSSxZQUFZLGNBQWMsWUFBWSxTQUFTLE9BQU87Q0FDMUQsSUFBSSxZQUFZLGFBQWEsWUFBWSxnQkFBZ0IsT0FBTztDQUNoRSxPQUFPO0FBQ1Q7QUFFQSxTQUFTLHNCQUFzQixXQUFzQztDQUNuRSxJQUFJLENBQUMsV0FBVyxPQUFPO0NBQ3ZCLE9BQU8sSUFBSSxLQUFLLFNBQVMsRUFBRSxtQkFBbUIsU0FBUztFQUFFLE1BQU07RUFBVyxRQUFRO0NBQVUsQ0FBQztBQUMvRjtBQUVBLFNBQVMscUJBQXFCLFFBQXFCLFFBQXNCLE9BQXFCO0NBQzVGLE1BQU0sU0FBUyxPQUFPLGNBQWMsY0FBYyxPQUFPLE1BQU07Q0FDL0QsTUFBTSxRQUFRLE9BQU8sbUJBQW1CLE9BQU87Q0FDL0MsTUFBTSxjQUNKLFdBQVcsV0FDVixPQUFPLGdCQUFnQixPQUFPLGtCQUFrQixlQUNqRCxNQUFNLFlBQVksRUFBRSxTQUFTLE9BQU87Q0FFdEMsSUFBSSxhQUFhLE9BQU87Q0FDeEIsSUFBSSxXQUFXLFVBQVUsT0FBTyxXQUFXLFFBQVEsT0FBTztDQUMxRCxPQUFPO0FBQ1Q7QUFFQSxTQUFTLGdCQUFnQixpQkFBeUIsUUFBc0I7Q0FDdEUsSUFBSSxvQkFBb0IsZ0JBQWdCLE9BQU8saUJBQWlCLGFBQWEsT0FBTztDQUNwRixJQUFJLG9CQUFvQixhQUFhLE9BQU87Q0FDNUMsT0FBTztBQUNUO0FBRUEsU0FBUyx3QkFBd0IsRUFDL0IsZ0JBQ0EsWUFJQztDQUNELE9BQ0Usd0JBQUMsV0FBRDtFQUFPO0VBQUUsV0FBVTtZQUFuQixDQUNFLHdCQUFDLE9BQUQ7R0FBRztHQUFFLFdBQVU7YUFBZixDQUNFLHdCQUFDLE9BQUQ7SUFBRztjQUFILENBQ0Usd0JBQUMsTUFBRDtLQUFFO2VBQUU7SUFBMkI7Ozs7Y0FDL0Isd0JBQUMsS0FBRDtLQUFDO0tBQUUsV0FBVTtlQUFnQjtJQUFnRDs7OztZQUMxRTs7Ozs7YUFDTCx3QkFBQyxZQUFEO0lBQVU7SUFBRSxNQUFLO2NBQVc7R0FBNkI7Ozs7V0FDdEQ7Ozs7O1lBQ0wsd0JBQUMsT0FBRDtHQUFHO0dBQUUsV0FBVTtHQUE0QixNQUFLO0dBQWEsY0FBVzthQUNyRSxzQkFBc0IsS0FBSSxXQUN6Qix3QkFBQyxVQUFEO0lBQU07SUFDSixnQkFBYyxXQUFXO0lBQ3pCLFdBQVcsbUJBQW1CLFdBQVcsaUJBQWlCLGNBQWM7SUFFeEUsZUFBZSxTQUFTLE1BQU07SUFDOUIsTUFBSztJQUNMLE1BQUs7Y0FFSjtHQUNLLEdBTkQ7Ozs7VUFNQyxDQUNUO0VBQ0U7Ozs7VUFDRTs7Ozs7O0FBRWI7O0FBRUEsU0FBUyxzQkFBc0IsRUFDN0IsUUFDQSxnQkFDQSxRQUNBLFNBTUM7Q0FDRCxNQUFNLFNBQVMsV0FBVyxPQUFPLE1BQU07Q0FDdkMsTUFBTSxrQkFBa0IscUJBQXFCLFFBQVEsUUFBUSxLQUFLO0NBQ2xFLE1BQU0sYUFBYSxnQkFBZ0IsaUJBQWlCLE1BQU07Q0FDMUQsTUFBTSxjQUFjLE9BQU8sZUFBZSxPQUFPO0NBQ2pELE1BQU0sbUJBQW1CLE9BQU8sb0JBQW9CLE9BQU87Q0FDM0QsTUFBTSxZQUFZLE9BQU8sYUFBYSxPQUFPO0NBRTdDLE9BQ0Usd0JBQUMsV0FBRDtFQUFPO0VBQUUsV0FBVTtZQUFuQjtHQUNFLHdCQUFDLE9BQUQ7SUFBRztJQUFFLFdBQVU7Y0FBZixDQUNFLHdCQUFDLE9BQUQ7S0FBRztlQUFILENBQ0Usd0JBQUMsTUFBRDtNQUFFO2dCQUFFO0tBQWlCOzs7O2VBQ3JCLHdCQUFDLEtBQUQ7TUFBQztNQUFFLFdBQVU7Z0JBQWdCO0tBQXlDOzs7O2FBQ25FOzs7OztjQUNMLHdCQUFDLFlBQUQ7S0FBVTtLQUFFLE1BQUs7ZUFBVztJQUFvQjs7OztZQUM3Qzs7Ozs7O0dBRUwsd0JBQUMsT0FBRDtJQUFHO0lBQUUsV0FBVTtjQUFmO0tBQ0Usd0JBQUMsUUFBRDtNQUFJO01BQUUsV0FBVTtnQkFBZ0I7S0FBeUI7Ozs7O0tBQ3pELHdCQUFDLFVBQUQ7TUFBTTtnQkFBRztLQUF1Qjs7Ozs7S0FDaEMsd0JBQUMsUUFBRDtNQUFJO01BQUUsV0FBVTtnQkFBaEI7T0FDRyxPQUFPO09BQVU7T0FBUyxZQUFZLE9BQU8sS0FBSztNQUMvQzs7Ozs7O0lBQ0g7Ozs7OztHQUVMLHdCQUFDLE9BQUQ7SUFBRztJQUFFLFdBQVU7Y0FBZjtLQUNFLHdCQUFDLFFBQUQ7TUFBSTtnQkFBSixDQUNFLHdCQUFDLEtBQUQ7T0FBQztpQkFBRTtNQUFTOzs7O2dCQUNaLHdCQUFDLFlBQUQ7T0FBVTtPQUFFLE1BQU0sb0JBQW9CLGVBQWUsY0FBYyxvQkFBb0IsY0FBYyxTQUFTO2lCQUMzRztNQUNTOzs7O2NBQ1I7Ozs7OztLQUNOLHdCQUFDLFFBQUQ7TUFBSTtnQkFBSixDQUNFLHdCQUFDLEtBQUQ7T0FBQztpQkFBRTtNQUFjOzs7O2dCQUNqQix3QkFBQyxZQUFEO09BQVU7T0FBRSxNQUFNLFNBQVMsTUFBTTtpQkFBSTtNQUFtQjs7OztjQUNwRDs7Ozs7O0tBQ04sd0JBQUMsUUFBRDtNQUFJO2dCQUFKLENBQ0Usd0JBQUMsS0FBRDtPQUFDO2lCQUFFO01BQVc7Ozs7Z0JBQ2Qsd0JBQUMsVUFBRDtPQUFNO2lCQUFHLGVBQWUsT0FBTyxRQUFRO01BQVU7Ozs7Y0FDN0M7Ozs7OztLQUNOLHdCQUFDLFFBQUQ7TUFBSTtnQkFBSixDQUNFLHdCQUFDLEtBQUQ7T0FBQztpQkFBRTtNQUFZOzs7O2dCQUNmLHdCQUFDLFVBQUQ7T0FBTTtpQkFBTixDQUFTLE9BQU8sWUFBVyxHQUFTOzs7OztjQUNoQzs7Ozs7O0lBQ0g7Ozs7OztHQUVMLHdCQUFDLE9BQUQ7SUFBRztJQUFFLFdBQVU7Y0FBZixDQUNFLHdCQUFDLE9BQUQ7S0FBRztlQUFILENBQ0Usd0JBQUMsUUFBRDtNQUFJO01BQUUsV0FBVTtnQkFBZ0I7S0FBaUI7Ozs7ZUFDakQsd0JBQUMsVUFBRDtNQUFNO2dCQUFHO0tBQXdCOzs7O2FBQzlCOzs7OztjQUNMLHdCQUFDLFlBQUQ7S0FBVTtLQUFFLE1BQU0sb0JBQW9CLGVBQWUsY0FBYyxvQkFBb0IsY0FBYyxTQUFTO2VBQzNHO0lBQ1M7Ozs7WUFDVDs7Ozs7O0dBRUwsd0JBQUMsT0FBRDtJQUFHO0lBQUUsV0FBVTtjQUFmO0tBQ0Usd0JBQUMsUUFBRDtNQUFJO2dCQUFKLENBQ0Usd0JBQUMsS0FBRDtPQUFDO2lCQUFFO01BQWU7Ozs7Z0JBQ2xCLHdCQUFDLFVBQUQ7T0FBTTtpQkFBRyxPQUFPLG1CQUFtQixPQUFPO01BQWdCOzs7O2NBQ3REOzs7Ozs7S0FDTix3QkFBQyxRQUFEO01BQUk7Z0JBQUosQ0FDRSx3QkFBQyxLQUFEO09BQUM7aUJBQUU7TUFBVzs7OztnQkFDZCx3QkFBQyxZQUFEO09BQVU7T0FBRSxNQUFNLE9BQU8sYUFBYSxjQUFjLFNBQVM7aUJBQWMsT0FBTyxZQUFZO01BQW1COzs7O2NBQzdHOzs7Ozs7S0FDTix3QkFBQyxRQUFEO01BQUk7Z0JBQUosQ0FDRSx3QkFBQyxLQUFEO09BQUM7aUJBQUU7TUFBZ0I7Ozs7Z0JBQ25CLHdCQUFDLFlBQUQ7T0FBVTtPQUFFLE1BQU0sWUFBWSxXQUFXO2lCQUFJLGVBQWU7TUFBc0I7Ozs7Y0FDOUU7Ozs7OztLQUNOLHdCQUFDLFFBQUQ7TUFBSTtnQkFBSixDQUNFLHdCQUFDLEtBQUQ7T0FBQztpQkFBRTtNQUFZOzs7O2dCQUNmLHdCQUFDLFVBQUQ7T0FBTTtpQkFBRyxzQkFBc0IsT0FBTyxjQUFjLE9BQU8sVUFBVTtNQUFVOzs7O2NBQzNFOzs7Ozs7S0FDTix3QkFBQyxRQUFEO01BQUk7Z0JBQUosQ0FDRSx3QkFBQyxLQUFEO09BQUM7aUJBQUU7TUFBYzs7OztnQkFDakIsd0JBQUMsVUFBRDtPQUFNO2lCQUFHLHNCQUFzQixPQUFPLGdCQUFnQixPQUFPLFlBQVk7TUFBVTs7OztjQUMvRTs7Ozs7O0tBQ04sd0JBQUMsUUFBRDtNQUFJO2dCQUFKLENBQ0Usd0JBQUMsS0FBRDtPQUFDO2lCQUFFO01BQVU7Ozs7Z0JBQ2Isd0JBQUMsVUFBRDtPQUFNO2lCQUFHLGNBQWMsYUFBYSxjQUFjLE9BQU8sUUFBUSxHQUFHLFVBQVU7TUFBYTs7OztjQUN2Rjs7Ozs7O0tBQ04sd0JBQUMsUUFBRDtNQUFJO2dCQUFKLENBQ0Usd0JBQUMsS0FBRDtPQUFDO2lCQUFFO01BQVk7Ozs7Z0JBQ2Ysd0JBQUMsVUFBRDtPQUFNO2lCQUFHLHFCQUFxQixhQUFhLHFCQUFxQixPQUFPLFFBQVEsR0FBRyxpQkFBaUI7TUFBVzs7OztjQUMxRzs7Ozs7O0lBQ0g7Ozs7OztHQUVMLHdCQUFDLE9BQUQ7SUFBRztJQUFFLFdBQVU7Y0FBZixDQUNFLHdCQUFDLFlBQUQ7S0FBVTtLQUFFLE1BQUs7ZUFBVztJQUFvQjs7OztjQUNoRCx3QkFBQyxZQUFEO0tBQVU7S0FBRSxNQUFLO2VBQVc7SUFBOEI7Ozs7WUFDdkQ7Ozs7OztFQUNFOzs7Ozs7QUFFYjs7QUFFQSxTQUFTLHFCQUFxQixFQUFFLFFBQThCO0NBQzVELE1BQU0sV0FBVyxLQUFLLFFBQVEsTUFBTSxLQUFLLGFBQWEsS0FBSyxhQUFhLEtBQUssZ0JBQWdCLENBQUMsS0FBSztDQUVuRyxPQUNFLHdCQUFDLFdBQUQ7RUFBTztFQUFFLFdBQVU7WUFBbkI7R0FDRSx3QkFBQyxPQUFEO0lBQUc7SUFBRSxXQUFVO2NBQWYsQ0FDRSx3QkFBQyxPQUFEO0tBQUc7ZUFBSCxDQUNFLHdCQUFDLE1BQUQ7TUFBRTtnQkFBRTtLQUFnQjs7OztlQUNwQix3QkFBQyxLQUFEO01BQUM7TUFBRSxXQUFVO2dCQUFnQjtLQUF5Qzs7OzthQUNuRTs7Ozs7Y0FDTCx3QkFBQyxZQUFEO0tBQVU7S0FBRSxNQUFNLFdBQVcsY0FBYztlQUFhLFdBQVcsVUFBVTtJQUFvQjs7OztZQUM5Rjs7Ozs7O0dBRUwsd0JBQUMsT0FBRDtJQUFHO0lBQUUsV0FBVTtjQUNiLHdCQUFDLE9BQUQ7S0FBRztLQUFFLE9BQU8sRUFBRSxNQUFNLEVBQUU7ZUFBdEIsQ0FDRSx3QkFBQyxPQUFEO01BQUc7TUFBRSxXQUFVO2dCQUFmLENBQ0Usd0JBQUMsUUFBRDtPQUFJO09BQUUsV0FBVTtpQkFBZ0I7TUFBZ0I7Ozs7Z0JBQ2hELHdCQUFDLFVBQUQ7T0FBTTtpQkFBTixDQUFTLEtBQUssT0FBTSxNQUFZOzs7OztjQUM3Qjs7Ozs7ZUFDTCx3QkFBQyxPQUFEO01BQUc7TUFBRSxXQUFVO01BQWEsY0FBWSxjQUFjLEtBQUs7Z0JBQ3pELHdCQUFDLFFBQUQ7T0FBSTtPQUFFLE9BQU8sRUFBRSxPQUFPLEdBQUcsS0FBSyxNQUFNLEdBQUc7TUFBSTs7Ozs7S0FDeEM7Ozs7YUFDRjs7Ozs7O0dBQ0Y7Ozs7O0dBRUwsd0JBQUMsT0FBRDtJQUFHO0lBQUUsV0FBVTtjQUFmO0tBQ0Usd0JBQUMsUUFBRDtNQUFJO2dCQUFKLENBQ0Usd0JBQUMsS0FBRDtPQUFDO2lCQUFFO01BQUs7Ozs7Z0JBQ1Isd0JBQUMsVUFBRDtPQUFNO2lCQUFOLENBQVEsTUFBRyxLQUFLLEVBQVc7Ozs7O2NBQ3ZCOzs7Ozs7S0FDTix3QkFBQyxRQUFEO01BQUk7Z0JBQUosQ0FDRSx3QkFBQyxLQUFEO09BQUM7aUJBQUU7TUFBZTs7OztnQkFDbEIsd0JBQUMsVUFBRDtPQUFNO2lCQUFOLENBQVMsS0FBSyxjQUFhLEdBQVM7Ozs7O2NBQ2hDOzs7Ozs7S0FDTix3QkFBQyxRQUFEO01BQUk7Z0JBQUosQ0FDRSx3QkFBQyxLQUFEO09BQUM7aUJBQUU7TUFBVTs7OztnQkFDYix3QkFBQyxVQUFEO09BQU07aUJBQU4sQ0FBUyxLQUFLLGVBQWMsR0FBUzs7Ozs7Y0FDakM7Ozs7OztLQUNOLHdCQUFDLFFBQUQ7TUFBSTtnQkFBSixDQUNFLHdCQUFDLEtBQUQ7T0FBQztpQkFBRTtNQUFPOzs7O2dCQUNWLHdCQUFDLFVBQUQ7T0FBTTtPQUFFLFdBQVU7aUJBQW1CO01BQVc7Ozs7Y0FDNUM7Ozs7OztJQUNIOzs7Ozs7RUFDRTs7Ozs7O0FBRWI7O0FBRUEsU0FBUyxlQUFlLEVBQUUsUUFBOEI7Q0FDdEQsTUFBTSxRQUFRO0VBQ1o7R0FBRSxPQUFPO0dBQW9CLElBQUk7RUFBSztFQUN0QztHQUFFLE9BQU87R0FBYSxJQUFJLEtBQUssTUFBTTtFQUFFO0VBQ3ZDO0dBQUUsT0FBTztHQUFjLElBQUksS0FBSztFQUFVO0VBQzFDO0dBQUUsT0FBTztHQUFjLElBQUksS0FBSztFQUFVO0VBQzFDO0dBQUUsT0FBTztHQUFpQixJQUFJLEtBQUs7RUFBYTtFQUNoRDtHQUFFLE9BQU87R0FBNEIsSUFBSSxDQUFDLEtBQUs7RUFBWTtFQUMzRDtHQUFFLE9BQU87R0FBMEIsSUFBSTtFQUFLO0NBQzlDO0NBRUEsT0FDRSx3QkFBQyxXQUFEO0VBQU87RUFBRSxXQUFVO1lBQW5CLENBQ0Usd0JBQUMsT0FBRDtHQUFHO0dBQUUsV0FBVTthQUFmLENBQ0Usd0JBQUMsTUFBRDtJQUFFO2NBQUU7R0FBYzs7OzthQUNsQix3QkFBQyxZQUFEO0lBQVU7SUFBRSxNQUFLO2NBQVk7R0FBb0I7Ozs7V0FDOUM7Ozs7O1lBQ0wsd0JBQUMsT0FBRDtHQUFHO0dBQUUsV0FBVTthQUNaLE1BQU0sS0FBSSxTQUNULHdCQUFDLE9BQUQ7SUFBRztJQUFFLFdBQVU7Y0FDYix3QkFBQyxPQUFEO0tBQUc7S0FBRSxXQUFVO2VBQWYsQ0FDRSx3QkFBQyxVQUFEO01BQU07Z0JBQUcsS0FBSztLQUFjOzs7O2VBQzVCLHdCQUFDLFlBQUQ7TUFBVTtNQUFFLE1BQU0sS0FBSyxLQUFLLGNBQWM7Z0JBQWEsS0FBSyxLQUFLLE9BQU87S0FBb0I7Ozs7YUFDekY7Ozs7OztHQUNGLEdBTGtDLEtBQUs7Ozs7VUFLdkMsQ0FDTjtFQUNFOzs7O1VBQ0U7Ozs7OztBQUViOztBQUVBLFNBQVMsZ0JBQWdCLEVBQUUsYUFBd0Q7Q0FDakYsT0FDRSx3QkFBQyxXQUFEO0VBQU87RUFBRSxXQUFVO1lBQW5CLENBQ0Usd0JBQUMsT0FBRDtHQUFHO0dBQUUsV0FBVTthQUFmLENBQ0Usd0JBQUMsTUFBRDtJQUFFO2NBQUU7R0FBa0I7Ozs7YUFDdEIsd0JBQUMsWUFBRDtJQUFVO0lBQUUsTUFBSztjQUFPO0dBQXFCOzs7O1dBQzFDOzs7OztZQUNMLHdCQUFDLE9BQUQ7R0FBRztHQUFFLFdBQVU7YUFDWixVQUFVLE1BQU0sR0FBRyxDQUFDLEVBQUUsS0FBSSxhQUN6Qix3QkFBQyxXQUFEO0lBQU87SUFBRSxXQUFVO2NBQW5CO0tBQ0Usd0JBQUMsT0FBRDtNQUFHO01BQUUsV0FBVTtnQkFBZixDQUNFLHdCQUFDLFVBQUQ7T0FBTTtpQkFBRyxTQUFTO01BQVc7Ozs7Z0JBQzdCLHdCQUFDLFlBQUQ7T0FBVTtPQUFFLE1BQU0sU0FBUztpQkFBYSxTQUFTO01BQXVCOzs7O2NBQ3JFOzs7Ozs7S0FDTCx3QkFBQyxLQUFEO01BQUM7TUFBRSxXQUFVO2dCQUFiO09BQ0csU0FBUztPQUFPO09BQUksU0FBUztPQUFVO09BQUksU0FBUztNQUNwRDs7Ozs7O0tBQ0gsd0JBQUMsT0FBRDtNQUFHO01BQUUsV0FBVTtnQkFBZjtPQUNFLHdCQUFDLFFBQUQ7UUFBSTtrQkFBSixDQUFLLE9BRUgsd0JBQUMsVUFBRDtTQUFNO21CQUFOLENBQVMsU0FBUyxRQUFRLFFBQVEsQ0FBQyxHQUFFLEdBQVM7Ozs7O2dCQUMxQzs7Ozs7O09BQ04sd0JBQUMsUUFBRDtRQUFJO2tCQUFKLENBQUssTUFFSCx3QkFBQyxVQUFEO1NBQU07bUJBQUcsU0FBUyxhQUFhLFFBQVEsQ0FBQztRQUFVOzs7O2dCQUM5Qzs7Ozs7O09BQ04sd0JBQUMsUUFBRDtRQUFJO2tCQUFKLENBQUssT0FFSCx3QkFBQyxVQUFEO1NBQU07U0FBRSxXQUFXLFNBQVMsYUFBYSxJQUFJLHFCQUFxQjttQkFDL0QsU0FBUyxVQUFVLFFBQVEsQ0FBQztRQUN2Qjs7OztnQkFDSjs7Ozs7O01BQ0g7Ozs7OztJQUNFO01BeEJvQyxTQUFTOzs7O1VBd0I3QyxDQUNWO0VBQ0U7Ozs7VUFDRTs7Ozs7O0FBRWI7O0FBRUEsT0FBTyxTQUFTLGNBQWMsRUFDNUIsT0FDQSxRQUNBLFFBQ0EsTUFDQSxTQUNBLFlBQ0EsYUFDQSxXQUNBLFFBQ0EsV0FDQSx5QkFDQSx5QkFDQSxlQUNBLHFCQUNBLHdCQWlCQzs7Q0FDRCxNQUFNLENBQUMsV0FBVyxnQkFBZ0IsU0FBdUIsT0FBTztDQUNoRSxNQUFNLG9CQUFvQixzQkFBc0IsTUFBTTtDQUN0RCxNQUFNLG1CQUFtQixjQUFjO0VBQ3JDLE1BQU0sZUFBZSxZQUFZLFFBQU8sUUFBTyxJQUFJLFdBQVcsdUJBQXVCO0VBQ3JGLE1BQU0sZUFBMkI7R0FDL0IsSUFBSSxPQUFPLHdCQUF3QixRQUFRLE9BQU8sR0FBRyxFQUFFLFlBQVk7R0FDbkUsV0FBVyxJQUFJLEtBQUssRUFBRSxZQUFZO0dBQ2xDLFFBQVE7R0FDUixXQUFXLE9BQU87R0FDbEIsTUFBTSxNQUFNO0dBQ1osVUFBVSxPQUFPO0dBQ2pCLFlBQVksT0FBTztHQUNuQixXQUFXLEtBQUs7R0FDaEIsUUFBUSxPQUFPO0dBQ2YsUUFBUTtHQUNSLGFBQWEsT0FBTyxXQUFXLFVBQVUsT0FBTyxpQkFBaUIsY0FBYyxlQUFlO0dBQzlGLFVBQVUsT0FBTztHQUNqQixRQUFRLGtDQUFrQyxPQUFPLGdCQUFnQixVQUFVLGFBQWEsT0FBTyxZQUFZLE1BQU07RUFDbkg7RUFFQSxPQUFPO0dBQUM7R0FBYyxHQUFHO0dBQWMsR0FBRyxZQUFZLFFBQU8sUUFBTyxJQUFJLFdBQVcsdUJBQXVCO0VBQUMsRUFBRSxNQUFNLEdBQUcsQ0FBQztDQUN6SCxHQUFHO0VBQ0Q7RUFDQSxPQUFPO0VBQ1AsT0FBTztFQUNQLE9BQU87RUFDUCxPQUFPO0VBQ1AsS0FBSztFQUNMO0VBQ0EsT0FBTztFQUNQLE9BQU87RUFDUCxNQUFNO0NBQ1IsQ0FBQztDQUVELE9BQ0Usd0JBQUMsT0FBRDtFQUFHO0VBQUUsV0FBVTtZQUFmO0dBQ0Usd0JBQUMseUJBQUQ7SUFBdUI7SUFBRSxnQkFBZ0I7SUFBeUIsVUFBVTtHQUEwQjs7Ozs7R0FFdEcsd0JBQUMsT0FBRDtJQUFHO0lBQUUsV0FBVTtjQUFmLENBQ0Usd0JBQUMsT0FBRDtLQUFHO0tBQUUsV0FBVTtlQUNiLHdCQUFDLGlCQUFEO01BQWU7TUFBVztNQUFpQjtNQUFnQjtLQUFTOzs7OztJQUNqRTs7OztjQUNMLHdCQUFDLFNBQUQ7S0FBSztLQUFFLFdBQVU7S0FBMkIsY0FBVztlQUF2RCxDQUNFLHdCQUFDLHVCQUFEO01BQXFCO01BQ1g7TUFDUixnQkFBZ0I7TUFDUjtNQUNEO0tBQ1I7Ozs7ZUFDRCx3QkFBQyxzQkFBRDtNQUFvQjtNQUFRO0tBQU87Ozs7YUFDOUI7Ozs7O1lBQ0o7Ozs7OztHQUVMLHdCQUFDLFdBQUQ7SUFBTztJQUFFLFdBQVU7Y0FBbkIsQ0FDRSx3QkFBQyxPQUFEO0tBQUc7S0FBRSxXQUFVO0tBQXFCLE1BQUs7S0FBVSxjQUFXO2VBQzNELGNBQWMsS0FBSSxRQUNqQix3QkFBQyxVQUFEO01BQU07TUFDSixpQkFBZSxJQUFJLE9BQU87TUFDMUIsV0FBVyxpQkFBaUIsSUFBSSxPQUFPLFlBQVksY0FBYztNQUVqRSxlQUFlLGFBQWEsSUFBSSxFQUFFO01BQ2xDLE1BQUs7TUFDTCxNQUFLO2dCQUVKLElBQUk7S0FDQyxHQU5ELElBQUk7Ozs7WUFNSCxDQUNUO0lBQ0U7Ozs7Y0FFTCx3QkFBQyxPQUFEO0tBQUc7S0FBRSxXQUFVO0tBQXFCLE1BQUs7ZUFBekM7TUFDRyxjQUFjLFVBQ2Isd0JBQUMsT0FBRDtPQUFHO09BQUUsV0FBVTtpQkFBZjtRQUNFLHdCQUFDLGtCQUFEO1NBQWdCO1NBQUUsVUFBVSxNQUFNO1NBQWtCO1FBQVM7Ozs7O1FBQzdELHdCQUFDLFdBQUQ7U0FBTztTQUFFLFdBQVU7bUJBQW5CLENBQ0Usd0JBQUMsT0FBRDtVQUFHO1VBQUUsV0FBVTtvQkFBZixDQUNFLHdCQUFDLE1BQUQ7V0FBRTtxQkFBRTtVQUFTOzs7O29CQUNiLHdCQUFDLFlBQUQ7V0FBVTtXQUFFLE1BQUs7cUJBQVc7VUFBOEI7Ozs7a0JBQ3ZEOzs7OzttQkFDTCx3QkFBQyxxQkFBRDtVQUFtQjtVQUNqQixjQUFjLE1BQU07VUFDcEIsYUFBYSxNQUFNO1VBQ0c7VUFDRDtTQUN0Qjs7OztpQkFDTTs7Ozs7O1FBQ1Qsd0JBQUMsZ0JBQUQ7U0FBYztTQUFFLE9BQU8sVUFBVSxNQUFNLEdBQUcsQ0FBQztRQUFJOzs7OztRQUMvQyx3QkFBQyxZQUFEO1NBQVU7U0FBRSxRQUFRLE9BQU8sTUFBTSxHQUFHLENBQUM7UUFBSTs7Ozs7T0FDdEM7Ozs7O2lCQUNIO01BRUgsY0FBYyxVQUNiLHdCQUFDLE9BQUQ7T0FBRztPQUFFLFdBQVU7aUJBQWY7UUFDRSx3QkFBQyxpQkFBRDtTQUFlO1NBQUUsU0FBUyxNQUFNO1NBQWMsVUFBVTtTQUF1QjtRQUFTOzs7OztRQUN4Rix3QkFBQyx1QkFBRDtTQUFxQjtTQUFFLE9BQU8sT0FBTztRQUFjOzs7OztRQUNuRCx3QkFBQyw4QkFBRDtTQUE0QjtTQUFVO1FBQVM7Ozs7O1FBQy9DLHdCQUFDLHNCQUFEO1NBQW9CO1NBQUUsWUFBWSxPQUFPO1FBQWE7Ozs7O09BQ25EOzs7OztpQkFDSDtNQUVILGNBQWMsVUFDYix3QkFBQyxPQUFEO09BQUc7T0FBRSxXQUFVO2lCQUFmLENBQ0Usd0JBQUMsV0FBRDtRQUFPO1FBQUUsV0FBVTtrQkFBbkIsQ0FDRSx3QkFBQyxPQUFEO1NBQUc7U0FBRSxXQUFVO21CQUFmLENBQ0Usd0JBQUMsT0FBRDtVQUFHO29CQUFILENBQ0Usd0JBQUMsTUFBRDtXQUFFO3FCQUFFO1VBQWlCOzs7O29CQUNyQix3QkFBQyxLQUFEO1dBQUM7V0FBRSxXQUFVO3FCQUFiO1lBQ0c7WUFBd0I7WUFBSSxPQUFPO1lBQVU7WUFBSTtZQUFrQjtZQUFTLFdBQVcsT0FBTyxNQUFNO1lBQUU7WUFBWTtZQUNsSCxPQUFPLFlBQVk7V0FDbkI7Ozs7O2tCQUNBOzs7OzttQkFDTCx3QkFBQyxZQUFEO1VBQVU7VUFBRSxNQUFLO29CQUFXO1NBQXdCOzs7O2lCQUNqRDs7Ozs7a0JBQ0wsd0JBQUMsT0FBRDtTQUFHO1NBQUUsV0FBVTttQkFBZjtVQUNFLHdCQUFDLE9BQUQ7V0FBRztXQUFFLFdBQVU7cUJBQWYsQ0FDRSx3QkFBQyxRQUFEO1lBQUk7WUFBRSxXQUFVO3NCQUFnQjtXQUFVOzs7O3FCQUMxQyx3QkFBQyxPQUFEO1lBQUc7WUFBRSxXQUFVO3NCQUFpQixZQUFZLE9BQU8sS0FBSztXQUFPOzs7O21CQUM1RDs7Ozs7O1VBQ0wsd0JBQUMsT0FBRDtXQUFHO1dBQUUsV0FBVTtxQkFBZixDQUNFLHdCQUFDLFFBQUQ7WUFBSTtZQUFFLFdBQVU7c0JBQWdCO1dBQVk7Ozs7cUJBQzVDLHdCQUFDLE9BQUQ7WUFBRztZQUFFLFdBQVU7c0JBQWlCLE9BQU87V0FBWTs7OzttQkFDaEQ7Ozs7OztVQUNMLHdCQUFDLE9BQUQ7V0FBRztXQUFFLFdBQVU7cUJBQWYsQ0FDRSx3QkFBQyxRQUFEO1lBQUk7WUFBRSxXQUFVO3NCQUFnQjtXQUFZOzs7O3FCQUM1Qyx3QkFBQyxPQUFEO1lBQUc7WUFBRSxXQUFVO3NCQUFpQixPQUFPLE9BQU8sZUFBZSxPQUFPO1dBQU87Ozs7bUJBQ3hFOzs7Ozs7VUFDTCx3QkFBQyxPQUFEO1dBQUc7V0FBRSxXQUFVO3FCQUFmLENBQ0Usd0JBQUMsUUFBRDtZQUFJO1lBQUUsV0FBVTtzQkFBZ0I7V0FBa0I7Ozs7cUJBQ2xELHdCQUFDLE9BQUQ7WUFBRztZQUFFLFdBQVU7WUFBZ0IsT0FBTyxFQUFFLFVBQVUsR0FBRztzQkFBSSxPQUFPLGVBQWU7V0FBZTs7OzttQkFDM0Y7Ozs7OztVQUNMLHdCQUFDLE9BQUQ7V0FBRztXQUFFLFdBQVU7cUJBQWYsQ0FDRSx3QkFBQyxRQUFEO1lBQUk7WUFBRSxXQUFVO3NCQUFnQjtXQUFVOzs7O3FCQUMxQyx3QkFBQyxPQUFEO1lBQUc7WUFBRSxXQUFVO1lBQWdCLE9BQU8sRUFBRSxVQUFVLEdBQUc7c0JBQUksT0FBTyxjQUFjO1dBQWU7Ozs7bUJBQzFGOzs7Ozs7U0FDRjs7Ozs7Z0JBQ0U7Ozs7O2lCQUNULHdCQUFDLFdBQUQ7UUFBTztRQUFFLFdBQVU7a0JBQW5CLENBQ0Usd0JBQUMsT0FBRDtTQUFHO1NBQUUsV0FBVTttQkFBZixDQUNFLHdCQUFDLE1BQUQ7VUFBRTtvQkFBRTtTQUFpQjs7OzttQkFDckIsd0JBQUMsWUFBRDtVQUFVO1VBQUUsTUFBSztvQkFBTztTQUFxQjs7OztpQkFDMUM7Ozs7O2tCQUNMLHdCQUFDLE9BQUQ7U0FBRztTQUFFLFdBQVU7bUJBQ1osb0JBQW9CLEtBQUksV0FDdkIsd0JBQUMsUUFBRDtVQUFJO1VBQUUsV0FBVTtvQkFBZ0MsT0FBTztTQUFZLEdBQS9CLE9BQU87Ozs7Z0JBQXdCLENBQ3BFO1FBQ0U7Ozs7Z0JBQ0U7Ozs7O2VBQ047Ozs7O2lCQUNIO01BRUgsY0FBYyxTQUNiLHdCQUFDLE9BQUQ7T0FBRztPQUFFLFdBQVU7aUJBQWY7UUFDRSx3QkFBQyxlQUFEO1NBQWE7U0FBUTtRQUFPOzs7OztRQUM1Qix3QkFBQyxnQkFBRDtTQUFjO1NBQVE7UUFBTzs7Ozs7UUFDN0Isd0JBQUMsV0FBRDtTQUFPO1NBQUUsV0FBVTttQkFBbkIsQ0FDRSx3QkFBQyxPQUFEO1VBQUc7VUFBRSxXQUFVO29CQUFmLENBQ0Usd0JBQUMsTUFBRDtXQUFFO3FCQUFFO1VBQVk7Ozs7b0JBQ2hCLHdCQUFDLFlBQUQ7V0FBVTtXQUFFLE1BQUs7cUJBQU87VUFBZ0I7Ozs7a0JBQ3JDOzs7OzttQkFDTCx3QkFBQyxPQUFEO1VBQUc7VUFBRSxXQUFVO29CQUFmO1dBQ0Usd0JBQUMsT0FBRDtZQUFHO1lBQUUsV0FBVTtzQkFBZixDQUNFLHdCQUFDLFFBQUQ7YUFBSTthQUFFLFdBQVU7dUJBQWdCO1lBQVc7Ozs7c0JBQzNDLHdCQUFDLE9BQUQ7YUFBRzthQUFFLFdBQVU7dUJBQWYsQ0FBZ0MsS0FBSyxlQUFjLEdBQU07Ozs7O29CQUN0RDs7Ozs7O1dBQ0wsd0JBQUMsT0FBRDtZQUFHO1lBQUUsV0FBVTtzQkFBZixDQUNFLHdCQUFDLFFBQUQ7YUFBSTthQUFFLFdBQVU7dUJBQWdCO1lBQVk7Ozs7c0JBQzVDLHdCQUFDLE9BQUQ7YUFBRzthQUFFLFdBQVU7dUJBQWYsQ0FBZ0MsS0FBSyxnQkFBZSxHQUFNOzs7OztvQkFDdkQ7Ozs7OztXQUNMLHdCQUFDLE9BQUQ7WUFBRztZQUFFLFdBQVU7c0JBQWYsQ0FDRSx3QkFBQyxRQUFEO2FBQUk7YUFBRSxXQUFVO3VCQUFnQjtZQUFXOzs7O3NCQUMzQyx3QkFBQyxPQUFEO2FBQUc7YUFBRSxXQUFVO3VCQUFmLENBQWdDLEtBQUssZUFBYyxHQUFNOzs7OztvQkFDdEQ7Ozs7OztXQUNMLHdCQUFDLE9BQUQ7WUFBRztZQUFFLFdBQVU7c0JBQWYsQ0FDRSx3QkFBQyxRQUFEO2FBQUk7YUFBRSxXQUFVO3VCQUFnQjtZQUFlOzs7O3NCQUMvQyx3QkFBQyxPQUFEO2FBQUc7YUFBRSxXQUFVO3VCQUFpQztZQUFROzs7O29CQUNyRDs7Ozs7O1VBQ0Y7Ozs7O2lCQUNFOzs7Ozs7T0FDTjs7Ozs7aUJBQ0g7TUFFSCxjQUFjLFlBQ2Isd0JBQUMsT0FBRDtPQUFHO09BQUUsV0FBVTtpQkFBZixDQUNFLHdCQUFDLFdBQUQ7UUFBTztRQUFFLFdBQVU7a0JBQW5CLENBQ0Usd0JBQUMsT0FBRDtTQUFHO1NBQUUsV0FBVTttQkFBZixDQUNFLHdCQUFDLE1BQUQ7VUFBRTtvQkFBRTtTQUFXOzs7O21CQUNmLHdCQUFDLFlBQUQ7VUFBVTtVQUFFLE1BQUs7b0JBQVk7U0FBMkI7Ozs7aUJBQ3JEOzs7OztrQkFDTCx3QkFBQyxjQUFEO1NBQVk7U0FBRSxNQUFNO1FBQW1COzs7O2dCQUNoQzs7Ozs7aUJBQ1Qsd0JBQUMsaUJBQUQ7UUFBZTtRQUFhO09BQVk7Ozs7ZUFDckM7Ozs7O2lCQUNIO01BRUgsY0FBYyxXQUFXLHdCQUFDLHdCQUFEO09BQXNCO09BQUUsUUFBUSxPQUFPO01BQWU7Ozs7aUJBQUk7TUFFbkYsY0FBYyxlQUNiLHdCQUFDLE9BQUQ7T0FBRztPQUFFLFdBQVU7aUJBQ1osV0FBVyxNQUFNLEdBQUcsQ0FBQyxFQUFFLEtBQUksY0FDMUIsd0JBQUMsc0JBQUQ7UUFBb0I7UUFBYTtPQUErQixHQUFmLFVBQVU7Ozs7Y0FBSyxDQUNqRTtNQUNFOzs7O2lCQUNIO0tBQ0Q7Ozs7O1lBQ0U7Ozs7OztFQUNOOzs7Ozs7QUFFVCIsIm5hbWVzIjpbXSwiaWdub3JlTGlzdCI6W10sInNvdXJjZXMiOlsiRGFzaGJvYXJkUGFnZS50c3giXSwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgdXNlTWVtbywgdXNlU3RhdGUgfSBmcm9tIFwicmVhY3RcIjtcbmltcG9ydCB0eXBlIHtcbiAgQWxlcnRJdGVtLFxuICBCYWNrdGVzdFN1bW1hcnksXG4gIENvY2twaXRTdGF0ZSxcbiAgQ29ubmVjdG9yU3RhdHVzLFxuICBLYWxvc1NpZ25hbCxcbiAgSm91cm5hbFJvdyxcbiAgTWFya2V0U3RhdHVzLFxuICBPaGxjQ2FuZGxlLFxuICBSaXNrU3RhdHVzLFxuICBTeW50aGV0aWNJbmRleFN5bWJvbCxcbiAgV2F0Y2hsaXN0SXRlbSxcbn0gZnJvbSBcIi4uL2FwcC9jb2NrcGl0LnR5cGVzXCI7XG5pbXBvcnQgeyBjaGFydENvbnRleHRBY3Rpb25zLCBzeW50aGV0aWNJbmRleFN5bWJvbHMgfSBmcm9tIFwiLi4vYXBwL2NvY2twaXQtZGF0YVwiO1xuaW1wb3J0IHsgTWFya2V0U3RhdHVzQ2FyZCB9IGZyb20gXCIuLi9jb21wb25lbnRzL01hcmtldFN0YXR1c0NhcmRcIjtcbmltcG9ydCB7IEthbG9zU2lnbmFsQ2FyZCB9IGZyb20gXCIuLi9jb21wb25lbnRzL0thbG9zU2lnbmFsQ2FyZFwiO1xuaW1wb3J0IHsgUmlza1Njb3JlQ2FyZCB9IGZyb20gXCIuLi9jb21wb25lbnRzL1Jpc2tTY29yZUNhcmRcIjtcbmltcG9ydCB7IFRyYWRpbmdNb2RlU2VsZWN0b3IgfSBmcm9tIFwiLi4vY29tcG9uZW50cy9UcmFkaW5nTW9kZVNlbGVjdG9yXCI7XG5pbXBvcnQgeyBXYXRjaGxpc3RQYW5lbCB9IGZyb20gXCIuLi9jb21wb25lbnRzL1dhdGNobGlzdFBhbmVsXCI7XG5pbXBvcnQgeyBBbGVydFBhbmVsIH0gZnJvbSBcIi4uL2NvbXBvbmVudHMvQWxlcnRQYW5lbFwiO1xuaW1wb3J0IHsgSm91cm5hbFRhYmxlIH0gZnJvbSBcIi4uL2NvbXBvbmVudHMvSm91cm5hbFRhYmxlXCI7XG5pbXBvcnQgeyBDb25uZWN0aW9uU3RhdHVzQ2FyZCB9IGZyb20gXCIuLi9jb21wb25lbnRzL0Nvbm5lY3Rpb25TdGF0dXNDYXJkXCI7XG5pbXBvcnQgeyBmb3JtYXREZWNpc2lvbiwgZm9ybWF0UHJpY2UsIFN0YXR1c1BpbGwgfSBmcm9tIFwiLi4vY29tcG9uZW50cy9Db2NrcGl0UHJpbWl0aXZlc1wiO1xuaW1wb3J0IHsgS2Fsb3NGdXR1cmVQYXRoUGFuZWwgfSBmcm9tIFwiLi4va2Fsb3MvS2Fsb3NGdXR1cmVQYXRoUGFuZWxcIjtcbmltcG9ydCB7IEthbG9zTWFya2V0QnJhaW5QYW5lbCB9IGZyb20gXCIuLi9rYWxvcy9LYWxvc01hcmtldEJyYWluUGFuZWxcIjtcbmltcG9ydCB7IEthbG9zTWFya2V0UmVwbGF5UGFuZWwgfSBmcm9tIFwiLi4va2Fsb3MvS2Fsb3NNYXJrZXRSZXBsYXlQYW5lbFwiO1xuaW1wb3J0IHsgS2Fsb3NWaXN1YWxJbnRlbGxpZ2VuY2VQYW5lbCB9IGZyb20gXCIuLi9rYWxvcy9LYWxvc1Zpc3VhbEludGVsbGlnZW5jZVBhbmVsXCI7XG5pbXBvcnQgeyBMaXZlTWFya2V0Q2hhcnQgfSBmcm9tIFwiLi4vdHJhZGluZy9MaXZlTWFya2V0Q2hhcnRcIjtcblxudHlwZSBEYXNoYm9hcmRUYWIgPSBcInF1aWNrXCIgfCBcImthbG9zXCIgfCBcImNoYXJ0XCIgfCBcInJpc2tcIiB8IFwiam91cm5hbFwiIHwgXCJyZXBsYXlcIiB8IFwiY29ubmVjdG9yc1wiO1xuXG5jb25zdCBkYXNoYm9hcmRUYWJzOiByZWFkb25seSB7IGlkOiBEYXNoYm9hcmRUYWI7IGxhYmVsOiBzdHJpbmcgfVtdID0gW1xuICB7IGlkOiBcInF1aWNrXCIsIGxhYmVsOiBcIlZ1ZSByYXBpZGVcIiB9LFxuICB7IGlkOiBcImthbG9zXCIsIGxhYmVsOiBcIkFuYWx5c2UgS0FMT1NcIiB9LFxuICB7IGlkOiBcImNoYXJ0XCIsIGxhYmVsOiBcIkdyYXBoaXF1ZVwiIH0sXG4gIHsgaWQ6IFwicmlza1wiLCBsYWJlbDogXCJSaXNxdWVcIiB9LFxuICB7IGlkOiBcImpvdXJuYWxcIiwgbGFiZWw6IFwiSm91cm5hbFwiIH0sXG4gIHsgaWQ6IFwicmVwbGF5XCIsIGxhYmVsOiBcIlJlcGxheVwiIH0sXG4gIHsgaWQ6IFwiY29ubmVjdG9yc1wiLCBsYWJlbDogXCJDb25uZWN0ZXVyc1wiIH0sXG5dO1xuXG5mdW5jdGlvbiBkaXNwbGF5U291cmNlKHN0YXRlOiBDb2NrcGl0U3RhdGUsIG1hcmtldDogTWFya2V0U3RhdHVzKTogXCJNT0NLXCIgfCBcIkRFTU9cIiB8IFwiUkVBTF9EQVRBXCIge1xuICBpZiAoc3RhdGUuZGF0YU1vZGUgPT09IFwiUkVBTF9EQVRBXCIgfHwgbWFya2V0LnNvdXJjZSA9PT0gXCJMSVZFXCIpIHJldHVybiBcIlJFQUxfREFUQVwiO1xuICByZXR1cm4gbWFya2V0LnNvdXJjZTtcbn1cblxuZnVuY3Rpb24gZmVlZFN0YXR1cyhzdGF0ZTogQ29ja3BpdFN0YXRlLCBtYXJrZXQ6IE1hcmtldFN0YXR1cyk6IFwiQ09OTkVDVEVEXCIgfCBcIkRFTEFZRURcIiB8IFwiTU9DS1wiIHwgXCJESVNDT05ORUNURURcIiB8IFwiVU5LTk9XTlwiIHtcbiAgaWYgKG1hcmtldC5zb3VyY2VTdGF0dXMpIHJldHVybiBtYXJrZXQuc291cmNlU3RhdHVzO1xuICBpZiAoc3RhdGUuZGF0YU1vZGUgPT09IFwiUkVBTF9EQVRBXCIpIHJldHVybiBcIkRFTEFZRURcIjtcbiAgaWYgKG1hcmtldC5zb3VyY2UgPT09IFwiREVNT1wiKSByZXR1cm4gXCJDT05ORUNURURcIjtcbiAgcmV0dXJuIFwiTU9DS1wiO1xufVxuXG5mdW5jdGlvbiBtYXJrZXREYXRhU291cmNlTGFiZWwobWFya2V0OiBNYXJrZXRTdGF0dXMpIHtcbiAgaWYgKG1hcmtldC5zb3VyY2UgPT09IFwiREVNT1wiICYmIG1hcmtldC5zb3VyY2VTdGF0dXMgPT09IFwiQ09OTkVDVEVEXCIgJiYgbWFya2V0LnNlc3Npb24udG9Mb3dlckNhc2UoKS5pbmNsdWRlcyhcImRlcml2XCIpKSB7XG4gICAgcmV0dXJuIFwiREVSSVYgREVNT1wiO1xuICB9XG4gIGlmIChtYXJrZXQuc291cmNlID09PSBcIk1PQ0tcIikgcmV0dXJuIFwiTU9DS19EQVRBXCI7XG4gIHJldHVybiBtYXJrZXQuc291cmNlO1xufVxuXG5mdW5jdGlvbiBmZWVkVG9uZShzdGF0dXM6IFwiQ09OTkVDVEVEXCIgfCBcIkRFTEFZRURcIiB8IFwiTU9DS1wiIHwgXCJESVNDT05ORUNURURcIiB8IFwiVU5LTk9XTlwiKSB7XG4gIGlmIChzdGF0dXMgPT09IFwiQ09OTkVDVEVEXCIpIHJldHVybiBcImNvbm5lY3RlZFwiIGFzIGNvbnN0O1xuICBpZiAoc3RhdHVzID09PSBcIkRFTEFZRURcIikgcmV0dXJuIFwiZGVsYXllZFwiIGFzIGNvbnN0O1xuICBpZiAoc3RhdHVzID09PSBcIkRJU0NPTk5FQ1RFRFwiIHx8IHN0YXR1cyA9PT0gXCJVTktOT1dOXCIpIHJldHVybiBcImRpc2Nvbm5lY3RlZFwiIGFzIGNvbnN0O1xuICByZXR1cm4gXCJNT0NLXCIgYXMgY29uc3Q7XG59XG5cbmZ1bmN0aW9uIHF1YWxpdHlUb25lKHF1YWxpdHk6IE1hcmtldFN0YXR1c1tcImRhdGFRdWFsaXR5XCJdKSB7XG4gIGlmIChxdWFsaXR5ID09PSBcIkhFQUxUSFlcIikgcmV0dXJuIFwiY29ubmVjdGVkXCIgYXMgY29uc3Q7XG4gIGlmIChxdWFsaXR5ID09PSBcIkRFR1JBREVEXCIgfHwgcXVhbGl0eSA9PT0gXCJTVEFMRVwiKSByZXR1cm4gXCJkZWxheWVkXCIgYXMgY29uc3Q7XG4gIGlmIChxdWFsaXR5ID09PSBcIklOVkFMSURcIiB8fCBxdWFsaXR5ID09PSBcIkRJU0NPTk5FQ1RFRFwiKSByZXR1cm4gXCJjcml0aWNhbFwiIGFzIGNvbnN0O1xuICByZXR1cm4gXCJNT0NLXCIgYXMgY29uc3Q7XG59XG5cbmZ1bmN0aW9uIGZvcm1hdFNvdXJjZVRpbWVzdGFtcCh0aW1lc3RhbXA6IHN0cmluZyB8IG51bGwgfCB1bmRlZmluZWQpIHtcbiAgaWYgKCF0aW1lc3RhbXApIHJldHVybiBcIm4vYVwiO1xuICByZXR1cm4gbmV3IERhdGUodGltZXN0YW1wKS50b0xvY2FsZVRpbWVTdHJpbmcoXCJmci1GUlwiLCB7IGhvdXI6IFwiMi1kaWdpdFwiLCBtaW51dGU6IFwiMi1kaWdpdFwiIH0pO1xufVxuXG5mdW5jdGlvbiBrYWxvc0RhdGFTb3VyY2VMYWJlbChzaWduYWw6IEthbG9zU2lnbmFsLCBtYXJrZXQ6IE1hcmtldFN0YXR1cywgc3RhdGU6IENvY2twaXRTdGF0ZSkge1xuICBjb25zdCBzb3VyY2UgPSBzaWduYWwuZGF0YVNvdXJjZSA/PyBkaXNwbGF5U291cmNlKHN0YXRlLCBtYXJrZXQpO1xuICBjb25zdCBsYWJlbCA9IHNpZ25hbC5kYXRhU291cmNlTGFiZWwgPz8gbWFya2V0LnNlc3Npb247XG4gIGNvbnN0IGlzRGVyaXZEZW1vID1cbiAgICBzb3VyY2UgPT09IFwiREVNT1wiICYmXG4gICAgKHNpZ25hbC5zb3VyY2VTdGF0dXMgPz8gbWFya2V0LnNvdXJjZVN0YXR1cykgPT09IFwiQ09OTkVDVEVEXCIgJiZcbiAgICBsYWJlbC50b0xvd2VyQ2FzZSgpLmluY2x1ZGVzKFwiZGVyaXZcIik7XG5cbiAgaWYgKGlzRGVyaXZEZW1vKSByZXR1cm4gXCJERVJJViBERU1PXCI7XG4gIGlmIChzb3VyY2UgPT09IFwiTU9DS1wiIHx8IG1hcmtldC5zb3VyY2UgPT09IFwiTU9DS1wiKSByZXR1cm4gXCJNT0NLX0RBVEFcIjtcbiAgcmV0dXJuIHNvdXJjZTtcbn1cblxuZnVuY3Rpb24gbW9ja1BvbGljeUxhYmVsKGRhdGFTb3VyY2VMYWJlbDogc3RyaW5nLCBtYXJrZXQ6IE1hcmtldFN0YXR1cykge1xuICBpZiAoZGF0YVNvdXJjZUxhYmVsID09PSBcIkRFUklWIERFTU9cIiAmJiBtYXJrZXQuc291cmNlU3RhdHVzID09PSBcIkNPTk5FQ1RFRFwiKSByZXR1cm4gXCJNT0NLX0RBVEEgQkxPQ0tFRFwiO1xuICBpZiAoZGF0YVNvdXJjZUxhYmVsID09PSBcIk1PQ0tfREFUQVwiKSByZXR1cm4gXCJNT0NLX0RBVEEgRkFMTEJBQ0tcIjtcbiAgcmV0dXJuIFwiTU9DS19EQVRBIE9GRlwiO1xufVxuXG5mdW5jdGlvbiBTeW50aGV0aWNNYXJrZXRTZWxlY3Rvcih7XG4gIHNlbGVjdGVkU3ltYm9sLFxuICBvbkNoYW5nZSxcbn06IHtcbiAgc2VsZWN0ZWRTeW1ib2w6IFN5bnRoZXRpY0luZGV4U3ltYm9sO1xuICBvbkNoYW5nZTogKHN5bWJvbDogU3ludGhldGljSW5kZXhTeW1ib2wpID0+IHZvaWQ7XG59KSB7XG4gIHJldHVybiAoXG4gICAgPHNlY3Rpb24gY2xhc3NOYW1lPVwiY29ja3BpdC1wYW5lbCBkYXNoYm9hcmQtc2VsZWN0b3ItcGFuZWxcIj5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1wYW5lbC1oZWFkZXJcIj5cbiAgICAgICAgPGRpdj5cbiAgICAgICAgICA8aDI+RGVyaXYgU3ludGhldGljIEluZGljZXM8L2gyPlxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImNvY2twaXQtbXV0ZWRcIj5TZWxlY3Rpb24gZHUgbWFyY2hlIGQnYW5hbHlzZSwgbGVjdHVyZSBzZXVsZS48L3A+XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8U3RhdHVzUGlsbCB0b25lPVwibGl2ZS1vZmZcIj5OTyBSRUFMIEVYRUNVVElPTjwvU3RhdHVzUGlsbD5cbiAgICAgIDwvZGl2PlxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJzeW50aGV0aWMtbWFya2V0LXNlbGVjdG9yXCIgcm9sZT1cInJhZGlvZ3JvdXBcIiBhcmlhLWxhYmVsPVwiRGVyaXYgc3ludGhldGljIG1hcmtldCBzZWxlY3RvclwiPlxuICAgICAgICB7c3ludGhldGljSW5kZXhTeW1ib2xzLm1hcChzeW1ib2wgPT4gKFxuICAgICAgICAgIDxidXR0b25cbiAgICAgICAgICAgIGFyaWEtY2hlY2tlZD17c3ltYm9sID09PSBzZWxlY3RlZFN5bWJvbH1cbiAgICAgICAgICAgIGNsYXNzTmFtZT17YGNvY2twaXQtY29udHJvbCAke3N5bWJvbCA9PT0gc2VsZWN0ZWRTeW1ib2wgPyBcImlzLWFjdGl2ZVwiIDogXCJcIn1gfVxuICAgICAgICAgICAga2V5PXtzeW1ib2x9XG4gICAgICAgICAgICBvbkNsaWNrPXsoKSA9PiBvbkNoYW5nZShzeW1ib2wpfVxuICAgICAgICAgICAgcm9sZT1cInJhZGlvXCJcbiAgICAgICAgICAgIHR5cGU9XCJidXR0b25cIlxuICAgICAgICAgID5cbiAgICAgICAgICAgIHtzeW1ib2x9XG4gICAgICAgICAgPC9idXR0b24+XG4gICAgICAgICkpfVxuICAgICAgPC9kaXY+XG4gICAgPC9zZWN0aW9uPlxuICApO1xufVxuXG5mdW5jdGlvbiBLYWxvc0Rhc2hib2FyZFN1bW1hcnkoe1xuICBtYXJrZXQsXG4gIHNlbGVjdGVkU3ltYm9sLFxuICBzaWduYWwsXG4gIHN0YXRlLFxufToge1xuICBtYXJrZXQ6IE1hcmtldFN0YXR1cztcbiAgc2VsZWN0ZWRTeW1ib2w6IFN5bnRoZXRpY0luZGV4U3ltYm9sO1xuICBzaWduYWw6IEthbG9zU2lnbmFsO1xuICBzdGF0ZTogQ29ja3BpdFN0YXRlO1xufSkge1xuICBjb25zdCBzdGF0dXMgPSBmZWVkU3RhdHVzKHN0YXRlLCBtYXJrZXQpO1xuICBjb25zdCBkYXRhU291cmNlTGFiZWwgPSBrYWxvc0RhdGFTb3VyY2VMYWJlbChzaWduYWwsIG1hcmtldCwgc3RhdGUpO1xuICBjb25zdCBtb2NrUG9saWN5ID0gbW9ja1BvbGljeUxhYmVsKGRhdGFTb3VyY2VMYWJlbCwgbWFya2V0KTtcbiAgY29uc3QgZGF0YVF1YWxpdHkgPSBzaWduYWwuZGF0YVF1YWxpdHkgPz8gbWFya2V0LmRhdGFRdWFsaXR5O1xuICBjb25zdCBmcmVzaG5lc3NTZWNvbmRzID0gc2lnbmFsLmZyZXNobmVzc1NlY29uZHMgPz8gbWFya2V0LmZyZXNobmVzc1NlY29uZHM7XG4gIGNvbnN0IGxhdGVuY3lNcyA9IHNpZ25hbC5sYXRlbmN5TXMgPz8gbWFya2V0LmxhdGVuY3lNcztcblxuICByZXR1cm4gKFxuICAgIDxzZWN0aW9uIGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWwgZGFzaGJvYXJkLXN1bW1hcnktcGFuZWxcIj5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1wYW5lbC1oZWFkZXJcIj5cbiAgICAgICAgPGRpdj5cbiAgICAgICAgICA8aDI+S0FMT1MgU3VtbWFyeTwvaDI+XG4gICAgICAgICAgPHAgY2xhc3NOYW1lPVwiY29ja3BpdC1tdXRlZFwiPkFuYWx5c2UgdW5pcXVlbWVudCwgYXVjdW4gb3JkcmUgcm91dGUuPC9wPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICAgPFN0YXR1c1BpbGwgdG9uZT1cImxpdmUtb2ZmXCI+TElWRSBPRkY8L1N0YXR1c1BpbGw+XG4gICAgICA8L2Rpdj5cblxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJkYXNoYm9hcmQtc3VtbWFyeS1zeW1ib2xcIj5cbiAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPlN5bWJvbGUgc2VsZWN0aW9ubmU8L3NwYW4+XG4gICAgICAgIDxzdHJvbmc+e3NlbGVjdGVkU3ltYm9sfTwvc3Ryb25nPlxuICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LW11dGVkXCI+XG4gICAgICAgICAge21hcmtldC50aW1lZnJhbWV9IHwgcHJpeCB7Zm9ybWF0UHJpY2UobWFya2V0LnByaWNlKX1cbiAgICAgICAgPC9zcGFuPlxuICAgICAgPC9kaXY+XG5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZGFzaGJvYXJkLW1pbmktZ3JpZFwiPlxuICAgICAgICA8c3Bhbj5cbiAgICAgICAgICA8Yj5Tb3VyY2U8L2I+XG4gICAgICAgICAgPFN0YXR1c1BpbGwgdG9uZT17ZGF0YVNvdXJjZUxhYmVsID09PSBcIkRFUklWIERFTU9cIiA/IFwiY29ubmVjdGVkXCIgOiBkYXRhU291cmNlTGFiZWwgPT09IFwiTU9DS19EQVRBXCIgPyBcIk1PQ0tcIiA6IFwiZGVtb1wifT5cbiAgICAgICAgICAgIHtkYXRhU291cmNlTGFiZWx9XG4gICAgICAgICAgPC9TdGF0dXNQaWxsPlxuICAgICAgICA8L3NwYW4+XG4gICAgICAgIDxzcGFuPlxuICAgICAgICAgIDxiPlN0YXR1dCBmbHV4PC9iPlxuICAgICAgICAgIDxTdGF0dXNQaWxsIHRvbmU9e2ZlZWRUb25lKHN0YXR1cyl9PntzdGF0dXN9PC9TdGF0dXNQaWxsPlxuICAgICAgICA8L3NwYW4+XG4gICAgICAgIDxzcGFuPlxuICAgICAgICAgIDxiPkRlY2lzaW9uPC9iPlxuICAgICAgICAgIDxzdHJvbmc+e2Zvcm1hdERlY2lzaW9uKHNpZ25hbC5kZWNpc2lvbil9PC9zdHJvbmc+XG4gICAgICAgIDwvc3Bhbj5cbiAgICAgICAgPHNwYW4+XG4gICAgICAgICAgPGI+Q29uZmlhbmNlPC9iPlxuICAgICAgICAgIDxzdHJvbmc+e3NpZ25hbC5jb25maWRlbmNlfSU8L3N0cm9uZz5cbiAgICAgICAgPC9zcGFuPlxuICAgICAgPC9kaXY+XG5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZGFzaGJvYXJkLWRhdGEtc291cmNlLWJhbm5lclwiPlxuICAgICAgICA8ZGl2PlxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5EQVRBIFNPVVJDRTwvc3Bhbj5cbiAgICAgICAgICA8c3Ryb25nPntkYXRhU291cmNlTGFiZWx9PC9zdHJvbmc+XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8U3RhdHVzUGlsbCB0b25lPXtkYXRhU291cmNlTGFiZWwgPT09IFwiREVSSVYgREVNT1wiID8gXCJjb25uZWN0ZWRcIiA6IGRhdGFTb3VyY2VMYWJlbCA9PT0gXCJNT0NLX0RBVEFcIiA/IFwiTU9DS1wiIDogXCJkZW1vXCJ9PlxuICAgICAgICAgIHttb2NrUG9saWN5fVxuICAgICAgICA8L1N0YXR1c1BpbGw+XG4gICAgICA8L2Rpdj5cblxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJkYXNoYm9hcmQtbWluaS1ncmlkXCI+XG4gICAgICAgIDxzcGFuPlxuICAgICAgICAgIDxiPktBTE9TIFNvdXJjZTwvYj5cbiAgICAgICAgICA8c3Ryb25nPntzaWduYWwuZGF0YVNvdXJjZUxhYmVsID8/IG1hcmtldC5zZXNzaW9ufTwvc3Ryb25nPlxuICAgICAgICA8L3NwYW4+XG4gICAgICAgIDxzcGFuPlxuICAgICAgICAgIDxiPkZhbGxiYWNrPC9iPlxuICAgICAgICAgIDxTdGF0dXNQaWxsIHRvbmU9e21hcmtldC5mYWxsYmFjayA9PT0gXCJNT0NLX0RBVEFcIiA/IFwiTU9DS1wiIDogXCJjb25uZWN0ZWRcIn0+e21hcmtldC5mYWxsYmFjayA/PyBcIk5PTkVcIn08L1N0YXR1c1BpbGw+XG4gICAgICAgIDwvc3Bhbj5cbiAgICAgICAgPHNwYW4+XG4gICAgICAgICAgPGI+S0FMT1MgUXVhbGl0eTwvYj5cbiAgICAgICAgICA8U3RhdHVzUGlsbCB0b25lPXtxdWFsaXR5VG9uZShkYXRhUXVhbGl0eSl9PntkYXRhUXVhbGl0eSA/PyBcIlVOS05PV05cIn08L1N0YXR1c1BpbGw+XG4gICAgICAgIDwvc3Bhbj5cbiAgICAgICAgPHNwYW4+XG4gICAgICAgICAgPGI+TGFzdCBUaWNrPC9iPlxuICAgICAgICAgIDxzdHJvbmc+e2Zvcm1hdFNvdXJjZVRpbWVzdGFtcChzaWduYWwubGFzdFRpY2tBdCA/PyBtYXJrZXQubGFzdFRpY2tBdCl9PC9zdHJvbmc+XG4gICAgICAgIDwvc3Bhbj5cbiAgICAgICAgPHNwYW4+XG4gICAgICAgICAgPGI+TGFzdCBDYW5kbGU8L2I+XG4gICAgICAgICAgPHN0cm9uZz57Zm9ybWF0U291cmNlVGltZXN0YW1wKHNpZ25hbC5sYXN0Q2FuZGxlQXQgPz8gbWFya2V0Lmxhc3RDYW5kbGVBdCl9PC9zdHJvbmc+XG4gICAgICAgIDwvc3Bhbj5cbiAgICAgICAgPHNwYW4+XG4gICAgICAgICAgPGI+TGF0ZW5jZTwvYj5cbiAgICAgICAgICA8c3Ryb25nPntsYXRlbmN5TXMgPT09IHVuZGVmaW5lZCB8fCBsYXRlbmN5TXMgPT09IG51bGwgPyBcIm4vYVwiIDogYCR7bGF0ZW5jeU1zfSBtc2B9PC9zdHJvbmc+XG4gICAgICAgIDwvc3Bhbj5cbiAgICAgICAgPHNwYW4+XG4gICAgICAgICAgPGI+RnJlc2huZXNzPC9iPlxuICAgICAgICAgIDxzdHJvbmc+e2ZyZXNobmVzc1NlY29uZHMgPT09IHVuZGVmaW5lZCB8fCBmcmVzaG5lc3NTZWNvbmRzID09PSBudWxsID8gXCJuL2FcIiA6IGAke2ZyZXNobmVzc1NlY29uZHN9c2B9PC9zdHJvbmc+XG4gICAgICAgIDwvc3Bhbj5cbiAgICAgIDwvZGl2PlxuXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImRhc2hib2FyZC1zYWZldHktcm93XCI+XG4gICAgICAgIDxTdGF0dXNQaWxsIHRvbmU9XCJsaXZlLW9mZlwiPkxJVkUgT0ZGPC9TdGF0dXNQaWxsPlxuICAgICAgICA8U3RhdHVzUGlsbCB0b25lPVwibGl2ZS1vZmZcIj5BVVRPIEVYRUNVVElPTiBPRkY8L1N0YXR1c1BpbGw+XG4gICAgICA8L2Rpdj5cbiAgICA8L3NlY3Rpb24+XG4gICk7XG59XG5cbmZ1bmN0aW9uIFJpc2tEYXNoYm9hcmRTdW1tYXJ5KHsgcmlzayB9OiB7IHJpc2s6IFJpc2tTdGF0dXMgfSkge1xuICBjb25zdCBhY2NlcHRlZCA9IHJpc2suc2NvcmUgPCA1MCAmJiByaXNrLnNsUHJlc2VudCAmJiByaXNrLnRwUHJlc2VudCAmJiByaXNrLmpvdXJuYWxSZWFkeSAmJiAhcmlzay5saXZlRW5hYmxlZDtcblxuICByZXR1cm4gKFxuICAgIDxzZWN0aW9uIGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWwgZGFzaGJvYXJkLXN1bW1hcnktcGFuZWxcIj5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1wYW5lbC1oZWFkZXJcIj5cbiAgICAgICAgPGRpdj5cbiAgICAgICAgICA8aDI+UmlzayBTdW1tYXJ5PC9oMj5cbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJjb2NrcGl0LW11dGVkXCI+QmxvY2FnZXMgYWN0aWZzIGF2YW50IHRvdXRlIGV4ZWN1dGlvbi48L3A+XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8U3RhdHVzUGlsbCB0b25lPXthY2NlcHRlZCA/IFwiY29ubmVjdGVkXCIgOiBcImNyaXRpY2FsXCJ9PnthY2NlcHRlZCA/IFwiVkFMSURcIiA6IFwiQkxPQ0tcIn08L1N0YXR1c1BpbGw+XG4gICAgICA8L2Rpdj5cblxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJyaXNrLXNjb3JlIGNvbXBhY3RcIj5cbiAgICAgICAgPGRpdiBzdHlsZT17eyBmbGV4OiAxIH19PlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1yb3dcIj5cbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5SaXNrIHNjb3JlPC9zcGFuPlxuICAgICAgICAgICAgPHN0cm9uZz57cmlzay5zY29yZX0vMTAwPC9zdHJvbmc+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJyaXNrLW1ldGVyXCIgYXJpYS1sYWJlbD17YFJpc2sgc2NvcmUgJHtyaXNrLnNjb3JlfWB9PlxuICAgICAgICAgICAgPHNwYW4gc3R5bGU9e3sgd2lkdGg6IGAke3Jpc2suc2NvcmV9JWAgfX0gLz5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgPC9kaXY+XG4gICAgICA8L2Rpdj5cblxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJkYXNoYm9hcmQtbWluaS1ncmlkXCI+XG4gICAgICAgIDxzcGFuPlxuICAgICAgICAgIDxiPlJSPC9iPlxuICAgICAgICAgIDxzdHJvbmc+MTp7cmlzay5ycn08L3N0cm9uZz5cbiAgICAgICAgPC9zcGFuPlxuICAgICAgICA8c3Bhbj5cbiAgICAgICAgICA8Yj5SaXNxdWUvdHJhZGU8L2I+XG4gICAgICAgICAgPHN0cm9uZz57cmlzay5yaXNrUGVyVHJhZGV9JTwvc3Ryb25nPlxuICAgICAgICA8L3NwYW4+XG4gICAgICAgIDxzcGFuPlxuICAgICAgICAgIDxiPkREIGpvdXI8L2I+XG4gICAgICAgICAgPHN0cm9uZz57cmlzay5kYWlseURyYXdkb3dufSU8L3N0cm9uZz5cbiAgICAgICAgPC9zcGFuPlxuICAgICAgICA8c3Bhbj5cbiAgICAgICAgICA8Yj5MSVZFPC9iPlxuICAgICAgICAgIDxzdHJvbmcgY2xhc3NOYW1lPVwiY29ja3BpdC1uZWdhdGl2ZVwiPk9GRjwvc3Ryb25nPlxuICAgICAgICA8L3NwYW4+XG4gICAgICA8L2Rpdj5cbiAgICA8L3NlY3Rpb24+XG4gICk7XG59XG5cbmZ1bmN0aW9uIFJpc2tSdWxlc1BhbmVsKHsgcmlzayB9OiB7IHJpc2s6IFJpc2tTdGF0dXMgfSkge1xuICBjb25zdCBydWxlcyA9IFtcbiAgICB7IGxhYmVsOiBcImNvbmZpZGVuY2UgPj0gODBcIiwgb2s6IHRydWUgfSxcbiAgICB7IGxhYmVsOiBcIlJSID49IDE6MlwiLCBvazogcmlzay5yciA+PSAyIH0sXG4gICAgeyBsYWJlbDogXCJTTCBwcmVzZW50XCIsIG9rOiByaXNrLnNsUHJlc2VudCB9LFxuICAgIHsgbGFiZWw6IFwiVFAgcHJlc2VudFwiLCBvazogcmlzay50cFByZXNlbnQgfSxcbiAgICB7IGxhYmVsOiBcIkpvdXJuYWwgcmVhZHlcIiwgb2s6IHJpc2suam91cm5hbFJlYWR5IH0sXG4gICAgeyBsYWJlbDogXCJMSVZFIGRpc2FibGVkIGJ5IGRlZmF1bHRcIiwgb2s6ICFyaXNrLmxpdmVFbmFibGVkIH0sXG4gICAgeyBsYWJlbDogXCJBVVRPIGV4ZWN1dGlvbiBibG9ja2VkXCIsIG9rOiB0cnVlIH0sXG4gIF07XG5cbiAgcmV0dXJuIChcbiAgICA8c2VjdGlvbiBjbGFzc05hbWU9XCJjb2NrcGl0LXBhbmVsXCI+XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWwtaGVhZGVyXCI+XG4gICAgICAgIDxoMj5SaXNrIFJ1bGVzPC9oMj5cbiAgICAgICAgPFN0YXR1c1BpbGwgdG9uZT1cImNvbm5lY3RlZFwiPkVuZm9yY2VkPC9TdGF0dXNQaWxsPlxuICAgICAgPC9kaXY+XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtc3RhY2tcIj5cbiAgICAgICAge3J1bGVzLm1hcChydWxlID0+IChcbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcnVsZS1yb3dcIiBrZXk9e3J1bGUubGFiZWx9PlxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXJvd1wiPlxuICAgICAgICAgICAgICA8c3Ryb25nPntydWxlLmxhYmVsfTwvc3Ryb25nPlxuICAgICAgICAgICAgICA8U3RhdHVzUGlsbCB0b25lPXtydWxlLm9rID8gXCJjb25uZWN0ZWRcIiA6IFwiY3JpdGljYWxcIn0+e3J1bGUub2sgPyBcIk9LXCIgOiBcIkJMT0NLXCJ9PC9TdGF0dXNQaWxsPlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgICkpfVxuICAgICAgPC9kaXY+XG4gICAgPC9zZWN0aW9uPlxuICApO1xufVxuXG5mdW5jdGlvbiBCYWNrdGVzdFByZXZpZXcoeyBiYWNrdGVzdHMgfTogeyBiYWNrdGVzdHM6IHJlYWRvbmx5IEJhY2t0ZXN0U3VtbWFyeVtdIH0pIHtcbiAgcmV0dXJuIChcbiAgICA8c2VjdGlvbiBjbGFzc05hbWU9XCJjb2NrcGl0LXBhbmVsXCI+XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWwtaGVhZGVyXCI+XG4gICAgICAgIDxoMj5CYWNrdGVzdHMgZGVtbzwvaDI+XG4gICAgICAgIDxTdGF0dXNQaWxsIHRvbmU9XCJNT0NLXCI+UmVhZCBvbmx5PC9TdGF0dXNQaWxsPlxuICAgICAgPC9kaXY+XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImRlbW8tYmFja3Rlc3QtZ3JpZCBjb21wYWN0XCI+XG4gICAgICAgIHtiYWNrdGVzdHMuc2xpY2UoMCwgMikubWFwKGJhY2t0ZXN0ID0+IChcbiAgICAgICAgICA8YXJ0aWNsZSBjbGFzc05hbWU9XCJkZW1vLWJhY2t0ZXN0LWNhcmRcIiBrZXk9e2JhY2t0ZXN0LmlkfT5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1yb3dcIj5cbiAgICAgICAgICAgICAgPHN0cm9uZz57YmFja3Rlc3QuaWR9PC9zdHJvbmc+XG4gICAgICAgICAgICAgIDxTdGF0dXNQaWxsIHRvbmU9e2JhY2t0ZXN0LmRhdGFTb3VyY2V9PntiYWNrdGVzdC5kYXRhU291cmNlfTwvU3RhdHVzUGlsbD5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwiY29ja3BpdC1tdXRlZFwiPlxuICAgICAgICAgICAgICB7YmFja3Rlc3Quc3ltYm9sfSB8IHtiYWNrdGVzdC50aW1lZnJhbWV9IHwge2JhY2t0ZXN0Lm1vZGV9XG4gICAgICAgICAgICA8L3A+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImRlbW8tbWV0cmljLXJvd1wiPlxuICAgICAgICAgICAgICA8c3Bhbj5cbiAgICAgICAgICAgICAgICBXaW5cbiAgICAgICAgICAgICAgICA8c3Ryb25nPntiYWNrdGVzdC53aW5SYXRlLnRvRml4ZWQoMSl9JTwvc3Ryb25nPlxuICAgICAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICAgICAgIDxzcGFuPlxuICAgICAgICAgICAgICAgIFBGXG4gICAgICAgICAgICAgICAgPHN0cm9uZz57YmFja3Rlc3QucHJvZml0RmFjdG9yLnRvRml4ZWQoMil9PC9zdHJvbmc+XG4gICAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgICAgPHNwYW4+XG4gICAgICAgICAgICAgICAgTmV0XG4gICAgICAgICAgICAgICAgPHN0cm9uZyBjbGFzc05hbWU9e2JhY2t0ZXN0Lm5ldFByb2ZpdCA+PSAwID8gXCJjb2NrcGl0LXBvc2l0aXZlXCIgOiBcImNvY2twaXQtbmVnYXRpdmVcIn0+XG4gICAgICAgICAgICAgICAgICB7YmFja3Rlc3QubmV0UHJvZml0LnRvRml4ZWQoMSl9XG4gICAgICAgICAgICAgICAgPC9zdHJvbmc+XG4gICAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvYXJ0aWNsZT5cbiAgICAgICAgKSl9XG4gICAgICA8L2Rpdj5cbiAgICA8L3NlY3Rpb24+XG4gICk7XG59XG5cbmV4cG9ydCBmdW5jdGlvbiBEYXNoYm9hcmRQYWdlKHtcbiAgc3RhdGUsXG4gIG1hcmtldCxcbiAgc2lnbmFsLFxuICByaXNrLFxuICBjYW5kbGVzLFxuICBjb25uZWN0b3JzLFxuICBqb3VybmFsUm93cyxcbiAgd2F0Y2hsaXN0LFxuICBhbGVydHMsXG4gIGJhY2t0ZXN0cyxcbiAgc2VsZWN0ZWRTeW50aGV0aWNTeW1ib2wsXG4gIG9uU3ludGhldGljU3ltYm9sQ2hhbmdlLFxuICBvblRvZ2dsZUthbG9zLFxuICBvblRyYWRpbmdNb2RlQ2hhbmdlLFxuICBvblN0cmF0ZWd5TW9kZUNoYW5nZSxcbn06IHtcbiAgc3RhdGU6IENvY2twaXRTdGF0ZTtcbiAgbWFya2V0OiBNYXJrZXRTdGF0dXM7XG4gIHNpZ25hbDogS2Fsb3NTaWduYWw7XG4gIHJpc2s6IFJpc2tTdGF0dXM7XG4gIGNhbmRsZXM6IHJlYWRvbmx5IE9obGNDYW5kbGVbXTtcbiAgY29ubmVjdG9yczogcmVhZG9ubHkgQ29ubmVjdG9yU3RhdHVzW107XG4gIGpvdXJuYWxSb3dzOiByZWFkb25seSBKb3VybmFsUm93W107XG4gIHdhdGNobGlzdDogcmVhZG9ubHkgV2F0Y2hsaXN0SXRlbVtdO1xuICBhbGVydHM6IHJlYWRvbmx5IEFsZXJ0SXRlbVtdO1xuICBiYWNrdGVzdHM6IHJlYWRvbmx5IEJhY2t0ZXN0U3VtbWFyeVtdO1xuICBzZWxlY3RlZFN5bnRoZXRpY1N5bWJvbDogU3ludGhldGljSW5kZXhTeW1ib2w7XG4gIG9uU3ludGhldGljU3ltYm9sQ2hhbmdlOiAoc3ltYm9sOiBTeW50aGV0aWNJbmRleFN5bWJvbCkgPT4gdm9pZDtcbiAgb25Ub2dnbGVLYWxvczogKCkgPT4gdm9pZDtcbiAgb25UcmFkaW5nTW9kZUNoYW5nZTogUGFyYW1ldGVyczx0eXBlb2YgVHJhZGluZ01vZGVTZWxlY3Rvcj5bMF1bXCJvblRyYWRpbmdNb2RlQ2hhbmdlXCJdO1xuICBvblN0cmF0ZWd5TW9kZUNoYW5nZTogUGFyYW1ldGVyczx0eXBlb2YgVHJhZGluZ01vZGVTZWxlY3Rvcj5bMF1bXCJvblN0cmF0ZWd5TW9kZUNoYW5nZVwiXTtcbn0pIHtcbiAgY29uc3QgW2FjdGl2ZVRhYiwgc2V0QWN0aXZlVGFiXSA9IHVzZVN0YXRlPERhc2hib2FyZFRhYj4oXCJxdWlja1wiKTtcbiAgY29uc3QgbWFya2V0U291cmNlTGFiZWwgPSBtYXJrZXREYXRhU291cmNlTGFiZWwobWFya2V0KTtcbiAgY29uc3Qgam91cm5hbEZvclN5bWJvbCA9IHVzZU1lbW8oKCkgPT4ge1xuICAgIGNvbnN0IHNlbGVjdGVkUm93cyA9IGpvdXJuYWxSb3dzLmZpbHRlcihyb3cgPT4gcm93LnN5bWJvbCA9PT0gc2VsZWN0ZWRTeW50aGV0aWNTeW1ib2wpO1xuICAgIGNvbnN0IHN5bnRoZXRpY1JvdzogSm91cm5hbFJvdyA9IHtcbiAgICAgIGlkOiBgU1lOLSR7c2VsZWN0ZWRTeW50aGV0aWNTeW1ib2wucmVwbGFjZSgvXFxzL2csIFwiLVwiKS50b1VwcGVyQ2FzZSgpfWAsXG4gICAgICB0aW1lc3RhbXA6IG5ldyBEYXRlKCkudG9JU09TdHJpbmcoKSxcbiAgICAgIHN5bWJvbDogc2VsZWN0ZWRTeW50aGV0aWNTeW1ib2wsXG4gICAgICB0aW1lZnJhbWU6IG1hcmtldC50aW1lZnJhbWUsXG4gICAgICBtb2RlOiBzdGF0ZS5zdHJhdGVneU1vZGUsXG4gICAgICBkZWNpc2lvbjogc2lnbmFsLmRlY2lzaW9uLFxuICAgICAgY29uZmlkZW5jZTogc2lnbmFsLmNvbmZpZGVuY2UsXG4gICAgICByaXNrU2NvcmU6IHJpc2suc2NvcmUsXG4gICAgICBzb3VyY2U6IG1hcmtldC5zb3VyY2UsXG4gICAgICBtb2R1bGU6IFwiS0FMT1NcIixcbiAgICAgIHNvdXJjZUxhYmVsOiBtYXJrZXQuc291cmNlID09PSBcIkRFTU9cIiAmJiBtYXJrZXQuc291cmNlU3RhdHVzID09PSBcIkNPTk5FQ1RFRFwiID8gXCJERVJJViBERU1PXCIgOiB1bmRlZmluZWQsXG4gICAgICBmYWxsYmFjazogbWFya2V0LmZhbGxiYWNrLFxuICAgICAgcmVzdWx0OiBgU3ludGhldGljIGluZGV4IGFuYWx5c2lzIG9ubHk7ICR7bWFya2V0LnNvdXJjZVN0YXR1cyA/PyBcIlVOS05PV05cIn07IGZhbGxiYWNrICR7bWFya2V0LmZhbGxiYWNrID8/IFwibi9hXCJ9OyBMSVZFIE9GRiBhbmQgQVVUTyBleGVjdXRpb24gT0ZGYCxcbiAgICB9O1xuXG4gICAgcmV0dXJuIFtzeW50aGV0aWNSb3csIC4uLnNlbGVjdGVkUm93cywgLi4uam91cm5hbFJvd3MuZmlsdGVyKHJvdyA9PiByb3cuc3ltYm9sICE9PSBzZWxlY3RlZFN5bnRoZXRpY1N5bWJvbCldLnNsaWNlKDAsIDYpO1xuICB9LCBbXG4gICAgam91cm5hbFJvd3MsXG4gICAgbWFya2V0LmZhbGxiYWNrLFxuICAgIG1hcmtldC5zb3VyY2UsXG4gICAgbWFya2V0LnNvdXJjZVN0YXR1cyxcbiAgICBtYXJrZXQudGltZWZyYW1lLFxuICAgIHJpc2suc2NvcmUsXG4gICAgc2VsZWN0ZWRTeW50aGV0aWNTeW1ib2wsXG4gICAgc2lnbmFsLmNvbmZpZGVuY2UsXG4gICAgc2lnbmFsLmRlY2lzaW9uLFxuICAgIHN0YXRlLnN0cmF0ZWd5TW9kZSxcbiAgXSk7XG5cbiAgcmV0dXJuIChcbiAgICA8ZGl2IGNsYXNzTmFtZT1cImRhc2hib2FyZC1zaGVsbFwiPlxuICAgICAgPFN5bnRoZXRpY01hcmtldFNlbGVjdG9yIHNlbGVjdGVkU3ltYm9sPXtzZWxlY3RlZFN5bnRoZXRpY1N5bWJvbH0gb25DaGFuZ2U9e29uU3ludGhldGljU3ltYm9sQ2hhbmdlfSAvPlxuXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImRhc2hib2FyZC1tYWluLWdyaWRcIj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJkYXNoYm9hcmQtY2hhcnQtY29sdW1uXCI+XG4gICAgICAgICAgPExpdmVNYXJrZXRDaGFydCBjYW5kbGVzPXtjYW5kbGVzfSBtYXJrZXQ9e21hcmtldH0gc2lnbmFsPXtzaWduYWx9IC8+XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8YXNpZGUgY2xhc3NOYW1lPVwiZGFzaGJvYXJkLXN1bW1hcnktY29sdW1uXCIgYXJpYS1sYWJlbD1cIktBTE9TIGFuZCByaXNrIHN1bW1hcmllc1wiPlxuICAgICAgICAgIDxLYWxvc0Rhc2hib2FyZFN1bW1hcnlcbiAgICAgICAgICAgIG1hcmtldD17bWFya2V0fVxuICAgICAgICAgICAgc2VsZWN0ZWRTeW1ib2w9e3NlbGVjdGVkU3ludGhldGljU3ltYm9sfVxuICAgICAgICAgICAgc2lnbmFsPXtzaWduYWx9XG4gICAgICAgICAgICBzdGF0ZT17c3RhdGV9XG4gICAgICAgICAgLz5cbiAgICAgICAgICA8Umlza0Rhc2hib2FyZFN1bW1hcnkgcmlzaz17cmlza30gLz5cbiAgICAgICAgPC9hc2lkZT5cbiAgICAgIDwvZGl2PlxuXG4gICAgICA8c2VjdGlvbiBjbGFzc05hbWU9XCJjb2NrcGl0LXBhbmVsIGRhc2hib2FyZC10YWJzLXBhbmVsXCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZGFzaGJvYXJkLXRhYi1saXN0XCIgcm9sZT1cInRhYmxpc3RcIiBhcmlhLWxhYmVsPVwiRGFzaGJvYXJkIGRldGFpbCB2aWV3c1wiPlxuICAgICAgICAgIHtkYXNoYm9hcmRUYWJzLm1hcCh0YWIgPT4gKFxuICAgICAgICAgICAgPGJ1dHRvblxuICAgICAgICAgICAgICBhcmlhLXNlbGVjdGVkPXt0YWIuaWQgPT09IGFjdGl2ZVRhYn1cbiAgICAgICAgICAgICAgY2xhc3NOYW1lPXtgZGFzaGJvYXJkLXRhYiAke3RhYi5pZCA9PT0gYWN0aXZlVGFiID8gXCJpcy1hY3RpdmVcIiA6IFwiXCJ9YH1cbiAgICAgICAgICAgICAga2V5PXt0YWIuaWR9XG4gICAgICAgICAgICAgIG9uQ2xpY2s9eygpID0+IHNldEFjdGl2ZVRhYih0YWIuaWQpfVxuICAgICAgICAgICAgICByb2xlPVwidGFiXCJcbiAgICAgICAgICAgICAgdHlwZT1cImJ1dHRvblwiXG4gICAgICAgICAgICA+XG4gICAgICAgICAgICAgIHt0YWIubGFiZWx9XG4gICAgICAgICAgICA8L2J1dHRvbj5cbiAgICAgICAgICApKX1cbiAgICAgICAgPC9kaXY+XG5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJkYXNoYm9hcmQtdGFiLWJvZHlcIiByb2xlPVwidGFicGFuZWxcIj5cbiAgICAgICAgICB7YWN0aXZlVGFiID09PSBcInF1aWNrXCIgPyAoXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImRhc2hib2FyZC10YWItZ3JpZFwiPlxuICAgICAgICAgICAgICA8TWFya2V0U3RhdHVzQ2FyZCBkYXRhTW9kZT17c3RhdGUuZGF0YU1vZGV9IG1hcmtldD17bWFya2V0fSAvPlxuICAgICAgICAgICAgICA8c2VjdGlvbiBjbGFzc05hbWU9XCJjb2NrcGl0LXBhbmVsXCI+XG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXBhbmVsLWhlYWRlclwiPlxuICAgICAgICAgICAgICAgICAgPGgyPk1vZGVzPC9oMj5cbiAgICAgICAgICAgICAgICAgIDxTdGF0dXNQaWxsIHRvbmU9XCJsaXZlLW9mZlwiPkFVVE8gRVhFQ1VUSU9OIE9GRjwvU3RhdHVzUGlsbD5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8VHJhZGluZ01vZGVTZWxlY3RvclxuICAgICAgICAgICAgICAgICAgc3RyYXRlZ3lNb2RlPXtzdGF0ZS5zdHJhdGVneU1vZGV9XG4gICAgICAgICAgICAgICAgICB0cmFkaW5nTW9kZT17c3RhdGUudHJhZGluZ01vZGV9XG4gICAgICAgICAgICAgICAgICBvblN0cmF0ZWd5TW9kZUNoYW5nZT17b25TdHJhdGVneU1vZGVDaGFuZ2V9XG4gICAgICAgICAgICAgICAgICBvblRyYWRpbmdNb2RlQ2hhbmdlPXtvblRyYWRpbmdNb2RlQ2hhbmdlfVxuICAgICAgICAgICAgICAgIC8+XG4gICAgICAgICAgICAgIDwvc2VjdGlvbj5cbiAgICAgICAgICAgICAgPFdhdGNobGlzdFBhbmVsIGl0ZW1zPXt3YXRjaGxpc3Quc2xpY2UoMCwgNSl9IC8+XG4gICAgICAgICAgICAgIDxBbGVydFBhbmVsIGFsZXJ0cz17YWxlcnRzLnNsaWNlKDAsIDIpfSAvPlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgKSA6IG51bGx9XG5cbiAgICAgICAgICB7YWN0aXZlVGFiID09PSBcImthbG9zXCIgPyAoXG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImRhc2hib2FyZC10YWItZ3JpZFwiPlxuICAgICAgICAgICAgICA8S2Fsb3NTaWduYWxDYXJkIGVuYWJsZWQ9e3N0YXRlLmthbG9zRW5hYmxlZH0gb25Ub2dnbGU9e29uVG9nZ2xlS2Fsb3N9IHNpZ25hbD17c2lnbmFsfSAvPlxuICAgICAgICAgICAgICA8S2Fsb3NNYXJrZXRCcmFpblBhbmVsIGJyYWluPXtzaWduYWwubWFya2V0QnJhaW59IC8+XG4gICAgICAgICAgICAgIDxLYWxvc1Zpc3VhbEludGVsbGlnZW5jZVBhbmVsIHNpZ25hbD17c2lnbmFsfSAvPlxuICAgICAgICAgICAgICA8S2Fsb3NGdXR1cmVQYXRoUGFuZWwgZnV0dXJlUGF0aD17c2lnbmFsLmZ1dHVyZVBhdGh9IC8+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICApIDogbnVsbH1cblxuICAgICAgICAgIHthY3RpdmVUYWIgPT09IFwiY2hhcnRcIiA/IChcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZGFzaGJvYXJkLXRhYi1ncmlkXCI+XG4gICAgICAgICAgICAgIDxzZWN0aW9uIGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWxcIj5cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWwtaGVhZGVyXCI+XG4gICAgICAgICAgICAgICAgICA8ZGl2PlxuICAgICAgICAgICAgICAgICAgICA8aDI+Q2hhcnQgQ29udGV4dDwvaDI+XG4gICAgICAgICAgICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImNvY2twaXQtbXV0ZWRcIj5cbiAgICAgICAgICAgICAgICAgICAgICB7c2VsZWN0ZWRTeW50aGV0aWNTeW1ib2x9IHwge21hcmtldC50aW1lZnJhbWV9IHwge21hcmtldFNvdXJjZUxhYmVsfSB8IGZsdXgge2ZlZWRTdGF0dXMoc3RhdGUsIG1hcmtldCl9IHwgZmFsbGJhY2t7XCIgXCJ9XG4gICAgICAgICAgICAgICAgICAgICAge21hcmtldC5mYWxsYmFjayA/PyBcIk5PTkVcIn1cbiAgICAgICAgICAgICAgICAgICAgPC9wPlxuICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICA8U3RhdHVzUGlsbCB0b25lPVwibGl2ZS1vZmZcIj5OTyBFWEVDVVRJT048L1N0YXR1c1BpbGw+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LWtwaS1yb3dcIj5cbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPlByaXg8L3NwYW4+XG4gICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC12YWx1ZVwiPntmb3JtYXRQcmljZShtYXJrZXQucHJpY2UpfTwvZGl2PlxuICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpXCI+XG4gICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5TcHJlYWQ8L3NwYW4+XG4gICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC12YWx1ZVwiPnttYXJrZXQuc3ByZWFkfTwvZGl2PlxuICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpXCI+XG4gICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5Wb2x1bWU8L3NwYW4+XG4gICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC12YWx1ZVwiPnttYXJrZXQudm9sdW1lLnRvTG9jYWxlU3RyaW5nKFwiZW4tVVNcIil9PC9kaXY+XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPkRhdGEgUXVhbGl0eTwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlXCIgc3R5bGU9e3sgZm9udFNpemU6IDE4IH19PnttYXJrZXQuZGF0YVF1YWxpdHkgPz8gXCJVTktOT1dOXCJ9PC9kaXY+XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPlN5bmM8L3NwYW4+XG4gICAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC12YWx1ZVwiIHN0eWxlPXt7IGZvbnRTaXplOiAxOCB9fT57bWFya2V0LnN5bmNTdGF0dXMgPz8gXCJVTktOT1dOXCJ9PC9kaXY+XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPC9zZWN0aW9uPlxuICAgICAgICAgICAgICA8c2VjdGlvbiBjbGFzc05hbWU9XCJjb2NrcGl0LXBhbmVsXCI+XG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXBhbmVsLWhlYWRlclwiPlxuICAgICAgICAgICAgICAgICAgPGgyPkNoYXJ0IEFjdGlvbnM8L2gyPlxuICAgICAgICAgICAgICAgICAgPFN0YXR1c1BpbGwgdG9uZT1cIk1PQ0tcIj5SZWFkIG9ubHk8L1N0YXR1c1BpbGw+XG4gICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJvdmVybGF5LWNoaXAtZ3JpZFwiPlxuICAgICAgICAgICAgICAgICAge2NoYXJ0Q29udGV4dEFjdGlvbnMubWFwKGFjdGlvbiA9PiAoXG4gICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cIm92ZXJsYXktY2hpcFwiIGtleT17YWN0aW9uLmlkfT57YWN0aW9uLmxhYmVsfTwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICkpfVxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICA8L3NlY3Rpb24+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICApIDogbnVsbH1cblxuICAgICAgICAgIHthY3RpdmVUYWIgPT09IFwicmlza1wiID8gKFxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJkYXNoYm9hcmQtdGFiLWdyaWRcIj5cbiAgICAgICAgICAgICAgPFJpc2tTY29yZUNhcmQgcmlzaz17cmlza30gLz5cbiAgICAgICAgICAgICAgPFJpc2tSdWxlc1BhbmVsIHJpc2s9e3Jpc2t9IC8+XG4gICAgICAgICAgICAgIDxzZWN0aW9uIGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWxcIj5cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWwtaGVhZGVyXCI+XG4gICAgICAgICAgICAgICAgICA8aDI+RHJhd2Rvd248L2gyPlxuICAgICAgICAgICAgICAgICAgPFN0YXR1c1BpbGwgdG9uZT1cImRlbW9cIj5ERU1PPC9TdGF0dXNQaWxsPlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGktcm93XCI+XG4gICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpXCI+XG4gICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5EYWlseTwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlXCI+e3Jpc2suZGFpbHlEcmF3ZG93bn0lPC9kaXY+XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPldlZWtseTwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlXCI+e3Jpc2sud2Vla2x5RHJhd2Rvd259JTwvZGl2PlxuICAgICAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpXCI+XG4gICAgICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5Ub3RhbDwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlXCI+e3Jpc2sudG90YWxEcmF3ZG93bn0lPC9kaXY+XG4gICAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPkV4ZWN1dGlvbjwvc3Bhbj5cbiAgICAgICAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlIGNvY2twaXQtbmVnYXRpdmVcIj5PRkY8L2Rpdj5cbiAgICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICA8L3NlY3Rpb24+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICApIDogbnVsbH1cblxuICAgICAgICAgIHthY3RpdmVUYWIgPT09IFwiam91cm5hbFwiID8gKFxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJkYXNoYm9hcmQtdGFiLWdyaWQgc2luZ2xlXCI+XG4gICAgICAgICAgICAgIDxzZWN0aW9uIGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWxcIj5cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWwtaGVhZGVyXCI+XG4gICAgICAgICAgICAgICAgICA8aDI+Sm91cm5hbDwvaDI+XG4gICAgICAgICAgICAgICAgICA8U3RhdHVzUGlsbCB0b25lPVwiY29ubmVjdGVkXCI+Tk9fVFJBREUgbG9nZ2VkPC9TdGF0dXNQaWxsPlxuICAgICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICAgIDxKb3VybmFsVGFibGUgcm93cz17am91cm5hbEZvclN5bWJvbH0gLz5cbiAgICAgICAgICAgICAgPC9zZWN0aW9uPlxuICAgICAgICAgICAgICA8QmFja3Rlc3RQcmV2aWV3IGJhY2t0ZXN0cz17YmFja3Rlc3RzfSAvPlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgKSA6IG51bGx9XG5cbiAgICAgICAgICB7YWN0aXZlVGFiID09PSBcInJlcGxheVwiID8gPEthbG9zTWFya2V0UmVwbGF5UGFuZWwgcmVwbGF5PXtzaWduYWwubWFya2V0UmVwbGF5fSAvPiA6IG51bGx9XG5cbiAgICAgICAgICB7YWN0aXZlVGFiID09PSBcImNvbm5lY3RvcnNcIiA/IChcbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZGFzaGJvYXJkLXRhYi1ncmlkIGNvbm5lY3RvcnNcIj5cbiAgICAgICAgICAgICAge2Nvbm5lY3RvcnMuc2xpY2UoMCwgNCkubWFwKGNvbm5lY3RvciA9PiAoXG4gICAgICAgICAgICAgICAgPENvbm5lY3Rpb25TdGF0dXNDYXJkIGNvbm5lY3Rvcj17Y29ubmVjdG9yfSBrZXk9e2Nvbm5lY3Rvci5pZH0gLz5cbiAgICAgICAgICAgICAgKSl9XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICApIDogbnVsbH1cbiAgICAgICAgPC9kaXY+XG4gICAgICA8L3NlY3Rpb24+XG4gICAgPC9kaXY+XG4gICk7XG59XG4iXSwiZmlsZSI6IkM6L1VzZXJzL1BDL0Rvd25sb2Fkcy9SYXpvbi9mcm9udGVuZC9kYXNoYm9hcmQvRGFzaGJvYXJkUGFnZS50c3gifQ==

@@ -1,0 +1,367 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/@fs/C:/Users/PC/Downloads/Razon/frontend/journal/JournalPage.tsx");const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];import { JournalTable } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/JournalTable.tsx";
+import { StatusPill } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/CockpitPrimitives.tsx";
+var _jsxFileName = "C:/Users/PC/Downloads/Razon/frontend/journal/JournalPage.tsx";
+import __vite__cjsImport2_react_jsxDevRuntime from "/@fs/C:/Users/PC/Downloads/Razon/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=7ec427b8";
+export function JournalPage({ backtests, rows }) {
+	return /* @__PURE__ */ _jsxDEV("div", {
+		"data-loc": "frontend\\journal\\JournalPage.tsx:13",
+		className: "cockpit-stack",
+		children: [
+			/* @__PURE__ */ _jsxDEV("section", {
+				"data-loc": "frontend\\journal\\JournalPage.tsx:14",
+				className: "cockpit-panel",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\journal\\JournalPage.tsx:15",
+					className: "cockpit-panel-header",
+					children: [/* @__PURE__ */ _jsxDEV("h2", {
+						"data-loc": "frontend\\journal\\JournalPage.tsx:16",
+						children: "Journal"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 16,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+						"data-loc": "frontend\\journal\\JournalPage.tsx:17",
+						tone: "connected",
+						children: "NO_TRADE logged"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 17,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 15,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV(JournalTable, {
+					"data-loc": "frontend\\journal\\JournalPage.tsx:19",
+					rows
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 19,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 14,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("section", {
+				"data-loc": "frontend\\journal\\JournalPage.tsx:21",
+				className: "cockpit-panel",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\journal\\JournalPage.tsx:22",
+					className: "cockpit-panel-header",
+					children: [/* @__PURE__ */ _jsxDEV("h2", {
+						"data-loc": "frontend\\journal\\JournalPage.tsx:23",
+						children: "Audit Trail"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 23,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+						"data-loc": "frontend\\journal\\JournalPage.tsx:24",
+						tone: "live-off",
+						children: "Read only"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 24,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 22,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\journal\\JournalPage.tsx:26",
+					className: "cockpit-grid three",
+					children: [
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\journal\\JournalPage.tsx:27",
+							className: "cockpit-kpi",
+							children: [/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\journal\\JournalPage.tsx:28",
+								className: "cockpit-label",
+								children: "Acceptations"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 28,
+								columnNumber: 13
+							}, this), /* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\journal\\JournalPage.tsx:29",
+								className: "cockpit-value",
+								children: rows.filter((row) => row.decision === "BUY" || row.decision === "SELL").length
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 29,
+								columnNumber: 13
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 27,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\journal\\JournalPage.tsx:31",
+							className: "cockpit-kpi",
+							children: [/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\journal\\JournalPage.tsx:32",
+								className: "cockpit-label",
+								children: "Refus"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 32,
+								columnNumber: 13
+							}, this), /* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\journal\\JournalPage.tsx:33",
+								className: "cockpit-value",
+								children: rows.filter((row) => row.decision === "NO_TRADE").length
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 33,
+								columnNumber: 13
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 31,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\journal\\JournalPage.tsx:35",
+							className: "cockpit-kpi",
+							children: [/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\journal\\JournalPage.tsx:36",
+								className: "cockpit-label",
+								children: "Attente"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 36,
+								columnNumber: 13
+							}, this), /* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\journal\\JournalPage.tsx:37",
+								className: "cockpit-value",
+								children: rows.filter((row) => row.decision === "WAIT").length
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 37,
+								columnNumber: 13
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 35,
+							columnNumber: 11
+						}, this)
+					]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 26,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 21,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("section", {
+				"data-loc": "frontend\\journal\\JournalPage.tsx:41",
+				className: "cockpit-panel",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\journal\\JournalPage.tsx:42",
+					className: "cockpit-panel-header",
+					children: [/* @__PURE__ */ _jsxDEV("h2", {
+						"data-loc": "frontend\\journal\\JournalPage.tsx:43",
+						children: "Backtests demo"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 43,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+						"data-loc": "frontend\\journal\\JournalPage.tsx:44",
+						tone: "live-off",
+						children: "Read only"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 44,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 42,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\journal\\JournalPage.tsx:46",
+					className: "demo-backtest-grid",
+					children: backtests.map((backtest) => /* @__PURE__ */ _jsxDEV("article", {
+						"data-loc": "frontend\\journal\\JournalPage.tsx:48",
+						className: "demo-backtest-card",
+						children: [
+							/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\journal\\JournalPage.tsx:49",
+								className: "cockpit-row",
+								children: [/* @__PURE__ */ _jsxDEV("strong", {
+									"data-loc": "frontend\\journal\\JournalPage.tsx:50",
+									children: backtest.id
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 50,
+									columnNumber: 17
+								}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+									"data-loc": "frontend\\journal\\JournalPage.tsx:51",
+									tone: backtest.dataSource === "MOCK" ? "demo" : backtest.dataSource,
+									children: backtest.dataSource === "MOCK" ? "SIM ARCHIVE" : backtest.dataSource
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 51,
+									columnNumber: 17
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 49,
+								columnNumber: 15
+							}, this),
+							/* @__PURE__ */ _jsxDEV("p", {
+								"data-loc": "frontend\\journal\\JournalPage.tsx:55",
+								className: "cockpit-muted",
+								children: [
+									backtest.symbol,
+									" | ",
+									backtest.timeframe,
+									" | ",
+									backtest.mode,
+									" | ",
+									backtest.period
+								]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 55,
+								columnNumber: 15
+							}, this),
+							/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\journal\\JournalPage.tsx:58",
+								className: "demo-metric-row",
+								children: [
+									/* @__PURE__ */ _jsxDEV("span", {
+										"data-loc": "frontend\\journal\\JournalPage.tsx:59",
+										children: ["Trades", /* @__PURE__ */ _jsxDEV("strong", {
+											"data-loc": "frontend\\journal\\JournalPage.tsx:61",
+											children: backtest.totalTrades
+										}, void 0, false, {
+											fileName: _jsxFileName,
+											lineNumber: 61,
+											columnNumber: 19
+										}, this)]
+									}, void 0, true, {
+										fileName: _jsxFileName,
+										lineNumber: 59,
+										columnNumber: 17
+									}, this),
+									/* @__PURE__ */ _jsxDEV("span", {
+										"data-loc": "frontend\\journal\\JournalPage.tsx:63",
+										children: ["Win", /* @__PURE__ */ _jsxDEV("strong", {
+											"data-loc": "frontend\\journal\\JournalPage.tsx:65",
+											children: [backtest.winRate.toFixed(1), "%"]
+										}, void 0, true, {
+											fileName: _jsxFileName,
+											lineNumber: 65,
+											columnNumber: 19
+										}, this)]
+									}, void 0, true, {
+										fileName: _jsxFileName,
+										lineNumber: 63,
+										columnNumber: 17
+									}, this),
+									/* @__PURE__ */ _jsxDEV("span", {
+										"data-loc": "frontend\\journal\\JournalPage.tsx:67",
+										children: ["Drawdown", /* @__PURE__ */ _jsxDEV("strong", {
+											"data-loc": "frontend\\journal\\JournalPage.tsx:69",
+											children: [backtest.maxDrawdown.toFixed(1), "%"]
+										}, void 0, true, {
+											fileName: _jsxFileName,
+											lineNumber: 69,
+											columnNumber: 19
+										}, this)]
+									}, void 0, true, {
+										fileName: _jsxFileName,
+										lineNumber: 67,
+										columnNumber: 17
+									}, this),
+									/* @__PURE__ */ _jsxDEV("span", {
+										"data-loc": "frontend\\journal\\JournalPage.tsx:71",
+										children: ["NO_TRADE", /* @__PURE__ */ _jsxDEV("strong", {
+											"data-loc": "frontend\\journal\\JournalPage.tsx:73",
+											children: backtest.noTradeCount
+										}, void 0, false, {
+											fileName: _jsxFileName,
+											lineNumber: 73,
+											columnNumber: 19
+										}, this)]
+									}, void 0, true, {
+										fileName: _jsxFileName,
+										lineNumber: 71,
+										columnNumber: 17
+									}, this)
+								]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 58,
+								columnNumber: 15
+							}, this),
+							/* @__PURE__ */ _jsxDEV("p", {
+								"data-loc": "frontend\\journal\\JournalPage.tsx:76",
+								className: "cockpit-muted",
+								children: backtest.recommendation
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 76,
+								columnNumber: 15
+							}, this)
+						]
+					}, backtest.id, true, {
+						fileName: _jsxFileName,
+						lineNumber: 48,
+						columnNumber: 13
+					}, this))
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 46,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 41,
+				columnNumber: 7
+			}, this)
+		]
+	}, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 13,
+		columnNumber: 5
+	}, this);
+}
+_c = JournalPage;
+var _c;
+$RefreshReg$(_c, "JournalPage");
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+import * as __vite_react_currentExports from "/@fs/C:/Users/PC/Downloads/Razon/frontend/journal/JournalPage.tsx";
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+
+  const currentExports = __vite_react_currentExports;
+  queueMicrotask(() => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/PC/Downloads/Razon/frontend/journal/JournalPage.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/PC/Downloads/Razon/frontend/journal/JournalPage.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+function $RefreshReg$(type, id) { return RefreshRuntime.register(type, "C:/Users/PC/Downloads/Razon/frontend/journal/JournalPage.tsx" + ' ' + id); }
+function $RefreshSig$() { return RefreshRuntime.createSignatureFunctionForTransform(); }
+
+//# sourceMappingURL=data:application/json;base64,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O29CQUFKLENBQUssT0FFSCx3QkFBQyxVQUFEO1dBQU07cUJBQU4sQ0FBUyxTQUFTLFFBQVEsUUFBUSxDQUFDLEdBQUUsR0FBUzs7Ozs7a0JBQzFDOzs7Ozs7U0FDTix3QkFBQyxRQUFEO1VBQUk7b0JBQUosQ0FBSyxZQUVILHdCQUFDLFVBQUQ7V0FBTTtxQkFBTixDQUFTLFNBQVMsWUFBWSxRQUFRLENBQUMsR0FBRSxHQUFTOzs7OztrQkFDOUM7Ozs7OztTQUNOLHdCQUFDLFFBQUQ7VUFBSTtvQkFBSixDQUFLLFlBRUgsd0JBQUMsVUFBRDtXQUFNO3FCQUFHLFNBQVM7VUFBcUI7Ozs7a0JBQ25DOzs7Ozs7UUFDSDs7Ozs7O09BQ0wsd0JBQUMsS0FBRDtRQUFDO1FBQUUsV0FBVTtrQkFBaUIsU0FBUztPQUFrQjs7Ozs7TUFDbEQ7UUE3Qm9DLFNBQVM7Ozs7WUE2QjdDLENBQ1Y7SUFDRTs7OztZQUNFOzs7Ozs7RUFDTjs7Ozs7O0FBRVQiLCJuYW1lcyI6W10sImlnbm9yZUxpc3QiOltdLCJzb3VyY2VzIjpbIkpvdXJuYWxQYWdlLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgdHlwZSB7IEJhY2t0ZXN0U3VtbWFyeSwgSm91cm5hbFJvdyB9IGZyb20gXCIuLi9hcHAvY29ja3BpdC50eXBlc1wiO1xuaW1wb3J0IHsgSm91cm5hbFRhYmxlIH0gZnJvbSBcIi4uL2NvbXBvbmVudHMvSm91cm5hbFRhYmxlXCI7XG5pbXBvcnQgeyBTdGF0dXNQaWxsIH0gZnJvbSBcIi4uL2NvbXBvbmVudHMvQ29ja3BpdFByaW1pdGl2ZXNcIjtcblxuZXhwb3J0IGZ1bmN0aW9uIEpvdXJuYWxQYWdlKHtcbiAgYmFja3Rlc3RzLFxuICByb3dzLFxufToge1xuICBiYWNrdGVzdHM6IHJlYWRvbmx5IEJhY2t0ZXN0U3VtbWFyeVtdO1xuICByb3dzOiByZWFkb25seSBKb3VybmFsUm93W107XG59KSB7XG4gIHJldHVybiAoXG4gICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXN0YWNrXCI+XG4gICAgICA8c2VjdGlvbiBjbGFzc05hbWU9XCJjb2NrcGl0LXBhbmVsXCI+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1wYW5lbC1oZWFkZXJcIj5cbiAgICAgICAgICA8aDI+Sm91cm5hbDwvaDI+XG4gICAgICAgICAgPFN0YXR1c1BpbGwgdG9uZT1cImNvbm5lY3RlZFwiPk5PX1RSQURFIGxvZ2dlZDwvU3RhdHVzUGlsbD5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxKb3VybmFsVGFibGUgcm93cz17cm93c30gLz5cbiAgICAgIDwvc2VjdGlvbj5cbiAgICAgIDxzZWN0aW9uIGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWxcIj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXBhbmVsLWhlYWRlclwiPlxuICAgICAgICAgIDxoMj5BdWRpdCBUcmFpbDwvaDI+XG4gICAgICAgICAgPFN0YXR1c1BpbGwgdG9uZT1cImxpdmUtb2ZmXCI+UmVhZCBvbmx5PC9TdGF0dXNQaWxsPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LWdyaWQgdGhyZWVcIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpXCI+XG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LWxhYmVsXCI+QWNjZXB0YXRpb25zPC9zcGFuPlxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlXCI+e3Jvd3MuZmlsdGVyKHJvdyA9PiByb3cuZGVjaXNpb24gPT09IFwiQlVZXCIgfHwgcm93LmRlY2lzaW9uID09PSBcIlNFTExcIikubGVuZ3RofTwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5SZWZ1czwvc3Bhbj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC12YWx1ZVwiPntyb3dzLmZpbHRlcihyb3cgPT4gcm93LmRlY2lzaW9uID09PSBcIk5PX1RSQURFXCIpLmxlbmd0aH08L2Rpdj5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpXCI+XG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LWxhYmVsXCI+QXR0ZW50ZTwvc3Bhbj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC12YWx1ZVwiPntyb3dzLmZpbHRlcihyb3cgPT4gcm93LmRlY2lzaW9uID09PSBcIldBSVRcIikubGVuZ3RofTwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvc2VjdGlvbj5cbiAgICAgIDxzZWN0aW9uIGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWxcIj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXBhbmVsLWhlYWRlclwiPlxuICAgICAgICAgIDxoMj5CYWNrdGVzdHMgZGVtbzwvaDI+XG4gICAgICAgICAgPFN0YXR1c1BpbGwgdG9uZT1cImxpdmUtb2ZmXCI+UmVhZCBvbmx5PC9TdGF0dXNQaWxsPlxuICAgICAgICA8L2Rpdj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJkZW1vLWJhY2t0ZXN0LWdyaWRcIj5cbiAgICAgICAgICB7YmFja3Rlc3RzLm1hcChiYWNrdGVzdCA9PiAoXG4gICAgICAgICAgICA8YXJ0aWNsZSBjbGFzc05hbWU9XCJkZW1vLWJhY2t0ZXN0LWNhcmRcIiBrZXk9e2JhY2t0ZXN0LmlkfT5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXJvd1wiPlxuICAgICAgICAgICAgICAgIDxzdHJvbmc+e2JhY2t0ZXN0LmlkfTwvc3Ryb25nPlxuICAgICAgICAgICAgICAgIDxTdGF0dXNQaWxsIHRvbmU9e2JhY2t0ZXN0LmRhdGFTb3VyY2UgPT09IFwiTU9DS1wiID8gXCJkZW1vXCIgOiBiYWNrdGVzdC5kYXRhU291cmNlfT5cbiAgICAgICAgICAgICAgICAgIHtiYWNrdGVzdC5kYXRhU291cmNlID09PSBcIk1PQ0tcIiA/IFwiU0lNIEFSQ0hJVkVcIiA6IGJhY2t0ZXN0LmRhdGFTb3VyY2V9XG4gICAgICAgICAgICAgICAgPC9TdGF0dXNQaWxsPlxuICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPHAgY2xhc3NOYW1lPVwiY29ja3BpdC1tdXRlZFwiPlxuICAgICAgICAgICAgICAgIHtiYWNrdGVzdC5zeW1ib2x9IHwge2JhY2t0ZXN0LnRpbWVmcmFtZX0gfCB7YmFja3Rlc3QubW9kZX0gfCB7YmFja3Rlc3QucGVyaW9kfVxuICAgICAgICAgICAgICA8L3A+XG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiZGVtby1tZXRyaWMtcm93XCI+XG4gICAgICAgICAgICAgICAgPHNwYW4+XG4gICAgICAgICAgICAgICAgICBUcmFkZXNcbiAgICAgICAgICAgICAgICAgIDxzdHJvbmc+e2JhY2t0ZXN0LnRvdGFsVHJhZGVzfTwvc3Ryb25nPlxuICAgICAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICAgICAgICA8c3Bhbj5cbiAgICAgICAgICAgICAgICAgIFdpblxuICAgICAgICAgICAgICAgICAgPHN0cm9uZz57YmFja3Rlc3Qud2luUmF0ZS50b0ZpeGVkKDEpfSU8L3N0cm9uZz5cbiAgICAgICAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICAgICAgICAgPHNwYW4+XG4gICAgICAgICAgICAgICAgICBEcmF3ZG93blxuICAgICAgICAgICAgICAgICAgPHN0cm9uZz57YmFja3Rlc3QubWF4RHJhd2Rvd24udG9GaXhlZCgxKX0lPC9zdHJvbmc+XG4gICAgICAgICAgICAgICAgPC9zcGFuPlxuICAgICAgICAgICAgICAgIDxzcGFuPlxuICAgICAgICAgICAgICAgICAgTk9fVFJBREVcbiAgICAgICAgICAgICAgICAgIDxzdHJvbmc+e2JhY2t0ZXN0Lm5vVHJhZGVDb3VudH08L3N0cm9uZz5cbiAgICAgICAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICA8cCBjbGFzc05hbWU9XCJjb2NrcGl0LW11dGVkXCI+e2JhY2t0ZXN0LnJlY29tbWVuZGF0aW9ufTwvcD5cbiAgICAgICAgICAgIDwvYXJ0aWNsZT5cbiAgICAgICAgICApKX1cbiAgICAgICAgPC9kaXY+XG4gICAgICA8L3NlY3Rpb24+XG4gICAgPC9kaXY+XG4gICk7XG59XG4iXSwiZmlsZSI6IkM6L1VzZXJzL1BDL0Rvd25sb2Fkcy9SYXpvbi9mcm9udGVuZC9qb3VybmFsL0pvdXJuYWxQYWdlLnRzeCJ9

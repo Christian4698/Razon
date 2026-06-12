@@ -1,0 +1,406 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/@fs/C:/Users/PC/Downloads/Razon/frontend/kalos/KalosVisualIntelligencePanel.tsx");const _jsxDEV = __vite__cjsImport2_react_jsxDevRuntime["jsxDEV"];import { formatPrice, StatusPill } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/CockpitPrimitives.tsx";
+import { kalosMarketStructureFeatures, kalosModes, kalosOutputFields, kalosSafetyRules, kalosSmartMoneyFeatures } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/kalos/kalos-visual-intelligence.mock.ts";
+var _jsxFileName = "C:/Users/PC/Downloads/Razon/frontend/kalos/KalosVisualIntelligencePanel.tsx";
+import __vite__cjsImport2_react_jsxDevRuntime from "/@fs/C:/Users/PC/Downloads/Razon/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=7ec427b8";
+export function KalosVisualIntelligencePanel({ signal }) {
+	const acceptedOverlays = signal.overlayObjects.filter((item) => item.status === "ACCEPTED").length;
+	const rejectedOverlays = signal.overlayObjects.filter((item) => item.status === "REJECTED").length;
+	return /* @__PURE__ */ _jsxDEV("section", {
+		"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:16",
+		className: "cockpit-panel",
+		children: [/* @__PURE__ */ _jsxDEV("div", {
+			"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:17",
+			className: "cockpit-panel-header",
+			children: [/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:18",
+				children: [/* @__PURE__ */ _jsxDEV("h2", {
+					"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:19",
+					children: "KALOS Visual Market Intelligence"
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 19,
+					columnNumber: 11
+				}, this), /* @__PURE__ */ _jsxDEV("p", {
+					"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:20",
+					className: "cockpit-muted",
+					children: "Structure, smart money, overlays et sortie lecture seule sans execution."
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 20,
+					columnNumber: 11
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 18,
+				columnNumber: 9
+			}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+				"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:22",
+				tone: "live-off",
+				children: "LIVE OFF"
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 22,
+				columnNumber: 9
+			}, this)]
+		}, void 0, true, {
+			fileName: _jsxFileName,
+			lineNumber: 17,
+			columnNumber: 7
+		}, this), /* @__PURE__ */ _jsxDEV("div", {
+			"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:25",
+			className: "cockpit-grid two",
+			children: [/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:26",
+				className: "cockpit-stack",
+				children: [
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:27",
+						children: [/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:28",
+							className: "cockpit-label",
+							children: "Structure marche"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 28,
+							columnNumber: 13
+						}, this), /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:29",
+							className: "overlay-chip-grid",
+							children: kalosMarketStructureFeatures.map((feature) => /* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:31",
+								className: "overlay-chip",
+								children: feature
+							}, feature, false, {
+								fileName: _jsxFileName,
+								lineNumber: 31,
+								columnNumber: 17
+							}, this))
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 29,
+							columnNumber: 13
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 27,
+						columnNumber: 11
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:35",
+						children: [/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:36",
+							className: "cockpit-label",
+							children: "Smart Money"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 36,
+							columnNumber: 13
+						}, this), /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:37",
+							className: "overlay-chip-grid",
+							children: kalosSmartMoneyFeatures.map((feature) => /* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:39",
+								className: "overlay-chip",
+								children: feature
+							}, feature, false, {
+								fileName: _jsxFileName,
+								lineNumber: 39,
+								columnNumber: 17
+							}, this))
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 37,
+							columnNumber: 13
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 35,
+						columnNumber: 11
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:43",
+						children: [/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:44",
+							className: "cockpit-label",
+							children: "Modes prevus"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 44,
+							columnNumber: 13
+						}, this), /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:45",
+							className: "overlay-chip-grid",
+							children: kalosModes.map((mode) => /* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:47",
+								className: mode === "AUTO" ? "overlay-chip is-risky" : "overlay-chip",
+								children: mode
+							}, mode, false, {
+								fileName: _jsxFileName,
+								lineNumber: 47,
+								columnNumber: 17
+							}, this))
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 45,
+							columnNumber: 13
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 43,
+						columnNumber: 11
+					}, this)
+				]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 26,
+				columnNumber: 9
+			}, this), /* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:53",
+				className: "cockpit-stack",
+				children: [
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:54",
+						className: "cockpit-kpi-row",
+						children: [
+							/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:55",
+								className: "cockpit-kpi",
+								children: [/* @__PURE__ */ _jsxDEV("span", {
+									"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:56",
+									className: "cockpit-label",
+									children: "Trend"
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 56,
+									columnNumber: 15
+								}, this), /* @__PURE__ */ _jsxDEV("div", {
+									"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:57",
+									className: "cockpit-value",
+									style: { fontSize: 19 },
+									children: signal.trend
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 57,
+									columnNumber: 15
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 55,
+								columnNumber: 13
+							}, this),
+							/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:59",
+								className: "cockpit-kpi",
+								children: [/* @__PURE__ */ _jsxDEV("span", {
+									"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:60",
+									className: "cockpit-label",
+									children: "Accepted overlays"
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 60,
+									columnNumber: 15
+								}, this), /* @__PURE__ */ _jsxDEV("div", {
+									"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:61",
+									className: "cockpit-value cockpit-positive",
+									children: acceptedOverlays
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 61,
+									columnNumber: 15
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 59,
+								columnNumber: 13
+							}, this),
+							/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:63",
+								className: "cockpit-kpi",
+								children: [/* @__PURE__ */ _jsxDEV("span", {
+									"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:64",
+									className: "cockpit-label",
+									children: "Rejected overlays"
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 64,
+									columnNumber: 15
+								}, this), /* @__PURE__ */ _jsxDEV("div", {
+									"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:65",
+									className: "cockpit-value cockpit-negative",
+									children: rejectedOverlays
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 65,
+									columnNumber: 15
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 63,
+								columnNumber: 13
+							}, this)
+						]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 54,
+						columnNumber: 11
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:69",
+						children: [/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:70",
+							className: "cockpit-label",
+							children: "Sortie KALOS"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 70,
+							columnNumber: 13
+						}, this), /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:71",
+							className: "overlay-chip-grid",
+							children: kalosOutputFields.map((field) => /* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:73",
+								className: "overlay-chip",
+								children: field
+							}, field, false, {
+								fileName: _jsxFileName,
+								lineNumber: 73,
+								columnNumber: 17
+							}, this))
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 71,
+							columnNumber: 13
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 69,
+						columnNumber: 11
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:78",
+						className: "cockpit-stack",
+						children: signal.overlayObjects.slice(0, 5).map((item) => /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:80",
+							className: "cockpit-rule-row",
+							children: /* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:81",
+								className: "cockpit-row",
+								children: [
+									/* @__PURE__ */ _jsxDEV("strong", {
+										"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:82",
+										children: item.label
+									}, void 0, false, {
+										fileName: _jsxFileName,
+										lineNumber: 82,
+										columnNumber: 19
+									}, this),
+									/* @__PURE__ */ _jsxDEV("span", {
+										"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:83",
+										className: "cockpit-muted",
+										children: item.price === undefined ? item.type : `${item.type} ${formatPrice(item.price)}`
+									}, void 0, false, {
+										fileName: _jsxFileName,
+										lineNumber: 83,
+										columnNumber: 19
+									}, this),
+									/* @__PURE__ */ _jsxDEV(StatusPill, {
+										"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:86",
+										tone: item.status === "REJECTED" ? "critical" : "connected",
+										children: item.status
+									}, void 0, false, {
+										fileName: _jsxFileName,
+										lineNumber: 86,
+										columnNumber: 19
+									}, this)
+								]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 81,
+								columnNumber: 17
+							}, this)
+						}, item.id, false, {
+							fileName: _jsxFileName,
+							lineNumber: 80,
+							columnNumber: 15
+						}, this))
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 78,
+						columnNumber: 11
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:92",
+						children: [/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:93",
+							className: "cockpit-label",
+							children: "Regles"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 93,
+							columnNumber: 13
+						}, this), /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:94",
+							className: "overlay-chip-grid",
+							children: kalosSafetyRules.map((rule) => /* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\kalos\\KalosVisualIntelligencePanel.tsx:96",
+								className: "overlay-chip is-risky",
+								children: rule
+							}, rule, false, {
+								fileName: _jsxFileName,
+								lineNumber: 96,
+								columnNumber: 17
+							}, this))
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 94,
+							columnNumber: 13
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 92,
+						columnNumber: 11
+					}, this)
+				]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 53,
+				columnNumber: 9
+			}, this)]
+		}, void 0, true, {
+			fileName: _jsxFileName,
+			lineNumber: 25,
+			columnNumber: 7
+		}, this)]
+	}, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 16,
+		columnNumber: 5
+	}, this);
+}
+_c = KalosVisualIntelligencePanel;
+var _c;
+$RefreshReg$(_c, "KalosVisualIntelligencePanel");
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+import * as __vite_react_currentExports from "/@fs/C:/Users/PC/Downloads/Razon/frontend/kalos/KalosVisualIntelligencePanel.tsx";
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+
+  const currentExports = __vite_react_currentExports;
+  queueMicrotask(() => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/PC/Downloads/Razon/frontend/kalos/KalosVisualIntelligencePanel.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/PC/Downloads/Razon/frontend/kalos/KalosVisualIntelligencePanel.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+function $RefreshReg$(type, id) { return RefreshRuntime.register(type, "C:/Users/PC/Downloads/Razon/frontend/kalos/KalosVisualIntelligencePanel.tsx" + ' ' + id); }
+function $RefreshSig$() { return RefreshRuntime.createSignatureFunctionForTransform(); }
+
+//# sourceMappingURL=data:application/json;base64,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QUc7T0FBRSxXQUFVO2lCQUFnQjtNQUFpQjs7OztnQkFDaEQsd0JBQUMsT0FBRDtPQUFHO09BQUUsV0FBVTtpQkFDWixrQkFBa0IsS0FBSSxVQUNyQix3QkFBQyxRQUFEO1FBQUk7UUFBRSxXQUFVO2tCQUE0QjtPQUFZLEdBQXBCOzs7O2NBQW9CLENBQ3pEO01BQ0U7Ozs7Y0FDRjs7Ozs7O0tBRUwsd0JBQUMsT0FBRDtNQUFHO01BQUUsV0FBVTtnQkFDWixPQUFPLGVBQWUsTUFBTSxHQUFHLENBQUMsRUFBRSxLQUFJLFNBQ3JDLHdCQUFDLE9BQUQ7T0FBRztPQUFFLFdBQVU7aUJBQ2Isd0JBQUMsT0FBRDtRQUFHO1FBQUUsV0FBVTtrQkFBZjtTQUNFLHdCQUFDLFVBQUQ7VUFBTTtvQkFBRyxLQUFLO1NBQWM7Ozs7O1NBQzVCLHdCQUFDLFFBQUQ7VUFBSTtVQUFFLFdBQVU7b0JBQ2IsS0FBSyxVQUFVLFlBQVksS0FBSyxPQUFPLEdBQUcsS0FBSyxLQUFLLEdBQUcsWUFBWSxLQUFLLEtBQUs7U0FDMUU7Ozs7O1NBQ04sd0JBQUMsWUFBRDtVQUFVO1VBQUUsTUFBTSxLQUFLLFdBQVcsYUFBYSxhQUFhO29CQUFjLEtBQUs7U0FBbUI7Ozs7O1FBQy9GOzs7Ozs7TUFDRixHQVJrQyxLQUFLOzs7O2FBUXZDLENBQ047S0FDRTs7Ozs7S0FFTCx3QkFBQyxPQUFEO01BQUc7Z0JBQUgsQ0FDRSx3QkFBQyxPQUFEO09BQUc7T0FBRSxXQUFVO2lCQUFnQjtNQUFXOzs7O2dCQUMxQyx3QkFBQyxPQUFEO09BQUc7T0FBRSxXQUFVO2lCQUNaLGlCQUFpQixLQUFJLFNBQ3BCLHdCQUFDLFFBQUQ7UUFBSTtRQUFFLFdBQVU7a0JBQW9DO09BQVcsR0FBbEI7Ozs7Y0FBa0IsQ0FDaEU7TUFDRTs7OztjQUNGOzs7Ozs7SUFDRjs7Ozs7V0FDRjs7Ozs7VUFDRTs7Ozs7O0FBRWIiLCJuYW1lcyI6W10sImlnbm9yZUxpc3QiOltdLCJzb3VyY2VzIjpbIkthbG9zVmlzdWFsSW50ZWxsaWdlbmNlUGFuZWwudHN4Il0sInNvdXJjZXNDb250ZW50IjpbImltcG9ydCB0eXBlIHsgS2Fsb3NTaWduYWwgfSBmcm9tIFwiLi4vYXBwL2NvY2twaXQudHlwZXNcIjtcbmltcG9ydCB7IGZvcm1hdFByaWNlLCBTdGF0dXNQaWxsIH0gZnJvbSBcIi4uL2NvbXBvbmVudHMvQ29ja3BpdFByaW1pdGl2ZXNcIjtcbmltcG9ydCB7XG4gIGthbG9zTWFya2V0U3RydWN0dXJlRmVhdHVyZXMsXG4gIGthbG9zTW9kZXMsXG4gIGthbG9zT3V0cHV0RmllbGRzLFxuICBrYWxvc1NhZmV0eVJ1bGVzLFxuICBrYWxvc1NtYXJ0TW9uZXlGZWF0dXJlcyxcbn0gZnJvbSBcIi4va2Fsb3MtdmlzdWFsLWludGVsbGlnZW5jZS5tb2NrXCI7XG5cbmV4cG9ydCBmdW5jdGlvbiBLYWxvc1Zpc3VhbEludGVsbGlnZW5jZVBhbmVsKHsgc2lnbmFsIH06IHsgc2lnbmFsOiBLYWxvc1NpZ25hbCB9KSB7XG4gIGNvbnN0IGFjY2VwdGVkT3ZlcmxheXMgPSBzaWduYWwub3ZlcmxheU9iamVjdHMuZmlsdGVyKGl0ZW0gPT4gaXRlbS5zdGF0dXMgPT09IFwiQUNDRVBURURcIikubGVuZ3RoO1xuICBjb25zdCByZWplY3RlZE92ZXJsYXlzID0gc2lnbmFsLm92ZXJsYXlPYmplY3RzLmZpbHRlcihpdGVtID0+IGl0ZW0uc3RhdHVzID09PSBcIlJFSkVDVEVEXCIpLmxlbmd0aDtcblxuICByZXR1cm4gKFxuICAgIDxzZWN0aW9uIGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWxcIj5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1wYW5lbC1oZWFkZXJcIj5cbiAgICAgICAgPGRpdj5cbiAgICAgICAgICA8aDI+S0FMT1MgVmlzdWFsIE1hcmtldCBJbnRlbGxpZ2VuY2U8L2gyPlxuICAgICAgICAgIDxwIGNsYXNzTmFtZT1cImNvY2twaXQtbXV0ZWRcIj5TdHJ1Y3R1cmUsIHNtYXJ0IG1vbmV5LCBvdmVybGF5cyBldCBzb3J0aWUgbGVjdHVyZSBzZXVsZSBzYW5zIGV4ZWN1dGlvbi48L3A+XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8U3RhdHVzUGlsbCB0b25lPVwibGl2ZS1vZmZcIj5MSVZFIE9GRjwvU3RhdHVzUGlsbD5cbiAgICAgIDwvZGl2PlxuXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtZ3JpZCB0d29cIj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXN0YWNrXCI+XG4gICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPlN0cnVjdHVyZSBtYXJjaGU8L2Rpdj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwib3ZlcmxheS1jaGlwLWdyaWRcIj5cbiAgICAgICAgICAgICAge2thbG9zTWFya2V0U3RydWN0dXJlRmVhdHVyZXMubWFwKGZlYXR1cmUgPT4gKFxuICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cIm92ZXJsYXktY2hpcFwiIGtleT17ZmVhdHVyZX0+e2ZlYXR1cmV9PC9zcGFuPlxuICAgICAgICAgICAgICApKX1cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5TbWFydCBNb25leTwvZGl2PlxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJvdmVybGF5LWNoaXAtZ3JpZFwiPlxuICAgICAgICAgICAgICB7a2Fsb3NTbWFydE1vbmV5RmVhdHVyZXMubWFwKGZlYXR1cmUgPT4gKFxuICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cIm92ZXJsYXktY2hpcFwiIGtleT17ZmVhdHVyZX0+e2ZlYXR1cmV9PC9zcGFuPlxuICAgICAgICAgICAgICApKX1cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5Nb2RlcyBwcmV2dXM8L2Rpdj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwib3ZlcmxheS1jaGlwLWdyaWRcIj5cbiAgICAgICAgICAgICAge2thbG9zTW9kZXMubWFwKG1vZGUgPT4gKFxuICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT17bW9kZSA9PT0gXCJBVVRPXCIgPyBcIm92ZXJsYXktY2hpcCBpcy1yaXNreVwiIDogXCJvdmVybGF5LWNoaXBcIn0ga2V5PXttb2RlfT57bW9kZX08L3NwYW4+XG4gICAgICAgICAgICAgICkpfVxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgIDwvZGl2PlxuXG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1zdGFja1wiPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGktcm93XCI+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpXCI+XG4gICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5UcmVuZDwvc3Bhbj5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlXCIgc3R5bGU9e3sgZm9udFNpemU6IDE5IH19PntzaWduYWwudHJlbmR9PC9kaXY+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPkFjY2VwdGVkIG92ZXJsYXlzPC9zcGFuPlxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtdmFsdWUgY29ja3BpdC1wb3NpdGl2ZVwiPnthY2NlcHRlZE92ZXJsYXlzfTwvZGl2PlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpXCI+XG4gICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5SZWplY3RlZCBvdmVybGF5czwvc3Bhbj5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlIGNvY2twaXQtbmVnYXRpdmVcIj57cmVqZWN0ZWRPdmVybGF5c308L2Rpdj5cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgPGRpdj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPlNvcnRpZSBLQUxPUzwvZGl2PlxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJvdmVybGF5LWNoaXAtZ3JpZFwiPlxuICAgICAgICAgICAgICB7a2Fsb3NPdXRwdXRGaWVsZHMubWFwKGZpZWxkID0+IChcbiAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJvdmVybGF5LWNoaXBcIiBrZXk9e2ZpZWxkfT57ZmllbGR9PC9zcGFuPlxuICAgICAgICAgICAgICApKX1cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuXG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXN0YWNrXCI+XG4gICAgICAgICAgICB7c2lnbmFsLm92ZXJsYXlPYmplY3RzLnNsaWNlKDAsIDUpLm1hcChpdGVtID0+IChcbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXJ1bGUtcm93XCIga2V5PXtpdGVtLmlkfT5cbiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcm93XCI+XG4gICAgICAgICAgICAgICAgICA8c3Ryb25nPntpdGVtLmxhYmVsfTwvc3Ryb25nPlxuICAgICAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1tdXRlZFwiPlxuICAgICAgICAgICAgICAgICAgICB7aXRlbS5wcmljZSA9PT0gdW5kZWZpbmVkID8gaXRlbS50eXBlIDogYCR7aXRlbS50eXBlfSAke2Zvcm1hdFByaWNlKGl0ZW0ucHJpY2UpfWB9XG4gICAgICAgICAgICAgICAgICA8L3NwYW4+XG4gICAgICAgICAgICAgICAgICA8U3RhdHVzUGlsbCB0b25lPXtpdGVtLnN0YXR1cyA9PT0gXCJSRUpFQ1RFRFwiID8gXCJjcml0aWNhbFwiIDogXCJjb25uZWN0ZWRcIn0+e2l0ZW0uc3RhdHVzfTwvU3RhdHVzUGlsbD5cbiAgICAgICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICApKX1cbiAgICAgICAgICA8L2Rpdj5cblxuICAgICAgICAgIDxkaXY+XG4gICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5SZWdsZXM8L2Rpdj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwib3ZlcmxheS1jaGlwLWdyaWRcIj5cbiAgICAgICAgICAgICAge2thbG9zU2FmZXR5UnVsZXMubWFwKHJ1bGUgPT4gKFxuICAgICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cIm92ZXJsYXktY2hpcCBpcy1yaXNreVwiIGtleT17cnVsZX0+e3J1bGV9PC9zcGFuPlxuICAgICAgICAgICAgICApKX1cbiAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgIDwvZGl2PlxuICAgICAgICA8L2Rpdj5cbiAgICAgIDwvZGl2PlxuICAgIDwvc2VjdGlvbj5cbiAgKTtcbn1cbiJdLCJmaWxlIjoiQzovVXNlcnMvUEMvRG93bmxvYWRzL1Jhem9uL2Zyb250ZW5kL2thbG9zL0thbG9zVmlzdWFsSW50ZWxsaWdlbmNlUGFuZWwudHN4In0=

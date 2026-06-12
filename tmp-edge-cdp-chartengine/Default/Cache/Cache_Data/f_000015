@@ -1,0 +1,462 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/@fs/C:/Users/PC/Downloads/Razon/frontend/components/MarketStatusCard.tsx");const _jsxDEV = __vite__cjsImport3_react_jsxDevRuntime["jsxDEV"];import { Activity, Clock, Database, LineChart } from "/@fs/C:/Users/PC/Downloads/Razon/node_modules/.vite/deps/lucide-react.js?v=765c9e56";
+import { dataModeLabels } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/app/cockpit-data.ts";
+import { formatPrice, Panel, StatusPill } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/CockpitPrimitives.tsx";
+var _jsxFileName = "C:/Users/PC/Downloads/Razon/frontend/components/MarketStatusCard.tsx";
+import __vite__cjsImport3_react_jsxDevRuntime from "/@fs/C:/Users/PC/Downloads/Razon/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=7ec427b8";
+function dataSourceLabel(market) {
+	if (market.source === "DEMO" && market.sourceStatus === "CONNECTED" && market.session.toLowerCase().includes("deriv")) {
+		return "DERIV DEMO";
+	}
+	if (market.source === "MOCK") return "MOCK_DATA";
+	return market.source;
+}
+export function MarketStatusCard({ dataMode, market }) {
+	const labels = dataModeLabels(dataMode);
+	const sourceLabel = dataSourceLabel(market);
+	return /* @__PURE__ */ _jsxDEV(Panel, {
+		"data-loc": "frontend\\components\\MarketStatusCard.tsx:20",
+		title: "Market Status",
+		action: /* @__PURE__ */ _jsxDEV("div", {
+			"data-loc": "frontend\\components\\MarketStatusCard.tsx:23",
+			className: "cockpit-controls",
+			children: [/* @__PURE__ */ _jsxDEV(StatusPill, {
+				"data-loc": "frontend\\components\\MarketStatusCard.tsx:24",
+				tone: dataMode === "REAL_DATA" ? "critical" : "demo",
+				children: dataMode
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 24,
+				columnNumber: 11
+			}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+				"data-loc": "frontend\\components\\MarketStatusCard.tsx:25",
+				tone: sourceLabel === "DERIV DEMO" ? "connected" : market.runtimeMode,
+				children: sourceLabel
+			}, void 0, false, {
+				fileName: _jsxFileName,
+				lineNumber: 25,
+				columnNumber: 11
+			}, this)]
+		}, void 0, true, {
+			fileName: _jsxFileName,
+			lineNumber: 23,
+			columnNumber: 9
+		}, this),
+		children: /* @__PURE__ */ _jsxDEV("div", {
+			"data-loc": "frontend\\components\\MarketStatusCard.tsx:29",
+			className: "cockpit-kpi-row",
+			children: [
+				/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\components\\MarketStatusCard.tsx:30",
+					className: "cockpit-kpi",
+					children: [
+						/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:31",
+							className: "cockpit-label",
+							children: "DATA SOURCE"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 31,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:32",
+							className: "cockpit-value",
+							style: { fontSize: 18 },
+							children: sourceLabel
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 32,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:33",
+							className: "cockpit-muted",
+							children: sourceLabel === "DERIV DEMO" ? `CONNECTED | fallback ${market.fallback ?? "NONE"}` : "Fallback visible only in DEMO_DATA"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 33,
+							columnNumber: 11
+						}, this)
+					]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 30,
+					columnNumber: 9
+				}, this),
+				/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\components\\MarketStatusCard.tsx:39",
+					className: "cockpit-kpi",
+					children: [
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:40",
+							className: "cockpit-row",
+							children: [/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\components\\MarketStatusCard.tsx:41",
+								className: "cockpit-label",
+								children: "Symbole"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 41,
+								columnNumber: 13
+							}, this), /* @__PURE__ */ _jsxDEV(LineChart, {
+								"data-loc": "frontend\\components\\MarketStatusCard.tsx:42",
+								size: 16,
+								color: "#58f0d1"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 42,
+								columnNumber: 13
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 40,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:44",
+							className: "cockpit-value",
+							children: market.symbol
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 44,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:45",
+							className: "cockpit-muted",
+							children: market.timeframe
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 45,
+							columnNumber: 11
+						}, this)
+					]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 39,
+					columnNumber: 9
+				}, this),
+				/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\components\\MarketStatusCard.tsx:47",
+					className: "cockpit-kpi",
+					children: [
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:48",
+							className: "cockpit-row",
+							children: [/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\components\\MarketStatusCard.tsx:49",
+								className: "cockpit-label",
+								children: "Prix actuel"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 49,
+								columnNumber: 13
+							}, this), /* @__PURE__ */ _jsxDEV(Activity, {
+								"data-loc": "frontend\\components\\MarketStatusCard.tsx:50",
+								size: 16,
+								color: "#63e6a6"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 50,
+								columnNumber: 13
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 48,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:52",
+							className: "cockpit-value",
+							children: formatPrice(market.price)
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 52,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:53",
+							className: "cockpit-muted",
+							children: ["Spread ", market.spread]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 53,
+							columnNumber: 11
+						}, this)
+					]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 47,
+					columnNumber: 9
+				}, this),
+				/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\components\\MarketStatusCard.tsx:55",
+					className: "cockpit-kpi",
+					children: [
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:56",
+							className: "cockpit-row",
+							children: [/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\components\\MarketStatusCard.tsx:57",
+								className: "cockpit-label",
+								children: "Volume"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 57,
+								columnNumber: 13
+							}, this), /* @__PURE__ */ _jsxDEV(Database, {
+								"data-loc": "frontend\\components\\MarketStatusCard.tsx:58",
+								size: 16,
+								color: "#f4c86a"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 58,
+								columnNumber: 13
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 56,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:60",
+							className: "cockpit-value",
+							children: market.volume.toLocaleString("en-US")
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 60,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:61",
+							className: "cockpit-muted",
+							children: "Disponible si feed actif"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 61,
+							columnNumber: 11
+						}, this)
+					]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 55,
+					columnNumber: 9
+				}, this),
+				/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\components\\MarketStatusCard.tsx:63",
+					className: "cockpit-kpi",
+					children: [
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:64",
+							className: "cockpit-row",
+							children: [/* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\components\\MarketStatusCard.tsx:65",
+								className: "cockpit-label",
+								children: "Session"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 65,
+								columnNumber: 13
+							}, this), /* @__PURE__ */ _jsxDEV(Clock, {
+								"data-loc": "frontend\\components\\MarketStatusCard.tsx:66",
+								size: 16,
+								color: "#8ad7ff"
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 66,
+								columnNumber: 13
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 64,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:68",
+							className: "cockpit-value",
+							style: { fontSize: 15 },
+							children: market.session
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 68,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:69",
+							className: "cockpit-muted",
+							children: [
+								"Source ",
+								sourceLabel,
+								" | ",
+								labels.slice(1).filter((label) => sourceLabel !== "DERIV DEMO" || label !== "MOCK").join(" / ")
+							]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 69,
+							columnNumber: 11
+						}, this)
+					]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 63,
+					columnNumber: 9
+				}, this),
+				/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\components\\MarketStatusCard.tsx:71",
+					className: "cockpit-kpi",
+					children: [
+						/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:72",
+							className: "cockpit-label",
+							children: "Data Quality"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 72,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:73",
+							className: "cockpit-value",
+							style: { fontSize: 18 },
+							children: market.dataQuality ?? "UNKNOWN"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 73,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:74",
+							className: "cockpit-muted",
+							children: ["Flux ", market.sourceStatus ?? "MOCK"]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 74,
+							columnNumber: 11
+						}, this)
+					]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 71,
+					columnNumber: 9
+				}, this),
+				/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\components\\MarketStatusCard.tsx:76",
+					className: "cockpit-kpi",
+					children: [
+						/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:77",
+							className: "cockpit-label",
+							children: "Last Candle"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 77,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:78",
+							className: "cockpit-value",
+							style: { fontSize: 18 },
+							children: market.lastCandleAt ? new Date(market.lastCandleAt).toLocaleTimeString("fr-FR", {
+								hour: "2-digit",
+								minute: "2-digit"
+							}) : "n/a"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 78,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:81",
+							className: "cockpit-muted",
+							children: ["Last Tick ", market.lastTickAt ? new Date(market.lastTickAt).toLocaleTimeString("fr-FR", {
+								hour: "2-digit",
+								minute: "2-digit"
+							}) : "n/a"]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 81,
+							columnNumber: 11
+						}, this)
+					]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 76,
+					columnNumber: 9
+				}, this),
+				/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\components\\MarketStatusCard.tsx:83",
+					className: "cockpit-kpi",
+					children: [
+						/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:84",
+							className: "cockpit-label",
+							children: "Latence"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 84,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:85",
+							className: "cockpit-value",
+							style: { fontSize: 18 },
+							children: market.latencyMs === undefined || market.latencyMs === null ? "n/a" : `${market.latencyMs} ms`
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 85,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\components\\MarketStatusCard.tsx:88",
+							className: "cockpit-muted",
+							children: ["Freshness ", market.freshnessSeconds === undefined || market.freshnessSeconds === null ? "n/a" : `${market.freshnessSeconds}s`]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 88,
+							columnNumber: 11
+						}, this)
+					]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 83,
+					columnNumber: 9
+				}, this)
+			]
+		}, void 0, true, {
+			fileName: _jsxFileName,
+			lineNumber: 29,
+			columnNumber: 7
+		}, this)
+	}, void 0, false, {
+		fileName: _jsxFileName,
+		lineNumber: 20,
+		columnNumber: 5
+	}, this);
+}
+_c = MarketStatusCard;
+var _c;
+$RefreshReg$(_c, "MarketStatusCard");
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+import * as __vite_react_currentExports from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/MarketStatusCard.tsx";
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+
+  const currentExports = __vite_react_currentExports;
+  queueMicrotask(() => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/PC/Downloads/Razon/frontend/components/MarketStatusCard.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/PC/Downloads/Razon/frontend/components/MarketStatusCard.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+function $RefreshReg$(type, id) { return RefreshRuntime.register(type, "C:/Users/PC/Downloads/Razon/frontend/components/MarketStatusCard.tsx" + ' ' + id); }
+function $RefreshSig$() { return RefreshRuntime.createSignatureFunctionForTransform(); }
+
+//# sourceMappingURL=data:application/json;base64,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d0JBQUMsUUFBRDtPQUFJO09BQUUsV0FBVTtpQkFBaEIsQ0FBZ0MsY0FBVyxPQUFPLGFBQWEsSUFBSSxLQUFLLE9BQU8sVUFBVSxFQUFFLG1CQUFtQixTQUFTO1FBQUUsTUFBTTtRQUFXLFFBQVE7T0FBVSxDQUFDLElBQUksS0FBWTs7Ozs7O0tBQzFLOzs7Ozs7SUFDTCx3QkFBQyxPQUFEO0tBQUc7S0FBRSxXQUFVO2VBQWY7TUFDRSx3QkFBQyxRQUFEO09BQUk7T0FBRSxXQUFVO2lCQUFnQjtNQUFhOzs7OztNQUM3Qyx3QkFBQyxPQUFEO09BQUc7T0FBRSxXQUFVO09BQWdCLE9BQU8sRUFBRSxVQUFVLEdBQUc7aUJBQ2xELE9BQU8sY0FBYyxhQUFhLE9BQU8sY0FBYyxPQUFPLFFBQVEsR0FBRyxPQUFPLFVBQVU7TUFDeEY7Ozs7O01BQ0wsd0JBQUMsUUFBRDtPQUFJO09BQUUsV0FBVTtpQkFBaEIsQ0FBZ0MsY0FBVyxPQUFPLHFCQUFxQixhQUFhLE9BQU8scUJBQXFCLE9BQU8sUUFBUSxHQUFHLE9BQU8saUJBQWlCLEVBQVM7Ozs7OztLQUNoSzs7Ozs7O0dBQ0Y7Ozs7OztDQUNBOzs7OztBQUVYIiwibmFtZXMiOltdLCJpZ25vcmVMaXN0IjpbXSwic291cmNlcyI6WyJNYXJrZXRTdGF0dXNDYXJkLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBBY3Rpdml0eSwgQ2xvY2ssIERhdGFiYXNlLCBMaW5lQ2hhcnQgfSBmcm9tIFwibHVjaWRlLXJlYWN0XCI7XG5pbXBvcnQgeyBkYXRhTW9kZUxhYmVscyB9IGZyb20gXCIuLi9hcHAvY29ja3BpdC1kYXRhXCI7XG5pbXBvcnQgdHlwZSB7IERhdGFNb2RlLCBNYXJrZXRTdGF0dXMgfSBmcm9tIFwiLi4vYXBwL2NvY2twaXQudHlwZXNcIjtcbmltcG9ydCB7IGZvcm1hdFByaWNlLCBQYW5lbCwgU3RhdHVzUGlsbCB9IGZyb20gXCIuL0NvY2twaXRQcmltaXRpdmVzXCI7XG5cbmZ1bmN0aW9uIGRhdGFTb3VyY2VMYWJlbChtYXJrZXQ6IE1hcmtldFN0YXR1cykge1xuICBpZiAobWFya2V0LnNvdXJjZSA9PT0gXCJERU1PXCIgJiYgbWFya2V0LnNvdXJjZVN0YXR1cyA9PT0gXCJDT05ORUNURURcIiAmJiBtYXJrZXQuc2Vzc2lvbi50b0xvd2VyQ2FzZSgpLmluY2x1ZGVzKFwiZGVyaXZcIikpIHtcbiAgICByZXR1cm4gXCJERVJJViBERU1PXCI7XG4gIH1cblxuICBpZiAobWFya2V0LnNvdXJjZSA9PT0gXCJNT0NLXCIpIHJldHVybiBcIk1PQ0tfREFUQVwiO1xuICByZXR1cm4gbWFya2V0LnNvdXJjZTtcbn1cblxuZXhwb3J0IGZ1bmN0aW9uIE1hcmtldFN0YXR1c0NhcmQoeyBkYXRhTW9kZSwgbWFya2V0IH06IHsgZGF0YU1vZGU6IERhdGFNb2RlOyBtYXJrZXQ6IE1hcmtldFN0YXR1cyB9KSB7XG4gIGNvbnN0IGxhYmVscyA9IGRhdGFNb2RlTGFiZWxzKGRhdGFNb2RlKTtcbiAgY29uc3Qgc291cmNlTGFiZWwgPSBkYXRhU291cmNlTGFiZWwobWFya2V0KTtcblxuICByZXR1cm4gKFxuICAgIDxQYW5lbFxuICAgICAgdGl0bGU9XCJNYXJrZXQgU3RhdHVzXCJcbiAgICAgIGFjdGlvbj17XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1jb250cm9sc1wiPlxuICAgICAgICAgIDxTdGF0dXNQaWxsIHRvbmU9e2RhdGFNb2RlID09PSBcIlJFQUxfREFUQVwiID8gXCJjcml0aWNhbFwiIDogXCJkZW1vXCJ9PntkYXRhTW9kZX08L1N0YXR1c1BpbGw+XG4gICAgICAgICAgPFN0YXR1c1BpbGwgdG9uZT17c291cmNlTGFiZWwgPT09IFwiREVSSVYgREVNT1wiID8gXCJjb25uZWN0ZWRcIiA6IG1hcmtldC5ydW50aW1lTW9kZX0+e3NvdXJjZUxhYmVsfTwvU3RhdHVzUGlsbD5cbiAgICAgICAgPC9kaXY+XG4gICAgICB9XG4gICAgPlxuICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LWtwaS1yb3dcIj5cbiAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LWtwaVwiPlxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5EQVRBIFNPVVJDRTwvc3Bhbj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtdmFsdWVcIiBzdHlsZT17eyBmb250U2l6ZTogMTggfX0+e3NvdXJjZUxhYmVsfTwvZGl2PlxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbXV0ZWRcIj5cbiAgICAgICAgICAgIHtzb3VyY2VMYWJlbCA9PT0gXCJERVJJViBERU1PXCJcbiAgICAgICAgICAgICAgPyBgQ09OTkVDVEVEIHwgZmFsbGJhY2sgJHttYXJrZXQuZmFsbGJhY2sgPz8gXCJOT05FXCJ9YFxuICAgICAgICAgICAgICA6IFwiRmFsbGJhY2sgdmlzaWJsZSBvbmx5IGluIERFTU9fREFUQVwifVxuICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcm93XCI+XG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LWxhYmVsXCI+U3ltYm9sZTwvc3Bhbj5cbiAgICAgICAgICAgIDxMaW5lQ2hhcnQgc2l6ZT17MTZ9IGNvbG9yPVwiIzU4ZjBkMVwiIC8+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlXCI+e21hcmtldC5zeW1ib2x9PC9kaXY+XG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1tdXRlZFwiPnttYXJrZXQudGltZWZyYW1lfTwvc3Bhbj5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcm93XCI+XG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LWxhYmVsXCI+UHJpeCBhY3R1ZWw8L3NwYW4+XG4gICAgICAgICAgICA8QWN0aXZpdHkgc2l6ZT17MTZ9IGNvbG9yPVwiIzYzZTZhNlwiIC8+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlXCI+e2Zvcm1hdFByaWNlKG1hcmtldC5wcmljZSl9PC9kaXY+XG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1tdXRlZFwiPlNwcmVhZCB7bWFya2V0LnNwcmVhZH08L3NwYW4+XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpXCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXJvd1wiPlxuICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPlZvbHVtZTwvc3Bhbj5cbiAgICAgICAgICAgIDxEYXRhYmFzZSBzaXplPXsxNn0gY29sb3I9XCIjZjRjODZhXCIgLz5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtdmFsdWVcIj57bWFya2V0LnZvbHVtZS50b0xvY2FsZVN0cmluZyhcImVuLVVTXCIpfTwvZGl2PlxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbXV0ZWRcIj5EaXNwb25pYmxlIHNpIGZlZWQgYWN0aWY8L3NwYW4+XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpXCI+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXJvd1wiPlxuICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPlNlc3Npb248L3NwYW4+XG4gICAgICAgICAgICA8Q2xvY2sgc2l6ZT17MTZ9IGNvbG9yPVwiIzhhZDdmZlwiIC8+XG4gICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlXCIgc3R5bGU9e3sgZm9udFNpemU6IDE1IH19PnttYXJrZXQuc2Vzc2lvbn08L2Rpdj5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LW11dGVkXCI+U291cmNlIHtzb3VyY2VMYWJlbH0gfCB7bGFiZWxzLnNsaWNlKDEpLmZpbHRlcihsYWJlbCA9PiBzb3VyY2VMYWJlbCAhPT0gXCJERVJJViBERU1PXCIgfHwgbGFiZWwgIT09IFwiTU9DS1wiKS5qb2luKFwiIC8gXCIpfTwvc3Bhbj5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LWxhYmVsXCI+RGF0YSBRdWFsaXR5PC9zcGFuPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC12YWx1ZVwiIHN0eWxlPXt7IGZvbnRTaXplOiAxOCB9fT57bWFya2V0LmRhdGFRdWFsaXR5ID8/IFwiVU5LTk9XTlwifTwvZGl2PlxuICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbXV0ZWRcIj5GbHV4IHttYXJrZXQuc291cmNlU3RhdHVzID8/IFwiTU9DS1wifTwvc3Bhbj5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LWxhYmVsXCI+TGFzdCBDYW5kbGU8L3NwYW4+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlXCIgc3R5bGU9e3sgZm9udFNpemU6IDE4IH19PlxuICAgICAgICAgICAge21hcmtldC5sYXN0Q2FuZGxlQXQgPyBuZXcgRGF0ZShtYXJrZXQubGFzdENhbmRsZUF0KS50b0xvY2FsZVRpbWVTdHJpbmcoXCJmci1GUlwiLCB7IGhvdXI6IFwiMi1kaWdpdFwiLCBtaW51dGU6IFwiMi1kaWdpdFwiIH0pIDogXCJuL2FcIn1cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LW11dGVkXCI+TGFzdCBUaWNrIHttYXJrZXQubGFzdFRpY2tBdCA/IG5ldyBEYXRlKG1hcmtldC5sYXN0VGlja0F0KS50b0xvY2FsZVRpbWVTdHJpbmcoXCJmci1GUlwiLCB7IGhvdXI6IFwiMi1kaWdpdFwiLCBtaW51dGU6IFwiMi1kaWdpdFwiIH0pIDogXCJuL2FcIn08L3NwYW4+XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpXCI+XG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPkxhdGVuY2U8L3NwYW4+XG4gICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXZhbHVlXCIgc3R5bGU9e3sgZm9udFNpemU6IDE4IH19PlxuICAgICAgICAgICAge21hcmtldC5sYXRlbmN5TXMgPT09IHVuZGVmaW5lZCB8fCBtYXJrZXQubGF0ZW5jeU1zID09PSBudWxsID8gXCJuL2FcIiA6IGAke21hcmtldC5sYXRlbmN5TXN9IG1zYH1cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LW11dGVkXCI+RnJlc2huZXNzIHttYXJrZXQuZnJlc2huZXNzU2Vjb25kcyA9PT0gdW5kZWZpbmVkIHx8IG1hcmtldC5mcmVzaG5lc3NTZWNvbmRzID09PSBudWxsID8gXCJuL2FcIiA6IGAke21hcmtldC5mcmVzaG5lc3NTZWNvbmRzfXNgfTwvc3Bhbj5cbiAgICAgICAgPC9kaXY+XG4gICAgICA8L2Rpdj5cbiAgICA8L1BhbmVsPlxuICApO1xufVxuIl0sImZpbGUiOiJDOi9Vc2Vycy9QQy9Eb3dubG9hZHMvUmF6b24vZnJvbnRlbmQvY29tcG9uZW50cy9NYXJrZXRTdGF0dXNDYXJkLnRzeCJ9

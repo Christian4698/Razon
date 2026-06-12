@@ -1,0 +1,26 @@
+{
+  "name": "Razon",
+  "short_name": "Razon",
+  "description": "Razon trading cockpit for analysis, risk visibility, journal and connector status.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#0d0f11",
+  "theme_color": "#0d0f11",
+  "categories": ["finance", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/razon-icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/razon-icon-512.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -1,0 +1,423 @@
+import { createHotContext as __vite__createHotContext } from "/@vite/client";import.meta.hot = __vite__createHotContext("/@fs/C:/Users/PC/Downloads/Razon/frontend/kalos/KalosMarketBrainPanel.tsx");const _jsxDEV = __vite__cjsImport1_react_jsxDevRuntime["jsxDEV"];import { formatPrice, StatusPill } from "/@fs/C:/Users/PC/Downloads/Razon/frontend/components/CockpitPrimitives.tsx";
+var _jsxFileName = "C:/Users/PC/Downloads/Razon/frontend/kalos/KalosMarketBrainPanel.tsx";
+import __vite__cjsImport1_react_jsxDevRuntime from "/@fs/C:/Users/PC/Downloads/Razon/node_modules/.vite/deps/react_jsx-dev-runtime.js?v=7ec427b8";
+function scenarioTone(scenario) {
+	if (scenario === "CONTINUE") return "connected";
+	if (scenario === "REVERSE" || scenario === "WAIT") return "delayed";
+	return "critical";
+}
+export function KalosMarketBrainPanel({ brain }) {
+	return /* @__PURE__ */ _jsxDEV("section", {
+		"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:12",
+		className: "cockpit-panel",
+		children: [
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:13",
+				className: "cockpit-panel-header",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:14",
+					children: [/* @__PURE__ */ _jsxDEV("h2", {
+						"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:15",
+						children: "KALOS THINKING…"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 15,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV("p", {
+						"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:16",
+						className: "cockpit-muted",
+						children: "Interpretation contextuelle, lecture seule et analyse-only."
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 16,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 14,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+					"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:18",
+					tone: "live-off",
+					children: "LIVE OFF"
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 18,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 13,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:21",
+				className: "cockpit-kpi-row",
+				children: [
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:22",
+						className: "cockpit-kpi",
+						children: [/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:23",
+							className: "cockpit-label",
+							children: "Structure"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 23,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:24",
+							className: "cockpit-value",
+							style: { fontSize: 19 },
+							children: brain.structure
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 24,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 22,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:26",
+						className: "cockpit-kpi",
+						children: [/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:27",
+							className: "cockpit-label",
+							children: "Confiance"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 27,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:28",
+							className: "cockpit-value",
+							children: [brain.confidence, "%"]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 28,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 26,
+						columnNumber: 9
+					}, this),
+					/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:30",
+						className: "cockpit-kpi",
+						children: [/* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:31",
+							className: "cockpit-label",
+							children: "Scénario"
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 31,
+							columnNumber: 11
+						}, this), /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:32",
+							className: "cockpit-value",
+							style: { fontSize: 19 },
+							children: brain.scenario
+						}, void 0, false, {
+							fileName: _jsxFileName,
+							lineNumber: 32,
+							columnNumber: 11
+						}, this)]
+					}, void 0, true, {
+						fileName: _jsxFileName,
+						lineNumber: 30,
+						columnNumber: 9
+					}, this)
+				]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 21,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:36",
+				className: "cockpit-rule-row",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:37",
+					className: "cockpit-row",
+					children: [/* @__PURE__ */ _jsxDEV("strong", {
+						"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:38",
+						children: "Raison"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 38,
+						columnNumber: 11
+					}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+						"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:39",
+						tone: scenarioTone(brain.scenario),
+						children: brain.signal
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 39,
+						columnNumber: 11
+					}, this)]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 37,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV("span", {
+					"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:41",
+					className: "cockpit-muted",
+					children: brain.explanation
+				}, void 0, false, {
+					fileName: _jsxFileName,
+					lineNumber: 41,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 36,
+				columnNumber: 7
+			}, this),
+			/* @__PURE__ */ _jsxDEV("div", {
+				"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:44",
+				className: "cockpit-grid two",
+				children: [/* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:45",
+					className: "cockpit-stack",
+					children: [/* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:46",
+						className: "cockpit-label",
+						children: "Chemin attendu"
+					}, void 0, false, {
+						fileName: _jsxFileName,
+						lineNumber: 46,
+						columnNumber: 11
+					}, this), brain.expectedPath.map((item) => /* @__PURE__ */ _jsxDEV("div", {
+						"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:48",
+						className: "cockpit-rule-row",
+						children: [/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:49",
+							className: "cockpit-row",
+							children: [/* @__PURE__ */ _jsxDEV("strong", {
+								"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:50",
+								children: item.step
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 50,
+								columnNumber: 17
+							}, this), /* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:51",
+								className: "cockpit-muted",
+								children: [item.probability, "%"]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 51,
+								columnNumber: 17
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 49,
+							columnNumber: 15
+						}, this), /* @__PURE__ */ _jsxDEV("span", {
+							"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:53",
+							className: "cockpit-muted",
+							children: [item.hypothesis, item.price === undefined ? "" : ` @ ${formatPrice(item.price)}`]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 53,
+							columnNumber: 15
+						}, this)]
+					}, `${item.step}-${item.probability}`, true, {
+						fileName: _jsxFileName,
+						lineNumber: 48,
+						columnNumber: 13
+					}, this))]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 45,
+					columnNumber: 9
+				}, this), /* @__PURE__ */ _jsxDEV("div", {
+					"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:60",
+					className: "cockpit-stack",
+					children: [
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:61",
+							className: "cockpit-kpi-row",
+							children: [/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:62",
+								className: "cockpit-kpi",
+								children: [/* @__PURE__ */ _jsxDEV("span", {
+									"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:63",
+									className: "cockpit-label",
+									children: "Timing"
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 63,
+									columnNumber: 15
+								}, this), /* @__PURE__ */ _jsxDEV("div", {
+									"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:64",
+									className: "cockpit-value",
+									children: brain.timingScore
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 64,
+									columnNumber: 15
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 62,
+								columnNumber: 13
+							}, this), /* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:66",
+								className: "cockpit-kpi",
+								children: [/* @__PURE__ */ _jsxDEV("span", {
+									"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:67",
+									className: "cockpit-label",
+									children: "Risk"
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 67,
+									columnNumber: 15
+								}, this), /* @__PURE__ */ _jsxDEV("div", {
+									"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:68",
+									className: "cockpit-value",
+									children: brain.riskScore
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 68,
+									columnNumber: 15
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 66,
+								columnNumber: 13
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 61,
+							columnNumber: 11
+						}, this),
+						/* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:71",
+							className: "cockpit-rule-row",
+							children: [/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:72",
+								className: "cockpit-row",
+								children: [/* @__PURE__ */ _jsxDEV("strong", {
+									"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:73",
+									children: "Invalidation"
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 73,
+									columnNumber: 15
+								}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+									"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:74",
+									tone: "live-off",
+									children: "NO EXECUTION"
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 74,
+									columnNumber: 15
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 72,
+								columnNumber: 13
+							}, this), /* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:76",
+								className: "cockpit-muted",
+								children: brain.invalidation === null ? "Aucune zone valide en lecture seule." : formatPrice(brain.invalidation)
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 76,
+								columnNumber: 13
+							}, this)]
+						}, void 0, true, {
+							fileName: _jsxFileName,
+							lineNumber: 71,
+							columnNumber: 11
+						}, this),
+						brain.rejectedReasons.map((reason) => /* @__PURE__ */ _jsxDEV("div", {
+							"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:81",
+							className: "cockpit-rule-row",
+							children: [/* @__PURE__ */ _jsxDEV("div", {
+								"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:82",
+								className: "cockpit-row",
+								children: [/* @__PURE__ */ _jsxDEV("strong", {
+									"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:83",
+									children: "Blocage"
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 83,
+									columnNumber: 17
+								}, this), /* @__PURE__ */ _jsxDEV(StatusPill, {
+									"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:84",
+									tone: "critical",
+									children: "BLOCK"
+								}, void 0, false, {
+									fileName: _jsxFileName,
+									lineNumber: 84,
+									columnNumber: 17
+								}, this)]
+							}, void 0, true, {
+								fileName: _jsxFileName,
+								lineNumber: 82,
+								columnNumber: 15
+							}, this), /* @__PURE__ */ _jsxDEV("span", {
+								"data-loc": "frontend\\kalos\\KalosMarketBrainPanel.tsx:86",
+								className: "cockpit-muted",
+								children: reason
+							}, void 0, false, {
+								fileName: _jsxFileName,
+								lineNumber: 86,
+								columnNumber: 15
+							}, this)]
+						}, reason, true, {
+							fileName: _jsxFileName,
+							lineNumber: 81,
+							columnNumber: 13
+						}, this))
+					]
+				}, void 0, true, {
+					fileName: _jsxFileName,
+					lineNumber: 60,
+					columnNumber: 9
+				}, this)]
+			}, void 0, true, {
+				fileName: _jsxFileName,
+				lineNumber: 44,
+				columnNumber: 7
+			}, this)
+		]
+	}, void 0, true, {
+		fileName: _jsxFileName,
+		lineNumber: 12,
+		columnNumber: 5
+	}, this);
+}
+_c = KalosMarketBrainPanel;
+var _c;
+$RefreshReg$(_c, "KalosMarketBrainPanel");
+import * as RefreshRuntime from "/@react-refresh";
+const inWebWorker = typeof WorkerGlobalScope !== 'undefined' && self instanceof WorkerGlobalScope;
+import * as __vite_react_currentExports from "/@fs/C:/Users/PC/Downloads/Razon/frontend/kalos/KalosMarketBrainPanel.tsx";
+if (import.meta.hot && !inWebWorker) {
+  if (!window.$RefreshReg$) {
+    throw new Error(
+      "@vitejs/plugin-react can't detect preamble. Something is wrong."
+    );
+  }
+
+  const currentExports = __vite_react_currentExports;
+  queueMicrotask(() => {
+    RefreshRuntime.registerExportsForReactRefresh("C:/Users/PC/Downloads/Razon/frontend/kalos/KalosMarketBrainPanel.tsx", currentExports);
+    import.meta.hot.accept((nextExports) => {
+      if (!nextExports) return;
+      const invalidateMessage = RefreshRuntime.validateRefreshBoundaryAndEnqueueUpdate("C:/Users/PC/Downloads/Razon/frontend/kalos/KalosMarketBrainPanel.tsx", currentExports, nextExports);
+      if (invalidateMessage) import.meta.hot.invalidate(invalidateMessage);
+    });
+  });
+}
+function $RefreshReg$(type, id) { return RefreshRuntime.register(type, "C:/Users/PC/Downloads/Razon/frontend/kalos/KalosMarketBrainPanel.tsx" + ' ' + id); }
+function $RefreshSig$() { return RefreshRuntime.createSignatureFunctionForTransform(); }
+
+//# sourceMappingURL=data:application/json;base64,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ZXMiOlsiS2Fsb3NNYXJrZXRCcmFpblBhbmVsLnRzeCJdLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgdHlwZSB7IEthbG9zTWFya2V0QnJhaW4sIEthbG9zTWFya2V0QnJhaW5TY2VuYXJpbyB9IGZyb20gXCIuLi9hcHAvY29ja3BpdC50eXBlc1wiO1xuaW1wb3J0IHsgZm9ybWF0UHJpY2UsIFN0YXR1c1BpbGwgfSBmcm9tIFwiLi4vY29tcG9uZW50cy9Db2NrcGl0UHJpbWl0aXZlc1wiO1xuXG5mdW5jdGlvbiBzY2VuYXJpb1RvbmUoc2NlbmFyaW86IEthbG9zTWFya2V0QnJhaW5TY2VuYXJpbykge1xuICBpZiAoc2NlbmFyaW8gPT09IFwiQ09OVElOVUVcIikgcmV0dXJuIFwiY29ubmVjdGVkXCIgYXMgY29uc3Q7XG4gIGlmIChzY2VuYXJpbyA9PT0gXCJSRVZFUlNFXCIgfHwgc2NlbmFyaW8gPT09IFwiV0FJVFwiKSByZXR1cm4gXCJkZWxheWVkXCIgYXMgY29uc3Q7XG4gIHJldHVybiBcImNyaXRpY2FsXCIgYXMgY29uc3Q7XG59XG5cbmV4cG9ydCBmdW5jdGlvbiBLYWxvc01hcmtldEJyYWluUGFuZWwoeyBicmFpbiB9OiB7IGJyYWluOiBLYWxvc01hcmtldEJyYWluIH0pIHtcbiAgcmV0dXJuIChcbiAgICA8c2VjdGlvbiBjbGFzc05hbWU9XCJjb2NrcGl0LXBhbmVsXCI+XG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcGFuZWwtaGVhZGVyXCI+XG4gICAgICAgIDxkaXY+XG4gICAgICAgICAgPGgyPktBTE9TIFRISU5LSU5H4oCmPC9oMj5cbiAgICAgICAgICA8cCBjbGFzc05hbWU9XCJjb2NrcGl0LW11dGVkXCI+SW50ZXJwcmV0YXRpb24gY29udGV4dHVlbGxlLCBsZWN0dXJlIHNldWxlIGV0IGFuYWx5c2Utb25seS48L3A+XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8U3RhdHVzUGlsbCB0b25lPVwibGl2ZS1vZmZcIj5MSVZFIE9GRjwvU3RhdHVzUGlsbD5cbiAgICAgIDwvZGl2PlxuXG4gICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpLXJvd1wiPlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpXCI+XG4gICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPlN0cnVjdHVyZTwvc3Bhbj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtdmFsdWVcIiBzdHlsZT17eyBmb250U2l6ZTogMTkgfX0+e2JyYWluLnN0cnVjdHVyZX08L2Rpdj5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LWxhYmVsXCI+Q29uZmlhbmNlPC9zcGFuPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC12YWx1ZVwiPnticmFpbi5jb25maWRlbmNlfSU8L2Rpdj5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LWxhYmVsXCI+U2PDqW5hcmlvPC9zcGFuPlxuICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC12YWx1ZVwiIHN0eWxlPXt7IGZvbnRTaXplOiAxOSB9fT57YnJhaW4uc2NlbmFyaW99PC9kaXY+XG4gICAgICAgIDwvZGl2PlxuICAgICAgPC9kaXY+XG5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1ydWxlLXJvd1wiPlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcm93XCI+XG4gICAgICAgICAgPHN0cm9uZz5SYWlzb248L3N0cm9uZz5cbiAgICAgICAgICA8U3RhdHVzUGlsbCB0b25lPXtzY2VuYXJpb1RvbmUoYnJhaW4uc2NlbmFyaW8pfT57YnJhaW4uc2lnbmFsfTwvU3RhdHVzUGlsbD5cbiAgICAgICAgPC9kaXY+XG4gICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbXV0ZWRcIj57YnJhaW4uZXhwbGFuYXRpb259PC9zcGFuPlxuICAgICAgPC9kaXY+XG5cbiAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1ncmlkIHR3b1wiPlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtc3RhY2tcIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtbGFiZWxcIj5DaGVtaW4gYXR0ZW5kdTwvZGl2PlxuICAgICAgICAgIHticmFpbi5leHBlY3RlZFBhdGgubWFwKGl0ZW0gPT4gKFxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXJ1bGUtcm93XCIga2V5PXtgJHtpdGVtLnN0ZXB9LSR7aXRlbS5wcm9iYWJpbGl0eX1gfT5cbiAgICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXJvd1wiPlxuICAgICAgICAgICAgICAgIDxzdHJvbmc+e2l0ZW0uc3RlcH08L3N0cm9uZz5cbiAgICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LW11dGVkXCI+e2l0ZW0ucHJvYmFiaWxpdHl9JTwvc3Bhbj5cbiAgICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICAgIDxzcGFuIGNsYXNzTmFtZT1cImNvY2twaXQtbXV0ZWRcIj5cbiAgICAgICAgICAgICAgICB7aXRlbS5oeXBvdGhlc2lzfVxuICAgICAgICAgICAgICAgIHtpdGVtLnByaWNlID09PSB1bmRlZmluZWQgPyBcIlwiIDogYCBAICR7Zm9ybWF0UHJpY2UoaXRlbS5wcmljZSl9YH1cbiAgICAgICAgICAgICAgPC9zcGFuPlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgKSl9XG4gICAgICAgIDwvZGl2PlxuICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtc3RhY2tcIj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQta3BpLXJvd1wiPlxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LWtwaVwiPlxuICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LWxhYmVsXCI+VGltaW5nPC9zcGFuPlxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtdmFsdWVcIj57YnJhaW4udGltaW5nU2NvcmV9PC9kaXY+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1rcGlcIj5cbiAgICAgICAgICAgICAgPHNwYW4gY2xhc3NOYW1lPVwiY29ja3BpdC1sYWJlbFwiPlJpc2s8L3NwYW4+XG4gICAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC12YWx1ZVwiPnticmFpbi5yaXNrU2NvcmV9PC9kaXY+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcnVsZS1yb3dcIj5cbiAgICAgICAgICAgIDxkaXYgY2xhc3NOYW1lPVwiY29ja3BpdC1yb3dcIj5cbiAgICAgICAgICAgICAgPHN0cm9uZz5JbnZhbGlkYXRpb248L3N0cm9uZz5cbiAgICAgICAgICAgICAgPFN0YXR1c1BpbGwgdG9uZT1cImxpdmUtb2ZmXCI+Tk8gRVhFQ1VUSU9OPC9TdGF0dXNQaWxsPlxuICAgICAgICAgICAgPC9kaXY+XG4gICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LW11dGVkXCI+XG4gICAgICAgICAgICAgIHticmFpbi5pbnZhbGlkYXRpb24gPT09IG51bGwgPyBcIkF1Y3VuZSB6b25lIHZhbGlkZSBlbiBsZWN0dXJlIHNldWxlLlwiIDogZm9ybWF0UHJpY2UoYnJhaW4uaW52YWxpZGF0aW9uKX1cbiAgICAgICAgICAgIDwvc3Bhbj5cbiAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICB7YnJhaW4ucmVqZWN0ZWRSZWFzb25zLm1hcChyZWFzb24gPT4gKFxuICAgICAgICAgICAgPGRpdiBjbGFzc05hbWU9XCJjb2NrcGl0LXJ1bGUtcm93XCIga2V5PXtyZWFzb259PlxuICAgICAgICAgICAgICA8ZGl2IGNsYXNzTmFtZT1cImNvY2twaXQtcm93XCI+XG4gICAgICAgICAgICAgICAgPHN0cm9uZz5CbG9jYWdlPC9zdHJvbmc+XG4gICAgICAgICAgICAgICAgPFN0YXR1c1BpbGwgdG9uZT1cImNyaXRpY2FsXCI+QkxPQ0s8L1N0YXR1c1BpbGw+XG4gICAgICAgICAgICAgIDwvZGl2PlxuICAgICAgICAgICAgICA8c3BhbiBjbGFzc05hbWU9XCJjb2NrcGl0LW11dGVkXCI+e3JlYXNvbn08L3NwYW4+XG4gICAgICAgICAgICA8L2Rpdj5cbiAgICAgICAgICApKX1cbiAgICAgICAgPC9kaXY+XG4gICAgICA8L2Rpdj5cbiAgICA8L3NlY3Rpb24+XG4gICk7XG59XG4iXSwiZmlsZSI6IkM6L1VzZXJzL1BDL0Rvd25sb2Fkcy9SYXpvbi9mcm9udGVuZC9rYWxvcy9LYWxvc01hcmtldEJyYWluUGFuZWwudHN4In0=
