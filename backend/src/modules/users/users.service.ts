@@ -72,13 +72,16 @@ export class UsersService {
   update(userId: string, patch: Partial<Pick<User, "displayName" | "email" | "firstLoginCompleted" | "lastLoginAt" | "mustChangePassword" | "role" | "status" | "username">>): User | null {
     const user = this.findById(userId);
     if (!user) return null;
+    const definedPatch = Object.fromEntries(
+      Object.entries(patch).filter(([, value]) => value !== undefined),
+    ) as Partial<Pick<User, "displayName" | "email" | "firstLoginCompleted" | "lastLoginAt" | "mustChangePassword" | "role" | "status" | "username">>;
 
     const next: User = {
       ...user,
-      ...patch,
-      email: patch.email?.trim().toLowerCase() ?? user.email,
-      username: patch.username?.trim().toLowerCase() ?? user.username,
-      displayName: patch.displayName?.trim() || user.displayName,
+      ...definedPatch,
+      email: definedPatch.email?.trim().toLowerCase() ?? user.email,
+      username: definedPatch.username?.trim().toLowerCase() ?? user.username,
+      displayName: definedPatch.displayName?.trim() || user.displayName,
       updatedAt: now(),
     };
     this.users.set(next.id, next);
