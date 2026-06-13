@@ -173,6 +173,42 @@ describe("Market Data Observability runtime contracts", () => {
     expect(snapshot.observability.sourceStatus).toBe("CONNECTED");
   });
 
+  it("authorizes only personal Deriv DEMO tokens and refuses real tokens", async () => {
+    const config: DerivClientConfig = {
+      enabled: true,
+      appId: "1089",
+      apiTokenConfigured: false,
+      endpoint: "wss://ws.derivws.com/websockets/v3",
+      accountType: "demo",
+      allowOrderPlacement: false,
+    };
+    const transport: DerivRequestTransport = async (_endpoint, payload) => {
+      if (payload.authorize === "demo-token") {
+        return { authorize: { loginid: "VRTC123456", is_virtual: 1 } };
+      }
+
+      if (payload.authorize === "real-token") {
+        return { authorize: { loginid: "CR123456", is_virtual: 0 } };
+      }
+
+      return { error: { code: "InvalidToken", message: "Invalid token." } };
+    };
+    const client = new DerivDemoReadOnlyClient(config, transport);
+
+    const demo = await client.testPersonalToken("demo-token");
+    const real = await client.testPersonalToken("real-token");
+    const invalid = await client.testPersonalToken("bad-token");
+
+    expect(demo.ok).toBe(true);
+    expect(demo.accountType).toBe("DEMO");
+    expect(demo.source).toBe("PERSONAL_DERIV_DEMO");
+    expect(real.ok).toBe(false);
+    expect(real.accountType).toBe("REAL");
+    expect(real.message).toContain("Only Deriv DEMO tokens are allowed");
+    expect(invalid.status).toBe("INVALID");
+    expect(JSON.stringify({ demo, real, invalid })).not.toContain("demo-token");
+  });
+
   it("uses MOCK_DATA fallback only when DATA_MODE=DEMO_DATA and Deriv is disabled", async () => {
     process.env.DERIV_ENABLED = "false";
     process.env.DERIV_APP_ID = "";

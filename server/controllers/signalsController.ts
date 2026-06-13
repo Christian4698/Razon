@@ -1,5 +1,6 @@
 import type { Request, Response } from "express";
 import { razonJournalService } from "../services/razonJournalService";
+import { getCurrentUserScope } from "../services/connectors/connectorSecretsRepository";
 import { marketAggregator } from "../services/market/marketAggregator";
 import type { MarketTimeframe } from "../services/market/marketProvider";
 import { sendJson } from "../utils/http";
@@ -38,8 +39,9 @@ export async function getSignals(req: Request, res: Response) {
     const opportunities = await marketAggregator.getOpportunities(timeframe);
     const requestedSymbol = parseSymbol(req);
     const selectedSymbol = requestedSymbol ?? opportunities[0]?.symbol ?? "EUR/USD";
-    const analysis = await marketAggregator.getKalos(selectedSymbol, timeframe);
-    const snapshot = await marketAggregator.getSnapshot(selectedSymbol, timeframe);
+    const user = getCurrentUserScope(req);
+    const analysis = await marketAggregator.getKalos(selectedSymbol, timeframe, user);
+    const snapshot = await marketAggregator.getSnapshot(selectedSymbol, timeframe, user);
     const signal = {
       signal: analysis.decision,
       decision: analysis.decision,

@@ -6,6 +6,8 @@ import {
   exportConnectorSecretsPersistence,
   getSecretMetadata,
   importConnectorSecretsPersistence,
+  markConnectorSecretTest,
+  readConnectorSecret,
   saveConnectorSecret,
   type CurrentUserScope,
 } from "../../server/services/connectors/connectorSecretsRepository";
@@ -154,6 +156,36 @@ describe("SaaS admin persistence contracts", () => {
     expect(restored.saved).toBe(true);
     expect(restored.maskedPreview).toBe("****1234");
     expect(JSON.stringify(exported)).not.toContain("pat_secret_demo_token_1234");
+  });
+
+  it("persists Deriv personal connector test state without exposing the raw token", () => {
+    const user: CurrentUserScope = {
+      scope: "CURRENT_USER",
+      userId: "secret-user-deriv-demo",
+      displayName: "Secret User Deriv Demo",
+    };
+
+    saveConnectorSecret(user, "deriv-demo", "pat_personal_demo_token_9876");
+    markConnectorSecretTest(user, "deriv-demo", {
+      connected: true,
+      accountType: "DEMO",
+      status: "CONNECTED",
+      source: "PERSONAL_DERIV_DEMO",
+    });
+
+    const exported = exportConnectorSecretsPersistence();
+    deleteConnectorSecret(user, "deriv-demo");
+    importConnectorSecretsPersistence(exported);
+
+    const metadata = getSecretMetadata(user, "deriv-demo");
+
+    expect(metadata.saved).toBe(true);
+    expect(metadata.connected).toBe(true);
+    expect(metadata.accountType).toBe("DEMO");
+    expect(metadata.source).toBe("PERSONAL_DERIV_DEMO");
+    expect(readConnectorSecret(user, "deriv-demo")).toBe("pat_personal_demo_token_9876");
+    expect(JSON.stringify(exported)).not.toContain("pat_personal_demo_token_9876");
+    expect(JSON.stringify(metadata)).not.toContain("pat_personal_demo_token_9876");
   });
 
   it("marks expired licenses read-only after restore", () => {

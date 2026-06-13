@@ -1,4 +1,5 @@
 import type { Request, Response } from "express";
+import { getCurrentUserScope } from "../services/connectors/connectorSecretsRepository";
 import { marketAggregator } from "../services/market/marketAggregator";
 import type { MarketTimeframe } from "../services/market/marketProvider";
 import { sendJson } from "../utils/http";
@@ -43,7 +44,7 @@ export async function getMarketData(req: Request, res: Response) {
   try {
     const symbol = parseSymbol(req);
     const timeframe = parseTimeframe(req);
-    const snapshot = await marketAggregator.getSnapshot(symbol, timeframe);
+    const snapshot = await marketAggregator.getSnapshot(symbol, timeframe, getCurrentUserScope(req));
 
     return sendJson(res, {
       mode: "demo" as const,
@@ -88,7 +89,7 @@ export async function getMarketSnapshot(req: Request, res: Response) {
   try {
     return sendJson(
       res,
-      await marketAggregator.getSnapshot(parseSymbol(req), parseTimeframe(req))
+      await marketAggregator.getSnapshot(parseSymbol(req), parseTimeframe(req), getCurrentUserScope(req))
     );
   } catch (error) {
     return sendControllerError(res, error);
@@ -117,7 +118,7 @@ export async function getKalos(req: Request, res: Response) {
   try {
     return sendJson(
       res,
-      await marketAggregator.getKalos(parseSymbol(req), parseTimeframe(req))
+      await marketAggregator.getKalos(parseSymbol(req), parseTimeframe(req), getCurrentUserScope(req))
     );
   } catch (error) {
     return sendControllerError(res, error);

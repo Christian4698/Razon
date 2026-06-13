@@ -1,5 +1,11 @@
 import { kalosEngine, type KalosOutput } from "../kalos/kalosEngine";
 import { calculateIndicators, type IndicatorSnapshot, type IndicatorSeries } from "../kalos/indicators";
+import { derivDemoReadOnlyClient } from "../deriv/DerivDemoReadOnlyClient";
+import {
+  getSecretMetadata,
+  readConnectorSecret,
+  type CurrentUserScope,
+} from "../connectors/connectorSecretsRepository";
 import { marketCache } from "./marketCache";
 import {
   CryptoApiProvider,
@@ -170,6 +176,15 @@ function resolveSymbol(symbol: string): NormalizedSymbol | null {
 
 function providerFor(symbol: NormalizedSymbol) {
   return providers.find(provider => provider.supports(symbol)) ?? null;
+}
+
+function personalDerivToken(user: CurrentUserScope | null | undefined, symbol: NormalizedSymbol | null) {
+  if (!user || !symbol || symbol.category !== "derivSynthetic") return null;
+
+  const metadata = getSecretMetadata(user, "deriv-demo");
+  if (!metadata.saved || metadata.connected !== true || metadata.accountType !== "DEMO") return null;
+
+  return readConnectorSecret(user, "deriv-demo");
 }
 
 function timeframeMinutes(timeframe: MarketTimeframe) {
@@ -350,7 +365,7 @@ export const marketAggregator = {
     return resolveSymbol(symbol);
   },
 
-  async getTicker(symbolName: string): Promise<NormalizedTicker> {
+  async getTicker(symbolName: string, user?: CurrentUserScope): Promise<NormalizedTicker> {
     const symbol = resolveSymbol(symbolName);
 
     if (!symbol) {
@@ -370,6 +385,20 @@ export const marketAggregator = {
 
     const provider = providerFor(symbol);
     if (!provider) return unavailableTicker(symbol, "No provider supports this symbol.");
+    const token = personalDerivToken(user, symbol);
+
+    if (token) {
+      return marketCache.getOrSet(`ticker:${user?.userId}:personal-deriv:${symbol.symbol}`, 15000, () =>
+        withFallback(
+          () => derivDemoReadOnlyClient.getTickerWithPersonalToken(token, symbol.providerSymbol).then(ticker => ({
+            ...ticker,
+            symbol: symbol.symbol,
+            category: symbol.category,
+          })),
+          unavailableTicker(symbol, "Personal Deriv DEMO provider request failed.")
+        )
+      );
+    }
 
     return marketCache.getOrSet(`ticker:${symbol.symbol}`, 15000, () =>
       withFallback(
@@ -379,12 +408,27 @@ export const marketAggregator = {
     );
   },
 
-  async getCandles(symbolName: string, timeframe: MarketTimeframe): Promise<NormalizedCandle[]> {
+  async getCandles(symbolName: string, timeframe: MarketTimeframe, user?: CurrentUserScope): Promise<NormalizedCandle[]> {
     const symbol = resolveSymbol(symbolName);
     if (!symbol) return [];
 
     const provider = providerFor(symbol);
     if (!provider) return [];
+    const token = personalDerivToken(user, symbol);
+
+    if (token) {
+      return marketCache.getOrSet(`candles:${user?.userId}:personal-deriv:${symbol.symbol}:${timeframe}`, 60000, () =>
+        withFallback(
+          () => derivDemoReadOnlyClient.getCandlesWithPersonalToken(token, symbol.providerSymbol, timeframe).then(candles =>
+            candles.map(candle => ({
+              ...candle,
+              symbol: symbol.symbol,
+            }))
+          ),
+          []
+        )
+      );
+    }
 
     return marketCache.getOrSet(`candles:${symbol.symbol}:${timeframe}`, 60000, () =>
       withFallback(() => provider.getCandles(symbol, timeframe), [])
@@ -428,12 +472,12 @@ export const marketAggregator = {
     );
   },
 
-  async getSnapshot(symbolName = "EUR/USD", timeframe: MarketTimeframe = "5m"): Promise<MarketSnapshot> {
+  async getSnapshot(symbolName = "EUR/USD", timeframe: MarketTimeframe = "5m", user?: CurrentUserScope): Promise<MarketSnapshot> {
     const symbol = resolveSymbol(symbolName);
     const startedAt = Date.now();
     const [rawTicker, rawCandles, rawOrderBook, rawVolume] = await Promise.all([
-      this.getTicker(symbolName),
-      this.getCandles(symbolName, timeframe),
+      this.getTicker(symbolName, user),
+      this.getCandles(symbolName, timeframe, user),
       this.getOrderBook(symbolName),
       this.getVolume(symbolName),
     ]);
@@ -518,8 +562,8 @@ export const marketAggregator = {
       .sort((a, b) => b.heatScore - a.heatScore);
   },
 
-  async getKalos(symbolName = "EUR/USD", timeframe: MarketTimeframe = "5m"): Promise<KalosOutput> {
-    const snapshot = await this.getSnapshot(symbolName, timeframe);
+  async getKalos(symbolName = "EUR/USD", timeframe: MarketTimeframe = "5m", user?: CurrentUserScope): Promise<KalosOutput> {
+    const snapshot = await this.getSnapshot(symbolName, timeframe, user);
     const guarded = applyDataGuardToKalos(
       kalosEngine.evaluate(snapshot.ticker, snapshot.candles),
       snapshot.dataGuard

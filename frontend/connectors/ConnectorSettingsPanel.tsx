@@ -35,6 +35,7 @@ function displayDate(value: string | null | undefined) {
 }
 
 function connectorSourceLabel(connector: ConnectorStatus) {
+  if (connector.id === "deriv-demo" && connector.connected === true) return "PERSONAL_DERIV_DEMO";
   if (connector.id === "deriv-demo" && connector.runtimeMode === "DEMO" && connector.state === "connected") return "DERIV DEMO";
   if (connector.runtimeMode === "REAL_DATA") return "REAL_DATA";
   return connector.source === "MOCK" ? "MOCK_DATA" : connector.source;
@@ -109,10 +110,13 @@ export function ConnectorSettingsPanel({
       }
 
       setDraftSecrets(current => ({ ...current, [connector.id]: "" }));
-      setNotices(current => ({ ...current, [connector.id]: `${actionLabels[action]} completed. Secret value was not returned.` }));
+      const payload = await response.json().catch(() => ({}));
+      const message = typeof payload.message === "string" ? payload.message : `${actionLabels[action]} completed. Secret value was not returned.`;
+      setNotices(current => ({ ...current, [connector.id]: message }));
       await onRefresh?.();
-    } catch {
-      setNotices(current => ({ ...current, [connector.id]: `${actionLabels[action]} failed safely. No execution route was used.` }));
+    } catch (error) {
+      const message = error instanceof Error ? error.message : `${actionLabels[action]} failed safely. No execution route was used.`;
+      setNotices(current => ({ ...current, [connector.id]: message }));
     } finally {
       setBusyAction(null);
     }
@@ -161,17 +165,22 @@ export function ConnectorSettingsPanel({
         {connectors.map(connector => {
           const draft = draftSecrets[connector.id] ?? "";
           const busy = (action: ConnectorAction) => busyAction === `${connector.id}:${action}`;
+          const isDerivDemo = connector.id === "deriv-demo";
+          const derivConnected = isDerivDemo && connector.connected === true;
 
           return (
             <section className="connector-settings-card" key={connector.id}>
               <div className="connector-settings-head">
                 <div>
-                  <h3>{connector.name}</h3>
+                  <h3>{isDerivDemo ? "Connecter mon compte Deriv DEMO" : connector.name}</h3>
                   <p>{connector.provider ?? "Provider"} | {connector.accountKind ?? connector.accessMode} | {connector.ownerScope ?? "CURRENT_USER"}</p>
                 </div>
                 <div className="connector-settings-pills">
-                  <StatusPill tone={connector.connectorStatus ?? connector.state}>{connector.connectorStatus ?? connector.state.toUpperCase()}</StatusPill>
-                  <StatusPill tone={connector.runtimeMode}>{connector.runtimeMode}</StatusPill>
+                  <StatusPill tone={derivConnected ? "CONNECTED" : connector.connectorStatus ?? connector.state}>
+                    {derivConnected ? "CONNECTED" : connector.connectorStatus ?? connector.state.toUpperCase()}
+                  </StatusPill>
+                  {isDerivDemo ? <StatusPill tone="DEMO">DEMO ONLY</StatusPill> : <StatusPill tone={connector.runtimeMode}>{connector.runtimeMode}</StatusPill>}
+                  <StatusPill tone="READ_ONLY">READ ONLY</StatusPill>
                 </div>
               </div>
 
@@ -236,10 +245,18 @@ export function ConnectorSettingsPanel({
                 <div className="secret-settings-title">
                   <span>
                     <KeyRound size={14} aria-hidden="true" />
-                    {t("connectors.secretSettings")}
+                    {isDerivDemo ? "Token personnel Deriv DEMO" : t("connectors.secretSettings")}
                   </span>
                   <StatusPill tone={connector.secretStatus ?? "MISSING"}>{connector.secretStatus ?? "MISSING"}</StatusPill>
                 </div>
+                {isDerivDemo ? (
+                  <div className="connector-personal-deriv-state">
+                    <strong>{derivConnected ? "Compte DEMO connecté" : "Compte DEMO déconnecté"}</strong>
+                    <span>Token sauvegardé : <b>{connector.secretSaved ? "true" : "false"}</b></span>
+                    <span>Dernier test : <b>{displayDate(connector.lastTestAt)}</b></span>
+                    <span>Source : <b>{connector.personalSource ?? "PERSONAL_DERIV_DEMO"}</b></span>
+                  </div>
+                ) : null}
                 <div className="connector-secret-state">
                   <span>{t("connectors.secretSaved")}: <b>{connector.secretSaved ? "true" : "false"}</b></span>
                   <span>{t("connectors.lastUpdated")}: <b>{displayDate(connector.secretLastUpdatedAt)}</b></span>
@@ -258,7 +275,7 @@ export function ConnectorSettingsPanel({
                 <div className="connector-action-row">
                   <button disabled={busy("save-secret")} onClick={() => runAction(connector, "save-secret")} type="button">
                     <Save size={14} aria-hidden="true" />
-                    {t("connectors.saveSecret")}
+                    {isDerivDemo ? "Save token" : t("connectors.saveSecret")}
                   </button>
                   <button disabled={busy("save-secret")} onClick={() => runAction(connector, "save-secret")} type="button">
                     <RotateCcw size={14} aria-hidden="true" />
@@ -270,7 +287,7 @@ export function ConnectorSettingsPanel({
                   </button>
                   <button disabled={busy("test")} onClick={() => runAction(connector, "test")} type="button">
                     <RefreshCw size={14} aria-hidden="true" />
-                    {t("connectors.testConnection")}
+                    {isDerivDemo ? "Test connection" : t("connectors.testConnection")}
                   </button>
                   <button disabled={busy("reconnect")} onClick={() => runAction(connector, "reconnect")} type="button">
                     <PlugZap size={14} aria-hidden="true" />

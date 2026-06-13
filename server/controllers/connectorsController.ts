@@ -2,10 +2,13 @@ import type { Request, Response } from "express";
 import { derivDemoReadOnlyClient } from "../services/deriv/DerivDemoReadOnlyClient";
 import {
   deleteConnectorSecret,
+  disconnectConnectorSecret,
   getCurrentUserScope,
   getLicenseSnapshot,
   getSecretMetadata,
   isConnectorId,
+  markConnectorSecretTest,
+  readConnectorSecret,
   saveConnectorSecret,
   type ConnectorId,
   type ConnectorSecretStatus,
@@ -64,8 +67,14 @@ interface ConnectorHealthCard {
   readonly state: "connected" | "disconnected" | "delayed";
   readonly safetyStatus: "DISCONNECTED" | "CONNECTED_DEMO" | "CONNECTED_REAL_READONLY" | "LIVE_BLOCKED";
   readonly accessMode: "DEMO" | "REAL";
-  readonly source: "DEMO" | "MOCK" | "LIVE";
+  readonly source: "DEMO" | "MOCK" | "LIVE" | "PERSONAL_DERIV_DEMO";
   readonly readonlyByDefault: true;
+  readonly saved?: boolean;
+  readonly connected?: boolean;
+  readonly lastTestAt?: string | null;
+  readonly accountType?: "DEMO" | "REAL" | "UNKNOWN" | null;
+  readonly status?: "CONNECTED" | "DISCONNECTED";
+  readonly personalSource?: "PERSONAL_DERIV_DEMO" | null;
 }
 
 function legacyState(status: ConnectorStatus): ConnectorHealthCard["state"] {
@@ -209,6 +218,12 @@ function safeSecretFields(metadata: ReturnType<typeof getSecretMetadata>) {
     secretSaved: metadata.saved,
     secretLastUpdatedAt: metadata.lastUpdatedAt,
     ...(metadata.maskedPreview ? { secretMaskedPreview: metadata.maskedPreview } : {}),
+    saved: metadata.saved,
+    connected: metadata.connected ?? false,
+    lastTestAt: metadata.lastTestAt ?? null,
+    accountType: metadata.accountType ?? null,
+    status: metadata.connected ? "CONNECTED" as const : "DISCONNECTED" as const,
+    personalSource: metadata.source ?? null,
   };
 }
 
@@ -281,10 +296,13 @@ function staticConnectorHealth(
 }
 
 async function derivDemoHealth(user: CurrentUserScope, license: LicenseSnapshot) {
-  const deriv = await derivDemoReadOnlyClient.connect();
   const personalSecret = getSecretMetadata(user, "deriv-demo");
-  const secret = personalSecret.saved ? personalSecret : getSecretMetadata(user, "deriv-demo", false);
-  const connected = deriv.sourceStatus === "CONNECTED";
+  const personalConnected = personalSecret.saved && personalSecret.connected === true && personalSecret.accountType === "DEMO";
+  const deriv = personalConnected ? derivDemoReadOnlyClient.health() : await derivDemoReadOnlyClient.connect();
+  const connected = personalConnected || deriv.sourceStatus === "CONNECTED";
+  const message = personalConnected
+    ? "Compte Deriv DEMO personnel connecté en lecture seule."
+    : deriv.message;
 
   return {
     ...connectorCard({
@@ -303,11 +321,12 @@ async function derivDemoHealth(user: CurrentUserScope, license: LicenseSnapshot)
       lastTickAt: connected ? deriv.generatedAt : null,
       lastCandleAt: connected ? deriv.generatedAt : null,
       appIdConfigured: deriv.appIdConfigured,
-      ...safeSecretFields(secret),
-      message: deriv.message,
+      ...safeSecretFields(personalSecret),
+      message,
     }),
     appIdConfigured: deriv.appIdConfigured,
     endpointConfigured: deriv.endpointConfigured,
+    source: personalConnected ? "PERSONAL_DERIV_DEMO" : "DEMO",
   };
 }
 
@@ -377,7 +396,20 @@ export async function postConnectorSafeAction(req: Request, res: Response) {
   const action = actionFromPath(req.path);
 
   if (action === "SAVE_SECRET") {
-    saveConnectorSecret(user, connectorId, readSecretBody(req));
+    const metadata = saveConnectorSecret(user, connectorId, readSecretBody(req));
+    if (!metadata.saved) {
+      return res.status(400).json({
+        ok: false,
+        action,
+        error: "INVALID_SECRET",
+        message: "Enter a valid backend-only connector token before saving.",
+        readOnly: true,
+        liveExecutionEnabled: false,
+        automaticTradingAllowed: false,
+        orderPlacementAllowed: false,
+        secretsExposed: false,
+      });
+    }
   }
 
   if (action === "DELETE_SECRET") {
@@ -386,7 +418,54 @@ export async function postConnectorSafeAction(req: Request, res: Response) {
   }
 
   if (action === "DISCONNECT" && connectorId === "deriv-demo") {
+    disconnectConnectorSecret(user, connectorId);
     derivDemoReadOnlyClient.disconnect();
+  }
+
+  if ((action === "TEST_CONNECTION" || action === "RECONNECT") && connectorId === "deriv-demo") {
+    const token = readConnectorSecret(user, connectorId);
+
+    if (!token) {
+      markConnectorSecretTest(user, connectorId, {
+        connected: false,
+        accountType: null,
+        status: "DISCONNECTED",
+        source: "PERSONAL_DERIV_DEMO",
+      });
+      return res.status(400).json({
+        ok: false,
+        action,
+        error: "DERIV_TOKEN_MISSING",
+        message: "Save your personal Deriv DEMO token before testing the read-only connector.",
+        readOnly: true,
+        liveExecutionEnabled: false,
+        automaticTradingAllowed: false,
+        orderPlacementAllowed: false,
+        secretsExposed: false,
+      });
+    }
+
+    const result = await derivDemoReadOnlyClient.testPersonalToken(token);
+    markConnectorSecretTest(user, connectorId, {
+      connected: result.connected,
+      accountType: result.accountType,
+      status: result.status,
+      source: "PERSONAL_DERIV_DEMO",
+    });
+
+    if (!result.ok) {
+      return res.status(result.accountType === "REAL" ? 403 : 400).json({
+        ok: false,
+        action,
+        error: result.accountType === "REAL" ? "DERIV_REAL_TOKEN_REFUSED" : "DERIV_DEMO_TEST_FAILED",
+        message: result.message,
+        readOnly: true,
+        liveExecutionEnabled: false,
+        automaticTradingAllowed: false,
+        orderPlacementAllowed: false,
+        secretsExposed: false,
+      });
+    }
   }
 
   const connectors = await buildConnectors(user, license);
@@ -395,6 +474,9 @@ export async function postConnectorSafeAction(req: Request, res: Response) {
   return sendJson(res, {
     ok: true,
     action,
+    message: connectorId === "deriv-demo" && (action === "TEST_CONNECTION" || action === "RECONNECT")
+      ? "Compte Deriv DEMO personnel connecté en lecture seule."
+      : "Connector action completed. Secret value was not returned.",
     generatedAt: now(),
     user,
     readOnly: true as const,

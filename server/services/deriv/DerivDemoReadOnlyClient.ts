@@ -73,6 +73,17 @@ export interface DerivReadOnlySnapshot {
   readonly dataGuard: KalosDataGuardOutput;
 }
 
+export interface DerivPersonalTokenTestResult {
+  readonly ok: boolean;
+  readonly connected: boolean;
+  readonly accountType: "DEMO" | "REAL" | "UNKNOWN";
+  readonly status: "CONNECTED" | "DISCONNECTED" | "INVALID";
+  readonly source: "PERSONAL_DERIV_DEMO";
+  readonly loginid: string | null;
+  readonly latencyMs: number | null;
+  readonly message: string;
+}
+
 const defaultDerivRequestTransport: DerivRequestTransport = (endpoint, payload) => {
   const WebSocketCtor = globalThis.WebSocket;
 
@@ -169,6 +180,10 @@ function unavailableTicker(symbol: string, source: string, message: string): Nor
     updatedAt: now(),
     providerMessage: message,
   };
+}
+
+function sourceLabel(personal = false) {
+  return personal ? "PERSONAL_DERIV_DEMO" : "Deriv DEMO Read-Only";
 }
 
 function parseNumber(value: number | string) {
@@ -301,14 +316,14 @@ export class DerivDemoReadOnlyClient {
         volume: null,
         trend: "sideways",
         status: "live",
-        source: "Deriv DEMO Read-Only",
+        source: sourceLabel(),
         updatedAt: message.tick?.epoch ? new Date(message.tick.epoch * 1000).toISOString() : now(),
       };
     } catch (error) {
       this.connected = false;
       this.latencyMs = Date.now() - startedAt;
       this.lastMessage = error instanceof Error ? error.message : "Deriv DEMO tick read failed.";
-      return unavailableTicker(symbol, "Deriv DEMO Read-Only", this.lastMessage);
+      return unavailableTicker(symbol, sourceLabel(), this.lastMessage);
     }
   }
 
@@ -351,13 +366,185 @@ export class DerivDemoReadOnlyClient {
           low,
           close,
           volume: null,
-          source: "Deriv DEMO Read-Only",
+          source: sourceLabel(),
         };
       });
     } catch (error) {
       this.connected = false;
       this.latencyMs = Date.now() - startedAt;
       this.lastMessage = error instanceof Error ? error.message : "Deriv DEMO candles read failed.";
+      return [];
+    }
+  }
+
+  async testPersonalToken(token: string): Promise<DerivPersonalTokenTestResult> {
+    const trimmed = token.trim();
+    const startedAt = Date.now();
+
+    if (!this.isPersonalConnectorConfigured()) {
+      return {
+        ok: false,
+        connected: false,
+        accountType: "UNKNOWN",
+        status: "DISCONNECTED",
+        source: "PERSONAL_DERIV_DEMO",
+        loginid: null,
+        latencyMs: null,
+        message: "DERIV_APP_ID is required for Deriv DEMO personal connector.",
+      };
+    }
+
+    if (trimmed.length < 6) {
+      return {
+        ok: false,
+        connected: false,
+        accountType: "UNKNOWN",
+        status: "INVALID",
+        source: "PERSONAL_DERIV_DEMO",
+        loginid: null,
+        latencyMs: Date.now() - startedAt,
+        message: "Deriv token is missing or too short.",
+      };
+    }
+
+    try {
+      const message = await this.request({ authorize: trimmed });
+      const authorize = message.authorize;
+
+      if (!authorize) {
+        throw new Error("Deriv did not return an authorize payload.");
+      }
+
+      if (authorize.is_virtual !== 1) {
+        return {
+          ok: false,
+          connected: false,
+          accountType: "REAL",
+          status: "INVALID",
+          source: "PERSONAL_DERIV_DEMO",
+          loginid: authorize.loginid ?? null,
+          latencyMs: Date.now() - startedAt,
+          message: "Only Deriv DEMO tokens are allowed. Real/live accounts are refused.",
+        };
+      }
+
+      this.connected = true;
+      this.latencyMs = Date.now() - startedAt;
+      this.lastMessage = "Personal Deriv DEMO token authorized read-only.";
+
+      return {
+        ok: true,
+        connected: true,
+        accountType: "DEMO",
+        status: "CONNECTED",
+        source: "PERSONAL_DERIV_DEMO",
+        loginid: authorize.loginid ?? null,
+        latencyMs: this.latencyMs,
+        message: "Compte Deriv DEMO personnel connecté en lecture seule.",
+      };
+    } catch (error) {
+      this.connected = false;
+      this.latencyMs = Date.now() - startedAt;
+      this.lastMessage = error instanceof Error ? error.message : "Deriv DEMO token authorization failed.";
+
+      return {
+        ok: false,
+        connected: false,
+        accountType: "UNKNOWN",
+        status: "INVALID",
+        source: "PERSONAL_DERIV_DEMO",
+        loginid: null,
+        latencyMs: this.latencyMs,
+        message: this.lastMessage,
+      };
+    }
+  }
+
+  async getTickerWithPersonalToken(token: string, symbol: string): Promise<NormalizedTicker> {
+    const auth = await this.testPersonalToken(token);
+    if (!auth.ok) return unavailableTicker(symbol, sourceLabel(true), auth.message);
+
+    const startedAt = Date.now();
+
+    try {
+      const message = await this.request({ ticks: symbol });
+      const quote = message.tick?.quote;
+
+      if (typeof quote !== "number") {
+        throw new Error(message.error?.message ?? "Deriv tick unavailable");
+      }
+
+      this.connected = true;
+      this.latencyMs = Date.now() - startedAt;
+      this.lastMessage = "Personal Deriv DEMO tick read succeeded.";
+
+      return {
+        symbol,
+        category: "derivSynthetic",
+        price: quote,
+        changePercent: null,
+        volume: null,
+        trend: "sideways",
+        status: "live",
+        source: sourceLabel(true),
+        updatedAt: message.tick?.epoch ? new Date(message.tick.epoch * 1000).toISOString() : now(),
+        providerMessage: "Personal Deriv DEMO read-only token authorized.",
+      };
+    } catch (error) {
+      this.connected = false;
+      this.latencyMs = Date.now() - startedAt;
+      this.lastMessage = error instanceof Error ? error.message : "Personal Deriv DEMO tick read failed.";
+      return unavailableTicker(symbol, sourceLabel(true), this.lastMessage);
+    }
+  }
+
+  async getCandlesWithPersonalToken(token: string, symbol: string, timeframe: MarketTimeframe, limit = 120): Promise<readonly NormalizedCandle[]> {
+    const auth = await this.testPersonalToken(token);
+    if (!auth.ok) return [];
+
+    const startedAt = Date.now();
+
+    try {
+      const message = await this.request({
+        ticks_history: symbol,
+        adjust_start_time: 1,
+        count: Math.max(1, Math.min(limit, 500)),
+        end: "latest",
+        granularity: granularityMap[timeframe],
+        style: "candles",
+      });
+
+      if (message.error) {
+        throw new Error(message.error.message ?? "Deriv candle read failed.");
+      }
+
+      this.connected = true;
+      this.latencyMs = Date.now() - startedAt;
+      this.lastMessage = "Personal Deriv DEMO candles read succeeded.";
+
+      return (message.candles ?? []).flatMap(item => {
+        const open = parseNumber(item.open);
+        const high = parseNumber(item.high);
+        const low = parseNumber(item.low);
+        const close = parseNumber(item.close);
+
+        if (![open, high, low, close].every(Number.isFinite)) return [];
+
+        return {
+          symbol,
+          timestamp: new Date(item.epoch * 1000).toISOString(),
+          open,
+          high,
+          low,
+          close,
+          volume: null,
+          source: sourceLabel(true),
+        };
+      });
+    } catch (error) {
+      this.connected = false;
+      this.latencyMs = Date.now() - startedAt;
+      this.lastMessage = error instanceof Error ? error.message : "Personal Deriv DEMO candles read failed.";
       return [];
     }
   }
@@ -387,6 +574,10 @@ export class DerivDemoReadOnlyClient {
 
   private isConfigured() {
     return this.config.enabled && Boolean(this.config.appId) && this.config.accountType === "demo";
+  }
+
+  private isPersonalConnectorConfigured() {
+    return Boolean(this.config.appId) && this.config.accountType === "demo";
   }
 
   private async request(payload: DerivRequestPayload): Promise<DerivMessage> {
