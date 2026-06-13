@@ -20,6 +20,20 @@ function isSecureRequest(req: Request) {
   return req.secure || req.header("x-forwarded-proto") === "https" || process.env.NODE_ENV === "production";
 }
 
+function isCrossSiteFrontend(req: Request) {
+  const origin = req.header("origin");
+  if (!origin) return false;
+
+  const host = req.header("host");
+  if (!host) return false;
+
+  try {
+    return new URL(origin).host !== host;
+  } catch {
+    return false;
+  }
+}
+
 function parseCookies(req: Request) {
   const header = req.header("cookie") ?? "";
   return Object.fromEntries(
@@ -40,10 +54,11 @@ export function cookieValue(req: Request, name: string) {
 }
 
 function cookieBase(req: Request) {
+  const crossSite = isCrossSiteFrontend(req) || process.env.AUTH_COOKIE_SAMESITE === "none";
   return {
     httpOnly: true,
-    sameSite: "lax" as const,
-    secure: isSecureRequest(req),
+    sameSite: crossSite ? "none" as const : "lax" as const,
+    secure: crossSite ? true : isSecureRequest(req),
     path: "/",
   };
 }

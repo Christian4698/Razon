@@ -29,8 +29,8 @@ export function LoginPage({ onNavigate }: { readonly nextPath?: string; readonly
     setError("");
     setNotice("");
     try {
-      await login({ identifier, password, rememberMe });
-      onNavigate("/cockpit");
+      const session = await login({ identifier, password, rememberMe });
+      onNavigate(session.user.mustChangePassword ? "/change-password" : "/cockpit");
     } catch (error) {
       setError(error instanceof Error ? error.message : "Login failed.");
     } finally {

@@ -3,6 +3,7 @@ import { useState } from "react";
 import type { ConnectorLicenseSnapshot, ConnectorStatus, ConnectorUserScope } from "../app/cockpit.types";
 import { StatusPill } from "../components/CockpitPrimitives";
 import { useLanguage } from "@/i18n/useLanguage";
+import { API_BASE_URL } from "@/lib/api";
 
 type ConnectorSecretDrafts = Record<string, string>;
 type ConnectorNotices = Record<string, string>;
@@ -92,7 +93,7 @@ export function ConnectorSettingsPanel({
     setNotices(current => ({ ...current, [connector.id]: `${actionLabels[action]} pending...` }));
 
     try {
-      const response = await fetch(`/api/connectors/${encodeURIComponent(connector.id)}/${action}`, {
+      const response = await fetch(`${API_BASE_URL}/api/connectors/${encodeURIComponent(connector.id)}/${action}`, {
         body: action === "save-secret" ? JSON.stringify({ secret: draft }) : undefined,
         headers: action === "save-secret" ? { "Content-Type": "application/json" } : undefined,
         method: "POST",

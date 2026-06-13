@@ -14,10 +14,12 @@ import { useAuth } from "./AuthProvider";
 const publicPaths = new Set([
   "/login",
   "/logout",
+  "/change-password",
   "/forgot-password",
   "/reset-password",
   "/frontend/auth/login",
   "/frontend/auth/logout",
+  "/frontend/auth/change-password",
   "/frontend/auth/forgot-password",
   "/frontend/auth/reset-password",
 ]);
@@ -92,6 +94,16 @@ export function AuthRouter() {
     const browserPath = currentPath();
     if (browserPath === "/" || browserPath === "/login" || browserPath === "/frontend/auth/login") {
       navigate(nextPathFromSearch(), true);
+      return;
+    }
+
+    if (session.user.mustChangePassword && browserPath !== "/change-password" && browserPath !== "/frontend/auth/change-password") {
+      navigate("/change-password", true);
+      return;
+    }
+
+    if (!session.user.mustChangePassword && (browserPath === "/change-password" || browserPath === "/frontend/auth/change-password")) {
+      navigate("/cockpit", true);
     }
   }, [loading, navigate, session]);
 

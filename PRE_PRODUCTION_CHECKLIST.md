@@ -57,7 +57,7 @@ Validated behavior:
 | Secrets not exposed | `PASS` | Health/snapshot responses do not expose `pat_`, token fields, or `DERIV_API_TOKEN`. |
 | Cookies httpOnly | `PASS` | Production login cookie includes `HttpOnly`. |
 | Cookies secure | `PASS` | Production login cookie includes `Secure`. |
-| Cookies sameSite | `PASS` | Production login cookie includes `SameSite=Lax`. |
+| Cookies sameSite | `PASS` | Production cross-domain login cookie includes `SameSite=None; Secure`; same-origin/dev cookies remain `SameSite=Lax`. |
 | CORS exact GTC subdomain | `PASS` | `https://app.gtc.example` returns `204` and matching allow-origin. |
 | CORS wildcard GTC subdomain | `PASS` | `https://beta.gtc.example` returns `204` and matching allow-origin. |
 | LIVE OFF | `PASS` | `/api/status liveExecutionEnabled=false`. |

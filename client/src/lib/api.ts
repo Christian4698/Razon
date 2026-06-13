@@ -354,8 +354,21 @@ export interface RazonBacktestState {
   message: string;
 }
 
+/**
+ * API base URL for the RAZON backend.
+ * - In production (Hostinger), VITE_API_BASE_URL = https://razon-api.onrender.com
+ * - API_BASE_URL is kept as a deployment alias, but Vite exposes VITE_* to the client.
+ * - In development, .env.local points to http://localhost:10000.
+ *   Set VITE_API_BASE_URL=http://localhost:10000 in .env.local if needed.
+ */
+export const API_BASE_URL =
+  (import.meta.env.VITE_API_BASE_URL as string) ||
+  ((import.meta.env as ImportMetaEnv & { API_BASE_URL?: string }).API_BASE_URL as string | undefined) ||
+  "";
+
 export async function razonApi<T>(path: string): Promise<T> {
-  const response = await fetch(path, {
+  const url = `${API_BASE_URL}${path}`;
+  const response = await fetch(url, {
     headers: {
       Accept: "application/json",
     },

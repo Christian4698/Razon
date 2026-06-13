@@ -70,7 +70,7 @@ Access token:
 - short-lived JWT
 - stored only in `razon_access`
 - cookie is `httpOnly`
-- cookie is `sameSite=lax`
+- cookie is `sameSite=none` for cross-domain production requests and `sameSite=lax` for same-origin/dev requests
 - cookie is `secure` in production or HTTPS
 
 Refresh token:
@@ -200,4 +200,3 @@ Never returned:
 - Password reset currently creates a server-side reset token but does not deliver email. Email delivery must be integrated before production password reset is enabled for end users.
 - Current in-memory auth state is suitable for local/dev continuity with the existing in-memory license engine. Production should replace repositories with durable server storage before multi-instance deployment.
 - License keys and temporary passwords are one-time admin outputs and must be handled as secrets by the operator.
-

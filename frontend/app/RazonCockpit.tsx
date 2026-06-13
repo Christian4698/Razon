@@ -57,6 +57,7 @@ import { MobileTradingPanel } from "../components/MobileTradingPanel";
 import { StatusPill, confirmDanger } from "../components/CockpitPrimitives";
 import "./razon-cockpit.css";
 import { useLanguage } from "@/i18n/useLanguage";
+import { API_BASE_URL } from "@/lib/api";
 
 const navIcons: Record<CockpitPage, ReactElement> = {
   dashboard: <BarChart3 size={17} />,
@@ -438,13 +439,13 @@ export default function RazonCockpit({
   const [backendHealth, setBackendHealth] = useState<BackendConnectorsHealth | null>(null);
   const [licenseSnapshot, setLicenseSnapshot] = useState<LicenseStatusSnapshot | null>(null);
   const refreshConnectors = useCallback(async () => {
-    const response = await fetch("/api/connectors/health", { headers: { Accept: "application/json" } });
+    const response = await fetch(`${API_BASE_URL}/api/connectors/health`, { headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`health ${response.status}`);
     const payload = (await response.json()) as BackendConnectorsHealth;
     setBackendHealth(payload);
   }, []);
   const refreshLicense = useCallback(async () => {
-    const response = await fetch("/api/licenses/status", { headers: { Accept: "application/json" } });
+    const response = await fetch(`${API_BASE_URL}/api/licenses/status`, { headers: { Accept: "application/json" } });
     if (!response.ok) throw new Error(`license ${response.status}`);
     const payload = (await response.json()) as LicenseStatusSnapshot;
     setLicenseSnapshot(payload);
@@ -584,8 +585,8 @@ export default function RazonCockpit({
       try {
         const query = `symbol=${encodeURIComponent(providerSymbol)}&timeframe=M5`;
         const [snapshotResponse, kalosResponse] = await Promise.all([
-          fetch(`/api/markets/snapshot?${query}`, { headers: { Accept: "application/json" } }),
-          fetch(`/api/kalos?${query}`, { headers: { Accept: "application/json" } }),
+          fetch(`${API_BASE_URL}/api/markets/snapshot?${query}`, { headers: { Accept: "application/json" } }),
+          fetch(`${API_BASE_URL}/api/kalos?${query}`, { headers: { Accept: "application/json" } }),
         ]);
 
         if (!snapshotResponse.ok || !kalosResponse.ok) {

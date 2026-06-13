@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import { API_BASE_URL } from "@/lib/api";
 
 export type AuthLicenseStatus = "PENDING" | "ACTIVE" | "EXPIRED" | "SUSPENDED" | "REVOKED" | "MISSING";
 export type AuthLicensePlan = "STARTER" | "PRO" | "ELITE" | "LIFETIME" | "NONE";
@@ -87,7 +88,7 @@ async function parseResponse<T>(response: Response): Promise<T> {
 }
 
 async function postJson<T>(url: string, body: Record<string, unknown>): Promise<T> {
-  const response = await fetch(url, {
+  const response = await fetch(`${API_BASE_URL}${url}`, {
     body: JSON.stringify(body),
     credentials: "include",
     headers: { "Content-Type": "application/json", Accept: "application/json" },
@@ -101,7 +102,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<AuthSession | null>(null);
 
   const refreshMe = useCallback(async () => {
-    const response = await fetch("/api/me", { credentials: "include", headers: { Accept: "application/json" } });
+    const response = await fetch(`${API_BASE_URL}/api/me`, { credentials: "include", headers: { Accept: "application/json" } });
     if (response.status === 401) {
       setSession(null);
       return null;
@@ -135,17 +136,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const logout = useCallback(async () => {
-    await fetch("/api/auth/logout", { credentials: "include", method: "POST" }).catch(() => undefined);
+    await fetch(`${API_BASE_URL}/api/auth/logout`, { credentials: "include", method: "POST" }).catch(() => undefined);
     setSession(null);
   }, []);
 
   const logoutGlobal = useCallback(async () => {
-    await fetch("/api/auth/logout-global", { credentials: "include", method: "POST" }).catch(() => undefined);
+    await fetch(`${API_BASE_URL}/api/auth/logout-global`, { credentials: "include", method: "POST" }).catch(() => undefined);
     setSession(null);
   }, []);
 
   const changePassword = useCallback(async (input: { currentPassword: string; newPassword: string }) => {
-    await postJson<{ ok: true }>("/api/auth/change-password", input);
+    const response = await fetch(`${API_BASE_URL}/api/auth/change-password`, {
+      body: JSON.stringify(input),
+      credentials: "include",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      method: "POST",
+    });
+    await parseResponse<{ ok: true }>(response);
     return refreshMe();
   }, [refreshMe]);
 

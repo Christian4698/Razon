@@ -4,6 +4,7 @@ import type { LicenseDuration, LicensePlan, LicenseStatusSnapshot, SafeLicense }
 import { StatusPill } from "../components/CockpitPrimitives";
 import { useLanguage } from "@/i18n/useLanguage";
 import { useAuth } from "@/auth/AuthProvider";
+import { API_BASE_URL } from "@/lib/api";
 
 interface AdminLicensesPayload {
   readonly licenses: readonly SafeLicense[];
@@ -125,10 +126,10 @@ export function LicenseSettingsPanel({
 
   const refreshAdmin = async () => {
     const [licensesResponse, usersResponse, devicesResponse, auditResponse] = await Promise.all([
-      fetch("/api/admin/licenses", { headers: { Accept: "application/json" } }),
-      fetch("/api/admin/users", { headers: { Accept: "application/json" } }),
-      fetch("/api/admin/devices", { headers: { Accept: "application/json" } }),
-      fetch("/api/admin/audit-logs", { headers: { Accept: "application/json" } }),
+      fetch(`${API_BASE_URL}/api/admin/licenses`, { headers: { Accept: "application/json" } }),
+      fetch(`${API_BASE_URL}/api/admin/users`, { headers: { Accept: "application/json" } }),
+      fetch(`${API_BASE_URL}/api/admin/devices`, { headers: { Accept: "application/json" } }),
+      fetch(`${API_BASE_URL}/api/admin/audit-logs`, { headers: { Accept: "application/json" } }),
     ]);
     if (licensesResponse.ok) {
       const payload = (await licensesResponse.json()) as AdminLicensesPayload;
@@ -154,7 +155,7 @@ export function LicenseSettingsPanel({
   }, [canManageLicenses]);
 
   const postJson = async (url: string, payload: Record<string, unknown>) => {
-    const response = await fetch(url, {
+    const response = await fetch(`${API_BASE_URL}${url}`, {
       body: JSON.stringify(payload),
       headers: { "Content-Type": "application/json" },
       method: "POST",
@@ -210,7 +211,7 @@ export function LicenseSettingsPanel({
 
   const actOnUser = async (action: "suspend" | "logout-global" | "reactivate", userId: string) => {
     if (action === "reactivate") {
-      await fetch(`/api/admin/users/${encodeURIComponent(userId)}`, {
+      await fetch(`${API_BASE_URL}/api/admin/users/${encodeURIComponent(userId)}`, {
         body: JSON.stringify({ status: "ACTIVE" }),
         headers: { "Content-Type": "application/json" },
         method: "PATCH",

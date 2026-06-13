@@ -1,10 +1,21 @@
 import type { NextFunction, Request, Response } from "express";
 
+const defaultAllowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:3001",
+  "http://localhost:5173",
+  "https://razon.generaltechconsult.com",
+];
+
 function configuredOrigins() {
-  return (process.env.CORS_ORIGIN ?? process.env.APP_BASE_URL ?? "http://localhost:3000")
+  const configured = [process.env.CORS_ORIGIN, process.env.APP_BASE_URL]
+    .filter(Boolean)
+    .join(",");
+
+  return `${defaultAllowedOrigins.join(",")},${configured}`
     .split(",")
     .map(origin => origin.trim())
-    .filter(Boolean);
+    .filter((origin, index, origins) => Boolean(origin) && origins.indexOf(origin) === index);
 }
 
 function wildcardToRegex(origin: string) {
