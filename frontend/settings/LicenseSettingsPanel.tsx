@@ -126,11 +126,17 @@ export function LicenseSettingsPanel({
 
   const refreshAdmin = async () => {
     const [licensesResponse, usersResponse, devicesResponse, auditResponse] = await Promise.all([
-      fetch(`${API_BASE_URL}/api/admin/licenses`, { headers: { Accept: "application/json" } }),
-      fetch(`${API_BASE_URL}/api/admin/users`, { headers: { Accept: "application/json" } }),
-      fetch(`${API_BASE_URL}/api/admin/devices`, { headers: { Accept: "application/json" } }),
-      fetch(`${API_BASE_URL}/api/admin/audit-logs`, { headers: { Accept: "application/json" } }),
+      fetch(`${API_BASE_URL}/api/admin/licenses`, { credentials: "include", headers: { Accept: "application/json" } }),
+      fetch(`${API_BASE_URL}/api/admin/users`, { credentials: "include", headers: { Accept: "application/json" } }),
+      fetch(`${API_BASE_URL}/api/admin/devices`, { credentials: "include", headers: { Accept: "application/json" } }),
+      fetch(`${API_BASE_URL}/api/admin/audit-logs`, { credentials: "include", headers: { Accept: "application/json" } }),
     ]);
+    const failed = [licensesResponse, usersResponse, devicesResponse, auditResponse].find(response => !response.ok);
+    if (failed) {
+      const payload = await failed.json().catch(() => ({}));
+      const message = typeof payload.message === "string" ? payload.message : `Admin request failed (${failed.status})`;
+      throw new Error(message);
+    }
     if (licensesResponse.ok) {
       const payload = (await licensesResponse.json()) as AdminLicensesPayload;
       setAdminLicenses(payload.licenses);
@@ -151,16 +157,25 @@ export function LicenseSettingsPanel({
   };
 
   useEffect(() => {
-    if (canManageLicenses) void refreshAdmin();
+    if (canManageLicenses) {
+      void refreshAdmin().catch(error => {
+        setNotice(error instanceof Error ? error.message : "Admin data failed to load.");
+      });
+    }
   }, [canManageLicenses]);
 
   const postJson = async (url: string, payload: Record<string, unknown>) => {
     const response = await fetch(`${API_BASE_URL}${url}`, {
       body: JSON.stringify(payload),
-      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
       method: "POST",
     });
-    if (!response.ok) throw new Error(`${response.status}`);
+    if (!response.ok) {
+      const errorPayload = await response.json().catch(() => ({}));
+      const message = typeof errorPayload.message === "string" ? errorPayload.message : `Request failed (${response.status})`;
+      throw new Error(message);
+    }
     return response.json() as Promise<Record<string, unknown>>;
   };
 
@@ -211,11 +226,17 @@ export function LicenseSettingsPanel({
 
   const actOnUser = async (action: "suspend" | "logout-global" | "reactivate", userId: string) => {
     if (action === "reactivate") {
-      await fetch(`${API_BASE_URL}/api/admin/users/${encodeURIComponent(userId)}`, {
+      const response = await fetch(`${API_BASE_URL}/api/admin/users/${encodeURIComponent(userId)}`, {
         body: JSON.stringify({ status: "ACTIVE" }),
-        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
         method: "PATCH",
       });
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        const message = typeof payload.message === "string" ? payload.message : `Request failed (${response.status})`;
+        throw new Error(message);
+      }
       setNotice("User reactivated.");
     } else {
       const payload = await postJson(`/api/admin/users/${encodeURIComponent(userId)}/${action}`, {});

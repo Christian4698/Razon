@@ -95,11 +95,18 @@ export function ConnectorSettingsPanel({
     try {
       const response = await fetch(`${API_BASE_URL}/api/connectors/${encodeURIComponent(connector.id)}/${action}`, {
         body: action === "save-secret" ? JSON.stringify({ secret: draft }) : undefined,
-        headers: action === "save-secret" ? { "Content-Type": "application/json" } : undefined,
+        credentials: "include",
+        headers: action === "save-secret"
+          ? { "Content-Type": "application/json", Accept: "application/json" }
+          : { Accept: "application/json" },
         method: "POST",
       });
 
-      if (!response.ok) throw new Error(`${response.status}`);
+      if (!response.ok) {
+        const payload = await response.json().catch(() => ({}));
+        const message = typeof payload.message === "string" ? payload.message : `Request failed (${response.status})`;
+        throw new Error(message);
+      }
 
       setDraftSecrets(current => ({ ...current, [connector.id]: "" }));
       setNotices(current => ({ ...current, [connector.id]: `${actionLabels[action]} completed. Secret value was not returned.` }));
