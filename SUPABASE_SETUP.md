@@ -1,6 +1,6 @@
 # RAZON Supabase Setup
 
-Status date: 2026-06-12
+Status date: 2026-06-13
 
 ## Project
 
@@ -41,7 +41,7 @@ SAAS_PERSISTENCE=postgres
 SAAS_PERSISTENCE_PROVIDER=postgres
 SUPABASE_PROJECT_REF=pvoztowlhdirmruwanzl
 SUPABASE_URL=https://pvoztowlhdirmruwanzl.supabase.co
-SUPABASE_DB_URL=postgresql://postgres.pvoztowlhdirmruwanzl:<database-password>@aws-0-eu-central-1.pooler.supabase.com:6543/postgres
+SUPABASE_DB_URL=postgresql://postgres.pvoztowlhdirmruwanzl:<database-password>@aws-1-eu-central-1.pooler.supabase.com:5432/postgres
 DATABASE_SSL=true
 ```
 
