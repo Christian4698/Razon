@@ -1,4 +1,4 @@
-import { RefreshCw, ShieldOff } from "lucide-react";
+import { Copy, RefreshCw, ShieldOff } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import type { LicenseDuration, LicensePlan, LicenseStatusSnapshot, SafeLicense } from "../app/cockpit.types";
 import { StatusPill } from "../components/CockpitPrimitives";
@@ -13,9 +13,13 @@ interface AdminLicensesPayload {
 interface CreatedAccountPayload {
   readonly user?: {
     readonly id: string;
+    readonly username?: string;
     readonly email: string;
     readonly displayName: string;
   };
+  readonly username?: string;
+  readonly email?: string;
+  readonly temporaryPassword?: string | null;
   readonly oneTimeTemporaryPassword?: string | null;
   readonly warning?: string;
 }
@@ -101,7 +105,7 @@ export function LicenseSettingsPanel({
   const [adminDevices, setAdminDevices] = useState<AdminDevicesPayload["devices"]>([]);
   const [adminSessions, setAdminSessions] = useState<AdminDevicesPayload["sessions"]>([]);
   const [adminAuditLogs, setAdminAuditLogs] = useState<AdminAuditPayload["auditLogs"]>([]);
-  const [createUserId, setCreateUserId] = useState("demo-current-user");
+  const [createUserId, setCreateUserId] = useState("");
   const [createUsername, setCreateUsername] = useState("client");
   const [createEmail, setCreateEmail] = useState("client@example.com");
   const [createDisplayName, setCreateDisplayName] = useState("Client User");
@@ -111,6 +115,7 @@ export function LicenseSettingsPanel({
   const [notice, setNotice] = useState("");
   const [oneTimeKey, setOneTimeKey] = useState("");
   const [createdAccount, setCreatedAccount] = useState<CreatedAccountPayload | null>(null);
+  const temporaryPassword = createdAccount?.temporaryPassword ?? createdAccount?.oneTimeTemporaryPassword ?? "";
   const activeLicense = license?.license ?? null;
   const isBlocked = license?.dashboardBlocked ?? true;
   const warningText = useMemo(() => {
@@ -181,7 +186,7 @@ export function LicenseSettingsPanel({
 
   const createLicense = async () => {
     const payload = await postJson("/api/licenses/create", {
-      userId: createUserId,
+      userId: createUserId.trim() || undefined,
       username: createUsername,
       email: createEmail,
       displayName: createDisplayName,
@@ -190,14 +195,18 @@ export function LicenseSettingsPanel({
       duration: createDuration,
     });
     setOneTimeKey(String(payload.oneTimeLicenseKey ?? ""));
-    setCreatedAccount((payload.account ?? null) as CreatedAccountPayload | null);
-    setNotice(t("license.createdNotice"));
+    const account = (payload.account ?? null) as CreatedAccountPayload | null;
+    setCreatedAccount(account ? {
+      ...account,
+      temporaryPassword: String(payload.temporaryPassword ?? account.oneTimeTemporaryPassword ?? ""),
+    } : null);
+    setNotice("User and license created. Copy one-time secrets now.");
     await refreshAdmin();
   };
 
   const createUser = async () => {
     const payload = await postJson("/api/admin/users", {
-      userId: createUserId,
+      userId: createUserId.trim() || undefined,
       username: createUsername,
       email: createEmail,
       displayName: createDisplayName,
@@ -206,11 +215,18 @@ export function LicenseSettingsPanel({
     });
     setCreatedAccount({
       user: payload.user as CreatedAccountPayload["user"],
-      oneTimeTemporaryPassword: String(payload.oneTimeTemporaryPassword ?? ""),
+      temporaryPassword: String(payload.temporaryPassword ?? payload.oneTimeTemporaryPassword ?? ""),
+      oneTimeTemporaryPassword: String(payload.oneTimeTemporaryPassword ?? payload.temporaryPassword ?? ""),
       warning: String(payload.warning ?? ""),
     });
+    setOneTimeKey("");
     setNotice("User created. Temporary password is visible once.");
     await refreshAdmin();
+  };
+
+  const copySecret = async (value: string, label: string) => {
+    await navigator.clipboard.writeText(value);
+    setNotice(`${label} copied. It will not be shown again after refresh.`);
   };
 
   const actOnLicense = async (action: "renew" | "suspend" | "revoke", licenseId: string) => {
@@ -317,7 +333,11 @@ export function LicenseSettingsPanel({
           <div className="license-admin-controls">
             <label>
               <span>{t("license.userId")}</span>
-              <input onChange={event => setCreateUserId(event.target.value)} value={createUserId} />
+              <input
+                onChange={event => setCreateUserId(event.target.value)}
+                placeholder="Optional; defaults from username/email"
+                value={createUserId}
+              />
             </label>
             <label>
               <span>Username</span>
@@ -352,21 +372,29 @@ export function LicenseSettingsPanel({
               </select>
             </label>
             <button onClick={createUser} type="button">Create user only</button>
-            <button onClick={createLicense} type="button">{t("license.createLicense")}</button>
+            <button onClick={createLicense} type="button">Create user + license</button>
           </div>
           {oneTimeKey ? (
             <div className="license-one-time-key">
               <span>{t("license.oneTimeKey")}</span>
               <strong>{oneTimeKey}</strong>
+              <button onClick={() => void copySecret(oneTimeKey, "License key")} type="button">
+                <Copy size={14} aria-hidden="true" />
+                Copy
+              </button>
               <small>{t("license.oneTimeHint")}</small>
             </div>
           ) : null}
-          {createdAccount?.oneTimeTemporaryPassword ? (
+          {temporaryPassword ? (
             <div className="license-one-time-key">
-              <span>Temporary password</span>
-              <strong>{createdAccount.oneTimeTemporaryPassword}</strong>
+              <span>Mot de passe temporaire</span>
+              <strong>{temporaryPassword}</strong>
+              <button onClick={() => void copySecret(temporaryPassword, "Temporary password")} type="button">
+                <Copy size={14} aria-hidden="true" />
+                Copy
+              </button>
               <small>
-                Visible once for {createdAccount.user?.email ?? createEmail}. The user must change it at first login.
+                Copiez maintenant, il ne sera plus affiché. {createdAccount?.user?.email ?? createEmail} devra le changer au premier login.
               </small>
             </div>
           ) : null}

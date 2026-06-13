@@ -242,6 +242,7 @@ export class AuthSessionService {
     readonly displayName?: string;
     readonly role?: UserRole;
     readonly temporaryPassword?: string;
+    readonly forceTemporaryPassword?: boolean;
     readonly mustChangePassword?: boolean;
     readonly firstLoginCompleted?: boolean;
   }) {
@@ -256,8 +257,9 @@ export class AuthSessionService {
       status: "ACTIVE",
     });
     const hasPassword = this.passwords.has(user.id);
-    const temporaryPassword = input.temporaryPassword ?? (hasPassword ? "" : this.generateTemporaryPassword());
-    if (!hasPassword || input.temporaryPassword) {
+    const shouldSetTemporaryPassword = input.forceTemporaryPassword || !hasPassword || Boolean(input.temporaryPassword);
+    const temporaryPassword = input.temporaryPassword ?? (shouldSetTemporaryPassword ? this.generateTemporaryPassword() : "");
+    if (shouldSetTemporaryPassword) {
       this.setPassword(user.id, temporaryPassword);
       usersService.update(user.id, {
         firstLoginCompleted: input.firstLoginCompleted ?? false,

@@ -66,11 +66,17 @@ export function createLicense(req: Request, res: Response) {
     username: stringField(payload.username) || result.license.userId,
     displayName: stringField(payload.displayName) || result.license.userId,
     role: roleField(payload.role),
+    forceTemporaryPassword: true,
     mustChangePassword: true,
   });
 
   return res.status(201).json({
     ...result,
+    username: account.user.username,
+    email: account.user.email,
+    plan: result.license.plan,
+    licenseKey: result.oneTimeLicenseKey,
+    temporaryPassword: account.oneTimeTemporaryPassword,
     account: {
       user: account.user,
       oneTimeTemporaryPassword: account.oneTimeTemporaryPassword,
@@ -175,12 +181,14 @@ export function createAdminUser(req: Request, res: Response) {
     displayName: stringField(payload.displayName) || undefined,
     role: roleField(payload.role),
     temporaryPassword: stringField(payload.temporaryPassword) || undefined,
+    forceTemporaryPassword: !stringField(payload.temporaryPassword),
     mustChangePassword: payload.mustChangePassword === false ? false : true,
     firstLoginCompleted: false,
   });
 
   return res.status(201).json({
     user: account.user,
+    temporaryPassword: account.oneTimeTemporaryPassword,
     oneTimeTemporaryPassword: account.oneTimeTemporaryPassword,
     warning: account.oneTimeTemporaryPassword ? "TEMPORARY_PASSWORD_VISIBLE_ONCE" : "ACCOUNT_ALREADY_PROVISIONED",
     liveExecutionEnabled: false as const,

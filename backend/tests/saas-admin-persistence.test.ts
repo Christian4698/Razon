@@ -66,6 +66,77 @@ describe("SaaS admin persistence contracts", () => {
     }
   });
 
+  it("generates a one-time temporary password for new admin-created users without persisting the raw value", () => {
+    const userId = `generated-temp-user-${Date.now()}`;
+    const provisioned = authSessionService.provisionUser({
+      userId,
+      email: `${userId}@example.com`,
+      username: userId,
+      displayName: "Generated Temporary User",
+      mustChangePassword: true,
+      firstLoginCompleted: false,
+    });
+
+    expect(provisioned.oneTimeTemporaryPassword).toMatch(/^Rzn-/);
+    expect(provisioned.user.mustChangePassword).toBe(true);
+    expect(provisioned.user.firstLoginCompleted).toBe(false);
+
+    const temporaryPassword = provisioned.oneTimeTemporaryPassword ?? "";
+    const login = authSessionService.login({
+      identifier: userId,
+      password: temporaryPassword,
+      rememberMe: false,
+      ip: "generated-temp-test",
+    });
+
+    expect(login.ok).toBe(true);
+    if (login.ok) {
+      expect(login.snapshot.user.mustChangePassword).toBe(true);
+      expect(login.snapshot.user.firstLoginCompleted).toBe(false);
+    }
+
+    expect(JSON.stringify(authSessionService.exportPersistence())).not.toContain(temporaryPassword);
+  });
+
+  it("can rotate an existing admin-created user to a new temporary password without exposing the raw value in persistence", () => {
+    const userId = `rotated-temp-user-${Date.now()}`;
+    const first = authSessionService.provisionUser({
+      userId,
+      username: userId,
+      temporaryPassword: "InitialPass1234",
+      mustChangePassword: false,
+      firstLoginCompleted: true,
+    });
+    const rotated = authSessionService.provisionUser({
+      userId,
+      username: userId,
+      forceTemporaryPassword: true,
+      mustChangePassword: true,
+      firstLoginCompleted: false,
+    });
+
+    expect(first.oneTimeTemporaryPassword).toBe("InitialPass1234");
+    expect(rotated.oneTimeTemporaryPassword).toMatch(/^Rzn-/);
+    expect(rotated.oneTimeTemporaryPassword).not.toBe(first.oneTimeTemporaryPassword);
+
+    const oldLogin = authSessionService.login({
+      identifier: userId,
+      password: "InitialPass1234",
+      rememberMe: false,
+      ip: "rotated-temp-old",
+    });
+    const newLogin = authSessionService.login({
+      identifier: userId,
+      password: rotated.oneTimeTemporaryPassword ?? "",
+      rememberMe: false,
+      ip: "rotated-temp-new",
+    });
+
+    expect(oldLogin.ok).toBe(false);
+    expect(newLogin.ok).toBe(true);
+    expect(JSON.stringify(authSessionService.exportPersistence())).not.toContain(rotated.oneTimeTemporaryPassword);
+  });
+
   it("persists connector secret metadata without exposing raw secrets", () => {
     const user: CurrentUserScope = {
       scope: "CURRENT_USER",
