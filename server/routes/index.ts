@@ -1,4 +1,5 @@
 import { Router } from "express";
+import { getConnectorsDebugAuth } from "../controllers/connectorsController";
 import { requireLicense } from "../middleware/authMiddleware";
 import { authRoutes } from "./authRoutes";
 import { backtestRoutes } from "./backtestRoutes";
@@ -15,6 +16,7 @@ export const apiRoutes = Router();
 apiRoutes.use(statusRoutes);
 apiRoutes.use(authRoutes);
 apiRoutes.use(licensesRoutes);
+apiRoutes.get("/connectors/debug-auth", getConnectorsDebugAuth);
 apiRoutes.use(requireLicense());
 apiRoutes.use(connectorsRoutes);
 apiRoutes.use(marketDataRoutes);

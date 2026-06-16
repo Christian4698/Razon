@@ -94,7 +94,7 @@ function buildTradeLevels(
       entryZone: [round(price - zone, decimals), round(price + zone, decimals)],
       sl: round(price - atr * 1.8, decimals),
       tp: round(price + atr * 2.8, decimals),
-      invalidationLevel: round(price - atr * 1.2, decimals),
+      invalidationLevel: round(price - atr * 2, decimals),
     };
   }
 
@@ -102,7 +102,7 @@ function buildTradeLevels(
     entryZone: [round(price - zone, decimals), round(price + zone, decimals)],
     sl: round(price + atr * 1.8, decimals),
     tp: round(price - atr * 2.8, decimals),
-    invalidationLevel: round(price + atr * 1.2, decimals),
+    invalidationLevel: round(price + atr * 2, decimals),
   };
 }
 

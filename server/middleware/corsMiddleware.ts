@@ -7,7 +7,7 @@ const defaultAllowedOrigins = [
   "https://razon.generaltechconsult.com",
 ];
 
-function configuredOrigins() {
+export function configuredOrigins() {
   const configured = [process.env.CORS_ORIGIN, process.env.APP_BASE_URL]
     .filter(Boolean)
     .join(",");
@@ -26,7 +26,7 @@ function wildcardToRegex(origin: string) {
   return new RegExp(`^${escaped}$`, "i");
 }
 
-function isAllowedOrigin(origin: string, allowedOrigins: readonly string[]) {
+export function isAllowedOrigin(origin: string, allowedOrigins: readonly string[]) {
   return allowedOrigins.some(allowed => {
     if (allowed === origin) return true;
     if (allowed.includes("*")) return wildcardToRegex(allowed).test(origin);

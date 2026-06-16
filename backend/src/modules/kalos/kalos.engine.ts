@@ -211,14 +211,14 @@ function buildAnalysisLevels(
     return {
       sl: round(price - stopDistance, decimals),
       tp: round(price + targetDistance, decimals),
-      invalidation: round(price - atr, decimals),
+      invalidation: round(price - stopDistance * 1.05, decimals),
     };
   }
 
   return {
     sl: round(price + stopDistance, decimals),
     tp: round(price - targetDistance, decimals),
-    invalidation: round(price + atr, decimals),
+    invalidation: round(price + stopDistance * 1.05, decimals),
   };
 }
 

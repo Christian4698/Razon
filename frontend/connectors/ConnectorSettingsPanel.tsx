@@ -41,6 +41,10 @@ function connectorSourceLabel(connector: ConnectorStatus) {
   return connector.source === "MOCK" ? "MOCK_DATA" : connector.source;
 }
 
+function brokerLoginLabel(connector: ConnectorStatus) {
+  return connector.loginid ?? connector.brokerLoginId ?? null;
+}
+
 function defaultUser(): ConnectorUserScope {
   return {
     scope: "CURRENT_USER",
@@ -255,6 +259,7 @@ export function ConnectorSettingsPanel({
                     <span>Token sauvegardé : <b>{connector.secretSaved ? "true" : "false"}</b></span>
                     <span>Dernier test : <b>{displayDate(connector.lastTestAt)}</b></span>
                     <span>Source : <b>{connector.personalSource ?? "PERSONAL_DERIV_DEMO"}</b></span>
+                    {brokerLoginLabel(connector) ? <span>Login ID : <b>{brokerLoginLabel(connector)}</b></span> : null}
                   </div>
                 ) : null}
                 <div className="connector-secret-state">

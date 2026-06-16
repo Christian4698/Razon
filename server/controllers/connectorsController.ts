@@ -1,4 +1,6 @@
 import type { Request, Response } from "express";
+import { accessCookieName, authenticateRequest, refreshCookieName, type RequestWithAuth } from "../middleware/authMiddleware";
+import { configuredOrigins, isAllowedOrigin } from "../middleware/corsMiddleware";
 import { derivDemoReadOnlyClient } from "../services/deriv/DerivDemoReadOnlyClient";
 import {
   deleteConnectorSecret,
@@ -23,7 +25,7 @@ function now() {
 
 type RuntimeMode = "MOCK" | "DEMO" | "REAL_DATA";
 type ConnectorStatus = "DISCONNECTED" | "CONNECTING" | "CONNECTED" | "CONNECTED_DEMO" | "DEGRADED" | "ERROR";
-type DataQuality = "HEALTHY" | "DEGRADED" | "STALE" | "INVALID" | "DISCONNECTED";
+type DataQuality = "GOOD" | "HEALTHY" | "DEGRADED" | "STALE" | "INVALID" | "DISCONNECTED";
 
 interface ConnectorHealthCard {
   readonly id: ConnectorId;
@@ -75,6 +77,8 @@ interface ConnectorHealthCard {
   readonly accountType?: "DEMO" | "REAL" | "UNKNOWN" | null;
   readonly status?: "CONNECTED" | "DISCONNECTED";
   readonly personalSource?: "PERSONAL_DERIV_DEMO" | null;
+  readonly loginid?: string | null;
+  readonly brokerLoginId?: string | null;
 }
 
 function legacyState(status: ConnectorStatus): ConnectorHealthCard["state"] {
@@ -224,6 +228,8 @@ function safeSecretFields(metadata: ReturnType<typeof getSecretMetadata>) {
     accountType: metadata.accountType ?? null,
     status: metadata.connected ? "CONNECTED" as const : "DISCONNECTED" as const,
     personalSource: metadata.source ?? null,
+    loginid: metadata.loginid ?? null,
+    brokerLoginId: metadata.loginid ?? null,
   };
 }
 
@@ -314,7 +320,7 @@ async function derivDemoHealth(user: CurrentUserScope, license: LicenseSnapshot)
       license,
       connectorStatus: connected ? "CONNECTED_DEMO" : deriv.sourceStatus === "MOCK" ? "DISCONNECTED" : "ERROR",
       runtimeMode: connected ? "DEMO" : "MOCK",
-      dataQuality: connected ? "HEALTHY" : "DISCONNECTED",
+      dataQuality: connected ? "GOOD" : "DISCONNECTED",
       sourceStatus: connected ? "CONNECTED" : deriv.sourceStatus === "MOCK" ? "MOCK" : "DISCONNECTED",
       latencyMs: deriv.latencyMs,
       freshnessSeconds: connected ? 0 : null,
@@ -362,6 +368,31 @@ export async function getConnectorsHealth(req: Request, res: Response) {
       proposalRoutesExposed: false as const,
     },
     connectors,
+  });
+}
+
+function authCookiePresent(req: Request) {
+  const cookie = req.header("cookie") ?? "";
+  return cookie.includes(`${accessCookieName}=`) || cookie.includes(`${refreshCookieName}=`);
+}
+
+export function getConnectorsDebugAuth(req: RequestWithAuth, res: Response) {
+  const context = req.auth ?? authenticateRequest(req, res);
+  const origin = req.header("origin") ?? null;
+  const allowedOrigins = configuredOrigins();
+
+  if (context) req.auth = context;
+
+  return sendJson(res, {
+    authenticated: Boolean(context),
+    userId: context?.userId ?? null,
+    role: context?.role ?? null,
+    cookiePresent: authCookiePresent(req),
+    origin,
+    corsAllowed: origin ? isAllowedOrigin(origin, allowedOrigins) : true,
+    liveExecutionEnabled: false as const,
+    automaticTradingAllowed: false as const,
+    secretsExposed: false as const,
   });
 }
 
@@ -451,6 +482,7 @@ export async function postConnectorSafeAction(req: Request, res: Response) {
       accountType: result.accountType,
       status: result.status,
       source: "PERSONAL_DERIV_DEMO",
+      loginid: result.loginid,
     });
 
     if (!result.ok) {

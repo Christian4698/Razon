@@ -22,6 +22,20 @@ function duplicateOpenOrder(order: PreparedOrder, openOrders: readonly PreparedO
   );
 }
 
+function priceRelationValid(order: PreparedOrder) {
+  if (!Number.isFinite(order.entry) || !Number.isFinite(order.stop_loss) || !Number.isFinite(order.take_profit)) {
+    return false;
+  }
+
+  if (order.side === "BUY") {
+    if (!(order.take_profit > order.entry && order.entry > order.stop_loss)) return false;
+    return order.invalidation === null || order.invalidation <= order.stop_loss;
+  }
+
+  if (!(order.take_profit < order.entry && order.entry < order.stop_loss)) return false;
+  return order.invalidation === null || order.invalidation >= order.stop_loss;
+}
+
 export interface ValidateOrderInput {
   readonly order: PreparedOrder;
   readonly context: ExecutionContext;
@@ -180,6 +194,17 @@ export function validateOrder(input: ValidateOrderInput): ExecutionValidationRes
   if (!Number.isFinite(order.take_profit)) {
     refusals.push(
       createExecutionRefusal("MISSING_TAKE_PROFIT", "Order has no valid take profit.", "critical", "Reject the order.")
+    );
+  }
+
+  if (!priceRelationValid(order)) {
+    refusals.push(
+      createExecutionRefusal(
+        "INVALID_SIGNAL_PRICE_RELATION",
+        "Signal price relation is impossible for the requested side.",
+        "critical",
+        "Reject the signal and recalculate entry, TP, SL, and invalidation from the active market feed."
+      )
     );
   }
 

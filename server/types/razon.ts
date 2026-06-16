@@ -132,6 +132,26 @@ export interface RazonSignalOutput {
   whyBuy?: string[];
   whySell?: string[];
   whyWait?: string[];
+  currentPrice?: number | null;
+  invalidation?: number | null;
+  symbol?: string;
+  timeframe?: string;
+  source?: string;
+  decimals?: number;
+  priceValidation?: {
+    readonly valid: boolean;
+    readonly reasonCode: "INVALID_SIGNAL_PRICE_RELATION" | null;
+    readonly reasons: readonly string[];
+    readonly entry: number | null;
+    readonly currentPrice: number | null;
+    readonly tp: number | null;
+    readonly sl: number | null;
+    readonly invalidation: number | null;
+    readonly symbol: string;
+    readonly timeframe: string;
+    readonly source: string;
+    readonly decimals: number;
+  };
 }
 
 export interface RazonFrappeDollarVisualMarker {

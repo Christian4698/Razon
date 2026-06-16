@@ -34,7 +34,7 @@ export type LicensePlan = "STARTER" | "PRO" | "ELITE" | "LIFETIME" | "NONE";
 export type LicenseDuration = "1_MONTH" | "2_MONTHS" | "3_MONTHS" | "6_MONTHS" | "1_YEAR" | "LIFETIME";
 export type UserRole = "OWNER" | "ADMIN" | "USER";
 
-export type DataQuality = "HEALTHY" | "DEGRADED" | "STALE" | "INVALID" | "DISCONNECTED";
+export type DataQuality = "GOOD" | "HEALTHY" | "DEGRADED" | "STALE" | "INVALID" | "DISCONNECTED";
 
 export interface ConnectorUserScope {
   readonly scope: "CURRENT_USER";
@@ -364,6 +364,8 @@ export interface ConnectorStatus {
   readonly connected?: boolean;
   readonly lastTestAt?: string | null;
   readonly accountType?: "DEMO" | "REAL" | "UNKNOWN" | null;
+  readonly loginid?: string | null;
+  readonly brokerLoginId?: string | null;
   readonly status?: "CONNECTED" | "DISCONNECTED";
   readonly personalSource?: "PERSONAL_DERIV_DEMO" | null;
   readonly readOnly?: true;

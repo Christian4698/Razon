@@ -36,6 +36,7 @@ export interface SafeSecretMetadata {
   readonly accountType?: "DEMO" | "REAL" | "UNKNOWN" | null;
   readonly connectionStatus?: "CONNECTED" | "DISCONNECTED" | "INVALID";
   readonly source?: "PERSONAL_DERIV_DEMO" | null;
+  readonly loginid?: string | null;
 }
 
 interface StoredSecretRecord {
@@ -58,6 +59,7 @@ interface SecretPayload {
   readonly accountType: "DEMO" | "REAL" | "UNKNOWN" | null;
   readonly status: "CONNECTED" | "DISCONNECTED" | "INVALID";
   readonly source: "PERSONAL_DERIV_DEMO" | null;
+  readonly loginid: string | null;
 }
 
 function now() {
@@ -121,6 +123,7 @@ function parsePayload(record: StoredSecretRecord): SecretPayload | null {
       accountType: parsed.accountType === "DEMO" || parsed.accountType === "REAL" || parsed.accountType === "UNKNOWN" ? parsed.accountType : null,
       status: parsed.status === "CONNECTED" || parsed.status === "INVALID" ? parsed.status : "DISCONNECTED",
       source: parsed.source === "PERSONAL_DERIV_DEMO" ? "PERSONAL_DERIV_DEMO" : null,
+      loginid: typeof parsed.loginid === "string" ? parsed.loginid : null,
     };
   } catch {
     return {
@@ -130,6 +133,7 @@ function parsePayload(record: StoredSecretRecord): SecretPayload | null {
       accountType: null,
       status: "DISCONNECTED",
       source: null,
+      loginid: null,
     };
   }
 }
@@ -139,14 +143,31 @@ export function isConnectorId(value: string): value is ConnectorId {
 }
 
 export function getCurrentUserScope(req: Request): CurrentUserScope {
-  const authUserId = (req as Request & { auth?: { userId?: string } }).auth?.userId;
+  const auth = (req as Request & {
+    auth?: {
+      userId?: string;
+      snapshot?: {
+        user?: {
+          displayName?: string;
+          email?: string;
+          username?: string;
+        };
+      };
+    };
+  }).auth;
+  const authUserId = auth?.userId;
   const rawUserId = authUserId ?? req.header("x-razon-user-id");
   const userId = stableUserId(rawUserId);
+  const displayName =
+    auth?.snapshot?.user?.displayName ||
+    auth?.snapshot?.user?.email ||
+    auth?.snapshot?.user?.username ||
+    (userId === "demo-current-user" ? "Current user" : userId);
 
   return {
     scope: "CURRENT_USER",
     userId,
-    displayName: userId === "demo-current-user" ? "Current user" : userId,
+    displayName,
   };
 }
 
@@ -181,6 +202,7 @@ export function getSecretMetadata(user: CurrentUserScope, connectorId: Connector
       accountType: payload?.accountType ?? null,
       connectionStatus: payload?.status ?? "DISCONNECTED",
       source: payload?.source ?? null,
+      loginid: payload?.loginid ?? null,
     };
   }
 
@@ -216,6 +238,7 @@ export function saveConnectorSecret(user: CurrentUserScope, connectorId: Connect
     accountType: null,
     status: "DISCONNECTED",
     source: connectorId === "deriv-demo" ? "PERSONAL_DERIV_DEMO" : null,
+    loginid: null,
   }));
   notifySaasMutation("connector-secret:save");
   return getSecretMetadata(user, connectorId);
@@ -236,6 +259,7 @@ export function markConnectorSecretTest(
     readonly accountType: "DEMO" | "REAL" | "UNKNOWN" | null;
     readonly status: "CONNECTED" | "DISCONNECTED" | "INVALID";
     readonly source?: "PERSONAL_DERIV_DEMO" | null;
+    readonly loginid?: string | null;
   }
 ): SafeSecretMetadata {
   const token = readConnectorSecret(user, connectorId);
@@ -248,6 +272,7 @@ export function markConnectorSecretTest(
     accountType: result.accountType,
     status: result.status,
     source: result.source ?? (connectorId === "deriv-demo" ? "PERSONAL_DERIV_DEMO" : null),
+    loginid: result.loginid ?? null,
   }));
   notifySaasMutation("connector-secret:test");
   return getSecretMetadata(user, connectorId);
@@ -265,6 +290,7 @@ export function disconnectConnectorSecret(user: CurrentUserScope, connectorId: C
     accountType: payload.accountType,
     status: "DISCONNECTED",
     source: connectorId === "deriv-demo" ? "PERSONAL_DERIV_DEMO" : null,
+    loginid: payload.loginid ?? null,
   }));
   notifySaasMutation("connector-secret:disconnect");
   return getSecretMetadata(user, connectorId);

@@ -3,6 +3,7 @@ import { razonJournalService } from "../services/razonJournalService";
 import { getCurrentUserScope } from "../services/connectors/connectorSecretsRepository";
 import { marketAggregator } from "../services/market/marketAggregator";
 import type { MarketTimeframe } from "../services/market/marketProvider";
+import { rejectInvalidPriceSignal, validateSignalPriceRelation } from "../services/priceValidation";
 import { sendJson } from "../utils/http";
 
 const timeframes: MarketTimeframe[] = ["1m", "5m", "15m", "1h", "1d"];
@@ -42,7 +43,8 @@ export async function getSignals(req: Request, res: Response) {
     const user = getCurrentUserScope(req);
     const analysis = await marketAggregator.getKalos(selectedSymbol, timeframe, user);
     const snapshot = await marketAggregator.getSnapshot(selectedSymbol, timeframe, user);
-    const signal = {
+    const source = analysis.source ?? snapshot.ticker.source;
+    const baseSignal = {
       signal: analysis.decision,
       decision: analysis.decision,
       confidence: analysis.confidence,
@@ -60,6 +62,29 @@ export async function getSignals(req: Request, res: Response) {
       whyBuy: analysis.whyBuy,
       whySell: analysis.whySell,
       whyWait: analysis.whyWait,
+      currentPrice: snapshot.ticker.price,
+      invalidation: analysis.invalidationLevel,
+      symbol: snapshot.symbol,
+      timeframe,
+      source,
+      decimals: 0,
+    };
+    const validation = validateSignalPriceRelation({
+      signal: baseSignal,
+      snapshot,
+      symbol: snapshot.symbol,
+      timeframe,
+      source,
+    });
+    const signal = {
+      ...rejectInvalidPriceSignal(baseSignal, validation),
+      currentPrice: validation.currentPrice,
+      invalidation: validation.invalidation,
+      symbol: validation.symbol,
+      timeframe: validation.timeframe,
+      source: validation.source,
+      decimals: validation.decimals,
+      priceValidation: validation,
     };
     const input = {
       symbol: selectedSymbol,

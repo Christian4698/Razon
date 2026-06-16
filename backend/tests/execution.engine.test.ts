@@ -31,7 +31,7 @@ function baseIntent(): ExecutionOrderIntent {
       entry: 1.1,
       stop_loss: 1.095,
       take_profit: 1.11,
-      invalidation: 1.097,
+      invalidation: 1.094,
       RR: 2,
       spread: 0.0002,
       slippage: 0.00005,
@@ -108,6 +108,41 @@ describe("Execution Engine", () => {
 
     expect(result.accepted).toBe(false);
     expect(result.refusals.some(refusal => refusal.reason_code === "MOCK_DATA_FORBIDDEN")).toBe(true);
+  });
+
+  it("refuses BUY when TP/SL/invalidation are not valid absolute price relations", async () => {
+    const service = createExecutionService();
+    const intent = baseIntent();
+    const result = await service.executeBuy({
+      ...intent,
+      signal: {
+        ...intent.signal,
+        take_profit: 1.09,
+        stop_loss: 1.095,
+        invalidation: 1.097,
+      },
+    });
+
+    expect(result.accepted).toBe(false);
+    expect(result.refusals.some(refusal => refusal.reason_code === "INVALID_SIGNAL_PRICE_RELATION")).toBe(true);
+  });
+
+  it("refuses SELL when TP/SL/invalidation are not valid absolute price relations", async () => {
+    const service = createExecutionService();
+    const intent = baseIntent();
+    const result = await service.executeSell({
+      ...intent,
+      signal: {
+        ...intent.signal,
+        entry: 1.1,
+        take_profit: 1.11,
+        stop_loss: 1.105,
+        invalidation: 1.103,
+      },
+    });
+
+    expect(result.accepted).toBe(false);
+    expect(result.refusals.some(refusal => refusal.reason_code === "INVALID_SIGNAL_PRICE_RELATION")).toBe(true);
   });
 
   it("requires AUTO mode or manual confirmation", async () => {

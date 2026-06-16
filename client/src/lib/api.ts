@@ -269,6 +269,26 @@ export interface RazonSignalOutput {
   whyBuy: string[];
   whySell: string[];
   whyWait: string[];
+  currentPrice: number | null;
+  invalidation: number | null;
+  symbol: string;
+  timeframe: string;
+  source: string;
+  decimals: number;
+  priceValidation?: {
+    valid: boolean;
+    reasonCode: "INVALID_SIGNAL_PRICE_RELATION" | null;
+    reasons: string[];
+    entry: number | null;
+    currentPrice: number | null;
+    tp: number | null;
+    sl: number | null;
+    invalidation: number | null;
+    symbol: string;
+    timeframe: string;
+    source: string;
+    decimals: number;
+  };
 }
 
 export interface KalosOutput {
@@ -361,9 +381,15 @@ export interface RazonBacktestState {
  * - In development, .env.local points to http://localhost:10000.
  *   Set VITE_API_BASE_URL=http://localhost:10000 in .env.local if needed.
  */
+function productionApiFallback() {
+  if (typeof window === "undefined") return "";
+  return window.location.hostname === "razon.generaltechconsult.com" ? "https://razon-api.onrender.com" : "";
+}
+
 export const API_BASE_URL =
   (import.meta.env.VITE_API_BASE_URL as string) ||
   ((import.meta.env as ImportMetaEnv & { API_BASE_URL?: string }).API_BASE_URL as string | undefined) ||
+  productionApiFallback() ||
   "";
 
 export async function razonApi<T>(path: string): Promise<T> {
