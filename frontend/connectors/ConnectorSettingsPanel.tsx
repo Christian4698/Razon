@@ -45,6 +45,22 @@ function brokerLoginLabel(connector: ConnectorStatus) {
   return connector.loginid ?? connector.brokerLoginId ?? null;
 }
 
+async function connectorAuthDebugSummary() {
+  const response = await fetch(`${API_BASE_URL}/api/connectors/debug-auth`, {
+    credentials: "include",
+    headers: { Accept: "application/json" },
+  });
+  const payload = await response.json().catch(() => ({}));
+
+  if (!response.ok) return `debug-auth ${response.status}`;
+
+  const authenticated = payload.authenticated === true ? "true" : "false";
+  const cookiePresent = payload.cookiePresent === true ? "true" : "false";
+  const corsAllowed = payload.corsAllowed === true ? "true" : "false";
+
+  return `debug-auth authenticated=${authenticated} cookiePresent=${cookiePresent} corsAllowed=${corsAllowed}`;
+}
+
 function defaultUser(): ConnectorUserScope {
   return {
     scope: "CURRENT_USER",
@@ -119,7 +135,10 @@ export function ConnectorSettingsPanel({
       setNotices(current => ({ ...current, [connector.id]: message }));
       await onRefresh?.();
     } catch (error) {
-      const message = error instanceof Error ? error.message : `${actionLabels[action]} failed safely. No execution route was used.`;
+      const baseMessage = error instanceof Error ? error.message : `${actionLabels[action]} failed safely. No execution route was used.`;
+      const message = baseMessage === "Authentication is required."
+        ? `${baseMessage} ${await connectorAuthDebugSummary().catch(() => "debug-auth unavailable")}`
+        : baseMessage;
       setNotices(current => ({ ...current, [connector.id]: message }));
     } finally {
       setBusyAction(null);

@@ -191,6 +191,10 @@ describe("Market Data Observability runtime contracts", () => {
         return { authorize: { loginid: "CR123456", is_virtual: 0 } };
       }
 
+      if (payload.balance === 1 && payload.subscribe === 1) {
+        return { balance: { balance: 10000, currency: "USD", loginid: "VRTC123456" } };
+      }
+
       return { error: { code: "InvalidToken", message: "Invalid token." } };
     };
     const client = new DerivDemoReadOnlyClient(config, transport);

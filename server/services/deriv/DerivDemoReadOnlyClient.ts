@@ -16,6 +16,7 @@ interface DerivActiveSymbol {
 
 export interface DerivMessage {
   readonly authorize?: { loginid?: string; is_virtual?: 0 | 1 };
+  readonly balance?: { balance?: number; currency?: string; loginid?: string };
   readonly active_symbols?: readonly DerivActiveSymbol[];
   readonly tick?: { quote?: number; epoch?: number; symbol?: string };
   readonly candles?: readonly DerivRawCandle[];
@@ -149,12 +150,20 @@ export function isDerivApiTokenConfigured(value: string | undefined) {
 }
 
 let lastLoggedTokenConfigured: boolean | null = null;
+let lastLoggedAppIdPresent: boolean | null = null;
 
 function logSafeTokenConfigured(tokenConfigured: boolean) {
   if (lastLoggedTokenConfigured === tokenConfigured) return;
 
   lastLoggedTokenConfigured = tokenConfigured;
   console.info(`[RAZON Deriv] tokenConfigured=${tokenConfigured}`);
+}
+
+function logSafeAppIdPresent(appIdPresent: boolean) {
+  if (lastLoggedAppIdPresent === appIdPresent) return;
+
+  lastLoggedAppIdPresent = appIdPresent;
+  console.info(`[RAZON Deriv] DERIV_APP_ID_PRESENT=${appIdPresent}`);
 }
 
 function now() {
@@ -192,11 +201,13 @@ function parseNumber(value: number | string) {
 
 export function getDerivDemoConfig(): DerivClientConfig {
   const apiTokenConfigured = isDerivApiTokenConfigured(env("DERIV_API_TOKEN"));
+  const appId = env("DERIV_APP_ID")?.trim() || null;
   logSafeTokenConfigured(apiTokenConfigured);
+  logSafeAppIdPresent(Boolean(appId));
 
   return {
     enabled: boolEnv("DERIV_ENABLED"),
-    appId: env("DERIV_APP_ID")?.trim() || null,
+    appId,
     apiTokenConfigured,
     endpoint: env("DERIV_ENDPOINT")?.trim() || "wss://ws.derivws.com/websockets/v3",
     accountType: env("DERIV_ACCOUNT_TYPE") === "live" ? "live" : "demo",
@@ -408,7 +419,7 @@ export class DerivDemoReadOnlyClient {
     }
 
     try {
-      const message = await this.request({ authorize: trimmed });
+      const [message, balanceMessage] = await this.requestPersonalAuthorizeAndBalance(trimmed);
       const authorize = message.authorize;
 
       if (!authorize) {
@@ -428,9 +439,13 @@ export class DerivDemoReadOnlyClient {
         };
       }
 
+      if (!balanceMessage.balance) {
+        throw new Error("Deriv did not return a balance payload.");
+      }
+
       this.connected = true;
       this.latencyMs = Date.now() - startedAt;
-      this.lastMessage = "Personal Deriv DEMO token authorized read-only.";
+      this.lastMessage = "Personal Deriv DEMO token authorized read-only with balance subscription.";
 
       return {
         ok: true,
@@ -578,6 +593,93 @@ export class DerivDemoReadOnlyClient {
 
   private isPersonalConnectorConfigured() {
     return Boolean(this.config.appId) && this.config.accountType === "demo";
+  }
+
+  private async requestPersonalAuthorizeAndBalance(token: string): Promise<readonly [DerivMessage, DerivMessage]> {
+    if (this.transport !== defaultDerivRequestTransport) {
+      const authorize = await this.request({ authorize: token });
+
+      if (authorize.authorize?.is_virtual !== 1) {
+        return [authorize, {}];
+      }
+
+      const balance = await this.request({ balance: 1, subscribe: 1 });
+      return [authorize, balance];
+    }
+
+    const [authorize, balance] = await this.requestSequence([
+      { authorize: token },
+      { balance: 1, subscribe: 1 },
+    ]);
+
+    return [authorize ?? {}, balance ?? {}];
+  }
+
+  private async requestSequence(payloads: readonly DerivRequestPayload[]): Promise<readonly DerivMessage[]> {
+    if (!this.config.appId) {
+      throw new Error("DERIV_APP_ID is required for Deriv WebSocket requests.");
+    }
+
+    const WebSocketCtor = globalThis.WebSocket;
+
+    if (!WebSocketCtor) {
+      throw new Error("WebSocket runtime is not available.");
+    }
+
+    const endpoint = buildEndpoint(this.config.endpoint, this.config.appId);
+
+    return new Promise((resolve, reject) => {
+      const socket = new WebSocketCtor(endpoint);
+      const responses: DerivMessage[] = [];
+      let index = 0;
+
+      const timeout = setTimeout(() => {
+        socket.close();
+        reject(new Error("Deriv WebSocket request timed out."));
+      }, 10000);
+
+      const fail = (message: string) => {
+        clearTimeout(timeout);
+        socket.close();
+        reject(new Error(message));
+      };
+
+      const sendNext = () => {
+        const payload = payloads[index];
+
+        if (!payload) {
+          clearTimeout(timeout);
+          socket.close();
+          resolve(responses);
+          return;
+        }
+
+        socket.send(JSON.stringify(payload));
+      };
+
+      socket.addEventListener("open", sendNext);
+
+      socket.addEventListener("message", event => {
+        try {
+          const message = JSON.parse(String(event.data)) as DerivMessage;
+
+          if (message.error) {
+            fail(message.error.message ?? "Deriv WebSocket returned an error.");
+            return;
+          }
+
+          responses.push(message);
+          index += 1;
+          sendNext();
+        } catch {
+          fail("Invalid Deriv WebSocket response.");
+        }
+      });
+
+      socket.addEventListener("error", () => {
+        fail("Deriv WebSocket connection failed.");
+      });
+    });
   }
 
   private async request(payload: DerivRequestPayload): Promise<DerivMessage> {
