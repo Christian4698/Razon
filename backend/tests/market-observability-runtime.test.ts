@@ -128,7 +128,7 @@ describe("Market Data Observability runtime contracts", () => {
   it("keeps a connected Deriv DEMO snapshot out of MOCK_DATA", async () => {
     const config: DerivClientConfig = {
       enabled: true,
-      appId: "1089",
+      appId: '"1089"',
       apiTokenConfigured: true,
       endpoint: "wss://ws.derivws.com/websockets/v3",
       accountType: "demo",
@@ -211,6 +211,36 @@ describe("Market Data Observability runtime contracts", () => {
     expect(real.message).toContain("Only Deriv DEMO tokens are allowed");
     expect(invalid.status).toBe("INVALID");
     expect(JSON.stringify({ demo, real, invalid })).not.toContain("demo-token");
+  });
+
+  it("normalizes Deriv WebSocket endpoint and injects the configured app id", async () => {
+    const config: DerivClientConfig = {
+      enabled: true,
+      appId: "1089",
+      apiTokenConfigured: false,
+      endpoint: "https://ws.derivws.com",
+      accountType: "demo",
+      allowOrderPlacement: false,
+    };
+    let capturedEndpoint = "";
+    const transport: DerivRequestTransport = async (endpoint, payload) => {
+      capturedEndpoint = endpoint;
+
+      if (payload.ticks === "R_75") {
+        return { tick: { quote: 39400.25, epoch: 1781600000, symbol: "R_75" } };
+      }
+
+      return {};
+    };
+    const client = new DerivDemoReadOnlyClient(config, transport);
+    const tickerResult = await client.getTicker("R_75");
+    const endpointUrl = new URL(capturedEndpoint);
+
+    expect(tickerResult.price).toBe(39400.25);
+    expect(endpointUrl.protocol).toBe("wss:");
+    expect(endpointUrl.hostname).toBe("ws.derivws.com");
+    expect(endpointUrl.pathname).toBe("/websockets/v3");
+    expect(endpointUrl.searchParams.get("app_id")).toBe("1089");
   });
 
   it("uses MOCK_DATA fallback only when DATA_MODE=DEMO_DATA and Deriv is disabled", async () => {

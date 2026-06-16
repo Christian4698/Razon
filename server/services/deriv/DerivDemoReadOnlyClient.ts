@@ -94,12 +94,28 @@ const defaultDerivRequestTransport: DerivRequestTransport = (endpoint, payload) 
 
   return new Promise((resolve, reject) => {
     const socket = new WebSocketCtor(endpoint);
+    let opened = false;
+    let authorizeSent = false;
+    let balanceSent = false;
     const timeout = setTimeout(() => {
       socket.close();
+      if (!opened) logSafeDerivWsStep("DERIV_WS_OPENED", false);
+      if (isAuthorizePayload(payload) && !authorizeSent) logSafeDerivWsStep("DERIV_AUTHORIZE_SENT", false);
+      if (isBalanceSubscribePayload(payload) && !balanceSent) logSafeDerivWsStep("DERIV_BALANCE_SENT", false);
       reject(new Error("Deriv WebSocket request timed out."));
     }, 8000);
 
     socket.addEventListener("open", () => {
+      opened = true;
+      logSafeDerivWsStep("DERIV_WS_OPENED", true);
+      if (isAuthorizePayload(payload)) {
+        authorizeSent = true;
+        logSafeDerivWsStep("DERIV_AUTHORIZE_SENT", true);
+      }
+      if (isBalanceSubscribePayload(payload)) {
+        balanceSent = true;
+        logSafeDerivWsStep("DERIV_BALANCE_SENT", true);
+      }
       socket.send(JSON.stringify(payload));
     });
 
@@ -124,6 +140,9 @@ const defaultDerivRequestTransport: DerivRequestTransport = (endpoint, payload) 
     socket.addEventListener("error", () => {
       clearTimeout(timeout);
       socket.close();
+      logSafeDerivWsStep("DERIV_WS_OPENED", opened);
+      if (isAuthorizePayload(payload) && !authorizeSent) logSafeDerivWsStep("DERIV_AUTHORIZE_SENT", false);
+      if (isBalanceSubscribePayload(payload) && !balanceSent) logSafeDerivWsStep("DERIV_BALANCE_SENT", false);
       reject(new Error("Deriv WebSocket connection failed."));
     });
   });
@@ -137,6 +156,8 @@ const granularityMap: Record<MarketTimeframe, number> = {
   "1d": 86400,
 };
 
+const DEFAULT_DERIV_ENDPOINT = "wss://ws.derivws.com/websockets/v3";
+
 function env(key: string) {
   return process.env[key];
 }
@@ -145,12 +166,22 @@ function boolEnv(key: string) {
   return env(key) === "true";
 }
 
+function normalizeDerivAppId(value: string | undefined) {
+  const trimmed = value?.trim();
+
+  if (!trimmed) return null;
+
+  const unquoted = trimmed.replace(/^["'](.+)["']$/, "$1").trim();
+  return /^\d+$/.test(unquoted) ? unquoted : null;
+}
+
 export function isDerivApiTokenConfigured(value: string | undefined) {
   return value?.trim().startsWith("pat_") ?? false;
 }
 
 let lastLoggedTokenConfigured: boolean | null = null;
 let lastLoggedAppIdPresent: boolean | null = null;
+let lastLoggedDerivWsUrlValid: boolean | null = null;
 
 function logSafeTokenConfigured(tokenConfigured: boolean) {
   if (lastLoggedTokenConfigured === tokenConfigured) return;
@@ -166,14 +197,58 @@ function logSafeAppIdPresent(appIdPresent: boolean) {
   console.info(`[RAZON Deriv] DERIV_APP_ID_PRESENT=${appIdPresent}`);
 }
 
+function logSafeDerivWsUrlValid(valid: boolean) {
+  if (lastLoggedDerivWsUrlValid === valid) return;
+
+  lastLoggedDerivWsUrlValid = valid;
+  console.info(`[RAZON Deriv] DERIV_WS_URL_VALID=${valid}`);
+}
+
+function logSafeDerivWsStep(step: string, value: boolean) {
+  console.info(`[RAZON Deriv] ${step}=${value}`);
+}
+
 function now() {
   return new Date().toISOString();
 }
 
 function buildEndpoint(endpoint: string, appId: string) {
-  const url = new URL(endpoint);
-  url.searchParams.set("app_id", appId);
+  return normalizeDerivEndpoint(endpoint, appId);
+}
+
+function normalizeDerivEndpoint(endpoint: string | null | undefined, appId: string) {
+  const rawEndpoint = endpoint?.trim() || DEFAULT_DERIV_ENDPOINT;
+  const normalizedAppId = normalizeDerivAppId(appId);
+  let url: URL;
+
+  try {
+    url = new URL(rawEndpoint);
+  } catch {
+    url = new URL(DEFAULT_DERIV_ENDPOINT);
+  }
+
+  if (url.protocol !== "wss:" && url.protocol !== "ws:") {
+    url = new URL(DEFAULT_DERIV_ENDPOINT);
+  }
+
+  if (!url.pathname || url.pathname === "/") {
+    url.pathname = "/websockets/v3";
+  }
+
+  if (normalizedAppId) {
+    url.searchParams.set("app_id", normalizedAppId);
+  }
+
+  logSafeDerivWsUrlValid((url.protocol === "wss:" || url.protocol === "ws:") && Boolean(url.searchParams.get("app_id")));
   return url.toString();
+}
+
+function isAuthorizePayload(payload: DerivRequestPayload) {
+  return typeof payload.authorize === "string";
+}
+
+function isBalanceSubscribePayload(payload: DerivRequestPayload) {
+  return payload.balance === 1 && payload.subscribe === 1;
 }
 
 function unavailableTicker(symbol: string, source: string, message: string): NormalizedTicker {
@@ -201,7 +276,7 @@ function parseNumber(value: number | string) {
 
 export function getDerivDemoConfig(): DerivClientConfig {
   const apiTokenConfigured = isDerivApiTokenConfigured(env("DERIV_API_TOKEN"));
-  const appId = env("DERIV_APP_ID")?.trim() || null;
+  const appId = normalizeDerivAppId(env("DERIV_APP_ID"));
   logSafeTokenConfigured(apiTokenConfigured);
   logSafeAppIdPresent(Boolean(appId));
 
@@ -209,7 +284,7 @@ export function getDerivDemoConfig(): DerivClientConfig {
     enabled: boolEnv("DERIV_ENABLED"),
     appId,
     apiTokenConfigured,
-    endpoint: env("DERIV_ENDPOINT")?.trim() || "wss://ws.derivws.com/websockets/v3",
+    endpoint: env("DERIV_ENDPOINT")?.trim() || DEFAULT_DERIV_ENDPOINT,
     accountType: env("DERIV_ACCOUNT_TYPE") === "live" ? "live" : "demo",
     allowOrderPlacement: boolEnv("DERIV_ALLOW_ORDER_PLACEMENT"),
   };
@@ -439,6 +514,19 @@ export class DerivDemoReadOnlyClient {
         };
       }
 
+      if (!authorize.loginid?.startsWith("VRTC")) {
+        return {
+          ok: false,
+          connected: false,
+          accountType: "UNKNOWN",
+          status: "INVALID",
+          source: "PERSONAL_DERIV_DEMO",
+          loginid: authorize.loginid ?? null,
+          latencyMs: Date.now() - startedAt,
+          message: "Deriv DEMO loginid must start with VRTC.",
+        };
+      }
+
       if (!balanceMessage.balance) {
         throw new Error("Deriv did not return a balance payload.");
       }
@@ -588,11 +676,11 @@ export class DerivDemoReadOnlyClient {
   }
 
   private isConfigured() {
-    return this.config.enabled && Boolean(this.config.appId) && this.config.accountType === "demo";
+    return this.config.enabled && Boolean(normalizeDerivAppId(this.config.appId ?? undefined)) && this.config.accountType === "demo";
   }
 
   private isPersonalConnectorConfigured() {
-    return Boolean(this.config.appId) && this.config.accountType === "demo";
+    return Boolean(normalizeDerivAppId(this.config.appId ?? undefined)) && this.config.accountType === "demo";
   }
 
   private async requestPersonalAuthorizeAndBalance(token: string): Promise<readonly [DerivMessage, DerivMessage]> {
@@ -616,8 +704,10 @@ export class DerivDemoReadOnlyClient {
   }
 
   private async requestSequence(payloads: readonly DerivRequestPayload[]): Promise<readonly DerivMessage[]> {
-    if (!this.config.appId) {
-      throw new Error("DERIV_APP_ID is required for Deriv WebSocket requests.");
+    const appId = normalizeDerivAppId(this.config.appId ?? undefined);
+
+    if (!appId) {
+      throw new Error("DERIV_APP_ID must be a numeric Deriv app id for WebSocket requests.");
     }
 
     const WebSocketCtor = globalThis.WebSocket;
@@ -626,21 +716,30 @@ export class DerivDemoReadOnlyClient {
       throw new Error("WebSocket runtime is not available.");
     }
 
-    const endpoint = buildEndpoint(this.config.endpoint, this.config.appId);
+    const endpoint = buildEndpoint(this.config.endpoint, appId);
 
     return new Promise((resolve, reject) => {
       const socket = new WebSocketCtor(endpoint);
       const responses: DerivMessage[] = [];
       let index = 0;
+      let opened = false;
+      let authorizeSent = false;
+      let balanceSent = false;
 
       const timeout = setTimeout(() => {
         socket.close();
+        if (!opened) logSafeDerivWsStep("DERIV_WS_OPENED", false);
+        if (!authorizeSent) logSafeDerivWsStep("DERIV_AUTHORIZE_SENT", false);
+        if (!balanceSent) logSafeDerivWsStep("DERIV_BALANCE_SENT", false);
         reject(new Error("Deriv WebSocket request timed out."));
       }, 10000);
 
       const fail = (message: string) => {
         clearTimeout(timeout);
         socket.close();
+        if (!opened) logSafeDerivWsStep("DERIV_WS_OPENED", false);
+        if (!authorizeSent) logSafeDerivWsStep("DERIV_AUTHORIZE_SENT", false);
+        if (!balanceSent) logSafeDerivWsStep("DERIV_BALANCE_SENT", false);
         reject(new Error(message));
       };
 
@@ -654,10 +753,22 @@ export class DerivDemoReadOnlyClient {
           return;
         }
 
+        if (isAuthorizePayload(payload)) {
+          authorizeSent = true;
+          logSafeDerivWsStep("DERIV_AUTHORIZE_SENT", true);
+        }
+        if (isBalanceSubscribePayload(payload)) {
+          balanceSent = true;
+          logSafeDerivWsStep("DERIV_BALANCE_SENT", true);
+        }
         socket.send(JSON.stringify(payload));
       };
 
-      socket.addEventListener("open", sendNext);
+      socket.addEventListener("open", () => {
+        opened = true;
+        logSafeDerivWsStep("DERIV_WS_OPENED", true);
+        sendNext();
+      });
 
       socket.addEventListener("message", event => {
         try {
@@ -677,17 +788,22 @@ export class DerivDemoReadOnlyClient {
       });
 
       socket.addEventListener("error", () => {
+        logSafeDerivWsStep("DERIV_WS_OPENED", opened);
+        if (!authorizeSent) logSafeDerivWsStep("DERIV_AUTHORIZE_SENT", false);
+        if (!balanceSent) logSafeDerivWsStep("DERIV_BALANCE_SENT", false);
         fail("Deriv WebSocket connection failed.");
       });
     });
   }
 
   private async request(payload: DerivRequestPayload): Promise<DerivMessage> {
-    if (!this.config.appId) {
-      throw new Error("DERIV_APP_ID is required for Deriv WebSocket requests.");
+    const appId = normalizeDerivAppId(this.config.appId ?? undefined);
+
+    if (!appId) {
+      throw new Error("DERIV_APP_ID must be a numeric Deriv app id for WebSocket requests.");
     }
 
-    const endpoint = buildEndpoint(this.config.endpoint, this.config.appId);
+    const endpoint = buildEndpoint(this.config.endpoint, appId);
     return this.transport(endpoint, payload);
   }
 }
