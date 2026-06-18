@@ -337,7 +337,7 @@ describe("Market Data Observability runtime contracts", () => {
     expect(diagnostics.endpointValid).toBe(true);
   });
 
-  it("uses MOCK_DATA fallback only when DATA_MODE=DEMO_DATA and Deriv is disabled", async () => {
+  it("does not use MOCK_DATA fallback when Deriv is disabled", async () => {
     process.env.DERIV_ENABLED = "false";
     process.env.DERIV_WS_APP_ID = "not-numeric";
     process.env.DERIV_APP_ID = "";
@@ -347,9 +347,10 @@ describe("Market Data Observability runtime contracts", () => {
     const demoModule = await import("../../server/services/market/marketAggregator");
     const demoSnapshot = await demoModule.marketAggregator.getSnapshot("BOOM500", "5m");
 
-    expect(demoSnapshot.fallback).toBe("MOCK_DATA");
-    expect(demoSnapshot.ticker.source).toBe("MOCK_DATA");
-    expect(demoSnapshot.observability.source).toBe("MOCK");
+    expect(demoSnapshot.fallback).toBe("NONE");
+    expect(demoSnapshot.ticker.source).not.toBe("MOCK_DATA");
+    expect(demoSnapshot.ticker.status).toBe("unavailable");
+    expect(demoSnapshot.observability.sourceStatus).toBe("DISCONNECTED");
 
     process.env.DATA_MODE = "REAL_DATA";
     process.env.DERIV_ENABLED = "false";

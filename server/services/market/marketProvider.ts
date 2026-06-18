@@ -1,5 +1,5 @@
 import { derivDemoReadOnlyClient } from "../deriv/DerivDemoReadOnlyClient";
-import { DERIV_SYNTHETIC_SYMBOLS } from "../deriv/derivSymbols";
+import { DERIV_MARKET_REGISTRY, DERIV_SYNTHETIC_SYMBOLS } from "../deriv/derivSymbols";
 
 export type MarketCategory =
   | "forex"
@@ -98,21 +98,7 @@ const forexSymbols = [
 const metalSymbols = ["XAU/USD", "XAG/USD"] as const;
 const indexSymbols = ["NAS100", "US30", "SPX500", "GER40", "UK100"] as const;
 const cryptoSymbols = ["BTC/USD", "ETH/USD", "SOL/USD", "BNB/USD"] as const;
-const derivSyntheticSymbols = [
-  "Volatility 10",
-  "Volatility 25",
-  "Volatility 50",
-  "Volatility 75",
-  "Volatility 100",
-  "Crash 300",
-  "Crash 500",
-  "Crash 1000",
-  "Boom 300",
-  "Boom 500",
-  "Boom 1000",
-  "Step Index",
-  "Jump Index",
-] as const;
+const derivSyntheticSymbols = DERIV_MARKET_REGISTRY.map(item => item.displayName);
 
 const stockSymbols = ["AAPL", "MSFT", "NVDA", "TSLA"] as const;
 
@@ -162,14 +148,9 @@ function symbol(symbol: string, category: MarketCategory, provider: string, prov
 }
 
 export const DEFAULT_MARKET_SYMBOLS: NormalizedSymbol[] = [
-  ...forexSymbols.map(item => symbol(item, "forex", "forex-market-data-api", yahooSymbolMap[item])),
-  ...metalSymbols.map(item => symbol(item, "metals", "forex-market-data-api", yahooSymbolMap[item])),
-  ...indexSymbols.map(item => symbol(item, "indices", "forex-market-data-api", yahooSymbolMap[item])),
-  ...cryptoSymbols.map(item => symbol(item, "crypto", "crypto-api", binanceSymbolMap[item])),
   ...derivSyntheticSymbols.map(item =>
     symbol(item, "derivSynthetic", "deriv-api-websocket", derivSymbolMap[item])
   ),
-  ...stockSymbols.map(item => symbol(item, "stocks", "forex-market-data-api", yahooSymbolMap[item])),
 ];
 
 function trendFromChange(changePercent: number | null): MarketTrend {

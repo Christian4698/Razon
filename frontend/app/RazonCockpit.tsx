@@ -261,10 +261,7 @@ function marketFromBackend(snapshot: BackendMarketSnapshot, fallback: MarketStat
     price: snapshot.ticker.price ?? fallback.price,
     volume,
     source,
-    session:
-      snapshot.fallback === "MOCK_DATA"
-        ? "MOCK_DATA fallback - Deriv DEMO unavailable"
-        : snapshot.observability.sourceLabel,
+    session: snapshot.observability.sourceLabel,
     fallback: snapshot.fallback,
     dataQuality: snapshot.observability.dataQuality,
     sourceStatus: snapshot.observability.sourceStatus,

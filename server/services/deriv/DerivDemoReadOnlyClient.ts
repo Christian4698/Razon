@@ -513,7 +513,7 @@ export class DerivDemoReadOnlyClient {
       balanceOk: false,
       tickReceived: false,
       candleReceived: false,
-      source: "MOCK_DATA",
+      source: "DEMO",
       lastError: this.lastMessage,
     });
     return this.health();

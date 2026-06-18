@@ -9,6 +9,7 @@ export type RazonConnectionState = "connected" | "disconnected";
 export type RazonConnectorSafetyStatus = "DISCONNECTED" | "CONNECTED_DEMO" | "CONNECTED_REAL_READONLY" | "LIVE_BLOCKED";
 
 export type RazonSignalDecision = "BUY" | "SELL" | "WAIT" | "NO_TRADE" | "DATA_LOW" | "INVALID";
+export type RazonSignalDirection = "UP" | "DOWN" | "WAIT";
 
 export type RazonSyntheticIndexName =
   | "Boom 500"
@@ -120,6 +121,7 @@ export interface RazonMarketSnapshot {
 export interface RazonSignalOutput {
   signal: RazonSignalDecision;
   decision?: RazonSignalDecision;
+  direction?: RazonSignalDirection;
   confidence: number;
   probability?: number;
   risk?: "low" | "medium" | "high";
@@ -127,6 +129,9 @@ export interface RazonSignalOutput {
   entryZone?: [number, number] | null;
   sl: number | null;
   tp: number | null;
+  SL?: number | null;
+  TP?: number | null;
+  expiry?: string;
   invalidationLevel?: number | null;
   reasons: string[];
   whyBuy?: string[];

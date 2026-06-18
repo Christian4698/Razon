@@ -1,10 +1,12 @@
 import type { Request, Response } from "express";
 import { razonJournalService } from "../services/razonJournalService";
 import { getCurrentUserScope } from "../services/connectors/connectorSecretsRepository";
+import { executionEngineState, parseTradingMode } from "../services/execution/executionEngine";
 import { marketAggregator } from "../services/market/marketAggregator";
 import type { MarketTimeframe } from "../services/market/marketProvider";
 import { rejectInvalidPriceSignal, validateSignalPriceRelation } from "../services/priceValidation";
 import { sendJson } from "../utils/http";
+import type { RazonSignalDirection } from "../types/razon";
 
 const timeframes: MarketTimeframe[] = ["1m", "5m", "15m", "1h", "1d"];
 const timeframeAliases: Record<string, MarketTimeframe> = {
@@ -34,12 +36,24 @@ function parseSymbol(req: Request) {
   return typeof value === "string" && value.trim() ? value : null;
 }
 
+function signalDirection(decision: string): RazonSignalDirection {
+  if (decision === "BUY") return "UP";
+  if (decision === "SELL") return "DOWN";
+  return "WAIT";
+}
+
+function expiryFor(timeframe: MarketTimeframe) {
+  const minutes = timeframe === "1m" ? 1 : timeframe === "5m" ? 5 : timeframe === "15m" ? 15 : timeframe === "1h" ? 60 : 1440;
+  return new Date(Date.now() + minutes * 3 * 60 * 1000).toISOString();
+}
+
 export async function getSignals(req: Request, res: Response) {
   try {
     const timeframe = parseTimeframe(req);
+    const tradingMode = parseTradingMode(Array.isArray(req.query.mode) ? req.query.mode[0] : req.query.mode);
     const opportunities = await marketAggregator.getOpportunities(timeframe);
     const requestedSymbol = parseSymbol(req);
-    const selectedSymbol = requestedSymbol ?? opportunities[0]?.symbol ?? "EUR/USD";
+    const selectedSymbol = requestedSymbol ?? opportunities[0]?.symbol ?? "Boom 500";
     const user = getCurrentUserScope(req);
     const analysis = await marketAggregator.getKalos(selectedSymbol, timeframe, user);
     const snapshot = await marketAggregator.getSnapshot(selectedSymbol, timeframe, user);
@@ -78,12 +92,16 @@ export async function getSignals(req: Request, res: Response) {
     });
     const signal = {
       ...rejectInvalidPriceSignal(baseSignal, validation),
+      direction: signalDirection(baseSignal.decision),
       currentPrice: validation.currentPrice,
       invalidation: validation.invalidation,
       symbol: validation.symbol,
       timeframe: validation.timeframe,
       source: validation.source,
       decimals: validation.decimals,
+      TP: validation.tp,
+      SL: validation.sl,
+      expiry: expiryFor(timeframe),
       priceValidation: validation,
     };
     const input = {
@@ -105,6 +123,8 @@ export async function getSignals(req: Request, res: Response) {
       source: "provider-backed" as const,
       input,
       signal,
+      tradingMode,
+      execution: executionEngineState(tradingMode),
       topOpportunities: opportunities,
       bestMarket: opportunities[0] ?? null,
       journalEntryId: journalEntry.id,

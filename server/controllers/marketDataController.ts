@@ -29,7 +29,7 @@ function parseTimeframe(req: Request): MarketTimeframe {
 
 function parseSymbol(req: Request) {
   const value = Array.isArray(req.query.symbol) ? req.query.symbol[0] : req.query.symbol;
-  return typeof value === "string" && value.trim() ? value : "EUR/USD";
+  return typeof value === "string" && value.trim() ? value : "Boom 500";
 }
 
 function sendControllerError(res: Response, error: unknown) {

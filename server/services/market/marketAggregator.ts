@@ -8,11 +8,8 @@ import {
 } from "../connectors/connectorSecretsRepository";
 import { marketCache } from "./marketCache";
 import {
-  CryptoApiProvider,
   DEFAULT_MARKET_SYMBOLS,
   DerivWebSocketProvider,
-  ForexMarketDataApiProvider,
-  Mt5FutureConnectorProvider,
   type MarketCategory,
   type MarketDataProvider,
   type MarketDataStatus,
@@ -27,7 +24,6 @@ import {
 import {
   applyKalosDataGuard,
   buildMarketDataHealth,
-  createMockUpdatedAt,
   type KalosDataGuardOutput,
   type MarketDataHealthModel,
 } from "./marketObservability";
@@ -94,10 +90,7 @@ export interface MarketOpportunity {
 }
 
 const providers: MarketDataProvider[] = [
-  new CryptoApiProvider(),
-  new ForexMarketDataApiProvider(),
   new DerivWebSocketProvider(),
-  new Mt5FutureConnectorProvider(),
 ];
 
 const categoryLabels: Record<MarketCategory, string> = {
@@ -109,21 +102,10 @@ const categoryLabels: Record<MarketCategory, string> = {
   stocks: "Stocks",
 };
 
-const categoryOrder: MarketCategory[] = [
-  "forex",
-  "metals",
-  "indices",
-  "crypto",
-  "derivSynthetic",
-  "stocks",
-];
+const categoryOrder: MarketCategory[] = ["derivSynthetic"];
 
 function now() {
   return new Date().toISOString();
-}
-
-function dataModeAllowsMockFallback() {
-  return process.env.DATA_MODE !== "REAL_DATA";
 }
 
 function unavailableTicker(symbol: NormalizedSymbol, message: string): NormalizedTicker {
@@ -226,86 +208,6 @@ function applyLiveTickToCurrentCandle(
 async function resolveDerivProviderSymbol(symbol: NormalizedSymbol) {
   if (symbol.category !== "derivSynthetic") return symbol.providerSymbol;
   return derivDemoReadOnlyClient.resolveProviderSymbol(symbol.symbol, symbol.providerSymbol);
-}
-
-function createMockDerivCandles(symbol: NormalizedSymbol, timeframe: MarketTimeframe): NormalizedCandle[] {
-  const seed = Array.from(symbol.providerSymbol).reduce((total, char) => total + char.charCodeAt(0), 0);
-  const base = seed % 5 === 0 ? 320 : seed % 3 === 0 ? 4800 : 8200 + seed;
-  const step = base > 1000 ? 8 + (seed % 17) : 0.6 + (seed % 7) / 10;
-  const minutes = timeframeMinutes(timeframe);
-  const current = Date.now();
-
-  return Array.from({ length: 120 }, (_, index) => {
-    const timestamp = new Date(current - (119 - index) * minutes * 60 * 1000).toISOString();
-    const wave = Math.sin((index + seed) * 0.31) * step + Math.cos((index + seed) * 0.17) * step * 0.45;
-    const trend = (index - 60) * step * 0.04;
-    const open = base + wave + trend;
-    const close = open + Math.sin((index + seed) * 0.47) * step * 0.55;
-    const high = Math.max(open, close) + step * 0.7;
-    const low = Math.min(open, close) - step * 0.7;
-
-    return {
-      symbol: symbol.symbol,
-      timestamp,
-      open: Number(open.toFixed(4)),
-      high: Number(high.toFixed(4)),
-      low: Number(low.toFixed(4)),
-      close: Number(close.toFixed(4)),
-      volume: Math.round(900 + Math.abs(Math.sin(index * 0.4 + seed)) * 1600),
-      source: "MOCK_DATA",
-    };
-  });
-}
-
-function createMockDerivTicker(symbol: NormalizedSymbol, candles: readonly NormalizedCandle[], message: string): NormalizedTicker {
-  const last = candles.at(-1);
-
-  return {
-    symbol: symbol.symbol,
-    category: symbol.category,
-    price: last?.close ?? null,
-    changePercent:
-      candles.length > 1 && candles[0].close !== 0
-        ? Number((((candles.at(-1)!.close - candles[0].close) / candles[0].close) * 100).toFixed(2))
-        : null,
-    volume: last?.volume ?? null,
-    trend: "sideways",
-    status: "delayed",
-    source: "MOCK_DATA",
-    updatedAt: createMockUpdatedAt(),
-    providerMessage: message,
-  };
-}
-
-function createMockOrderBook(symbol: NormalizedSymbol): NormalizedOrderBook {
-  return {
-    symbol: symbol.symbol,
-    bids: [],
-    asks: [],
-    status: "not_configured",
-    source: "MOCK_DATA",
-    updatedAt: now(),
-    providerMessage: "MOCK_DATA fallback does not expose an order book.",
-  };
-}
-
-function createMockVolume(symbol: NormalizedSymbol, candles: readonly NormalizedCandle[]): NormalizedVolume {
-  return {
-    symbol: symbol.symbol,
-    volume: candles.at(-1)?.volume ?? null,
-    status: "delayed",
-    source: "MOCK_DATA",
-    updatedAt: now(),
-    providerMessage: "MOCK_DATA fallback volume is simulated.",
-  };
-}
-
-function shouldFallbackToMock(symbol: NormalizedSymbol, ticker: NormalizedTicker, candles: readonly NormalizedCandle[]) {
-  return (
-    symbol.category === "derivSynthetic" &&
-    dataModeAllowsMockFallback() &&
-    (ticker.status === "unavailable" || ticker.status === "not_configured" || ticker.price === null || candles.length === 0)
-  );
 }
 
 function applyDataGuardToKalos(output: KalosOutput, guard: KalosDataGuardOutput): KalosOutput {
@@ -536,7 +438,7 @@ export const marketAggregator = {
     );
   },
 
-  async getSnapshot(symbolName = "EUR/USD", timeframe: MarketTimeframe = "5m", user?: CurrentUserScope): Promise<MarketSnapshot> {
+  async getSnapshot(symbolName = "Boom 500", timeframe: MarketTimeframe = "5m", user?: CurrentUserScope): Promise<MarketSnapshot> {
     const symbol = resolveSymbol(symbolName);
     const startedAt = Date.now();
     const [rawTicker, loadedCandles, rawOrderBook, rawVolume] = await Promise.all([
@@ -546,18 +448,11 @@ export const marketAggregator = {
       this.getVolume(symbolName),
     ]);
     const rawCandles = applyLiveTickToCurrentCandle(loadedCandles, rawTicker, timeframe);
-    const fallback = symbol && shouldFallbackToMock(symbol, rawTicker, rawCandles) ? "MOCK_DATA" : "NONE";
-    const candles = fallback === "MOCK_DATA" && symbol ? createMockDerivCandles(symbol, timeframe) : rawCandles;
-    const ticker =
-      fallback === "MOCK_DATA" && symbol
-        ? createMockDerivTicker(
-            symbol,
-            candles,
-            rawTicker.providerMessage ?? "Deriv DEMO unavailable; using MOCK_DATA fallback because DATA_MODE=DEMO_DATA."
-          )
-        : rawTicker;
-    const orderBook = fallback === "MOCK_DATA" && symbol ? createMockOrderBook(symbol) : rawOrderBook;
-    const volume = fallback === "MOCK_DATA" && symbol ? createMockVolume(symbol, candles) : rawVolume;
+    const fallback = "NONE";
+    const candles = rawCandles;
+    const ticker = rawTicker;
+    const orderBook = rawOrderBook;
+    const volume = rawVolume;
     const indicators = calculateIndicators(candles);
     const observability = buildMarketDataHealth({
       ticker,
@@ -627,7 +522,7 @@ export const marketAggregator = {
       .sort((a, b) => b.heatScore - a.heatScore);
   },
 
-  async getKalos(symbolName = "EUR/USD", timeframe: MarketTimeframe = "5m", user?: CurrentUserScope): Promise<KalosOutput> {
+  async getKalos(symbolName = "Boom 500", timeframe: MarketTimeframe = "5m", user?: CurrentUserScope): Promise<KalosOutput> {
     const snapshot = await this.getSnapshot(symbolName, timeframe, user);
     const guarded = applyDataGuardToKalos(
       kalosEngine.evaluate(snapshot.ticker, snapshot.candles),
