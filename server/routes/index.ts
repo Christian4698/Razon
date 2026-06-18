@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { getConnectorsDebugAuth } from "../controllers/connectorsController";
-import { requireLicense } from "../middleware/authMiddleware";
+import { getConnectorsDebugAuth, getDerivDemoOAuthCallback, startDerivDemoOAuth } from "../controllers/connectorsController";
+import { requireApiAuthJson, requireLicense } from "../middleware/authMiddleware";
 import { authRoutes } from "./authRoutes";
 import { backtestRoutes } from "./backtestRoutes";
 import { connectorsRoutes } from "./connectorsRoutes";
@@ -17,6 +17,8 @@ apiRoutes.use(statusRoutes);
 apiRoutes.use(authRoutes);
 apiRoutes.use(licensesRoutes);
 apiRoutes.get("/connectors/debug-auth", getConnectorsDebugAuth);
+apiRoutes.get("/connectors/deriv-demo/oauth/start", requireApiAuthJson(), startDerivDemoOAuth);
+apiRoutes.get("/connectors/deriv-demo/oauth/callback", requireApiAuthJson(), getDerivDemoOAuthCallback);
 apiRoutes.use(requireLicense());
 apiRoutes.use(connectorsRoutes);
 apiRoutes.use(marketDataRoutes);

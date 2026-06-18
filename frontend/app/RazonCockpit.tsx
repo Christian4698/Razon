@@ -609,7 +609,7 @@ export default function RazonCockpit({
     };
 
     void loadMarket();
-    const timer = window.setInterval(() => void loadMarket(), 8000);
+    const timer = window.setInterval(() => void loadMarket(), 2000);
 
     return () => {
       cancelled = true;

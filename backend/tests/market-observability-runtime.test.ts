@@ -15,6 +15,7 @@ const originalEnv = { ...process.env };
 
 afterEach(() => {
   process.env = { ...originalEnv };
+  vi.unstubAllGlobals();
   vi.resetModules();
 });
 
@@ -128,6 +129,8 @@ describe("Market Data Observability runtime contracts", () => {
   it("keeps a connected Deriv DEMO snapshot out of MOCK_DATA", async () => {
     const config: DerivClientConfig = {
       enabled: true,
+      wsAppId: "1089",
+      wsAppIdPresent: true,
       appId: '"1089"',
       apiTokenConfigured: true,
       endpoint: "wss://ws.derivws.com/websockets/v3",
@@ -176,23 +179,45 @@ describe("Market Data Observability runtime contracts", () => {
   it("authorizes only personal Deriv DEMO tokens and refuses real tokens", async () => {
     const config: DerivClientConfig = {
       enabled: true,
+      wsAppId: "1089",
+      wsAppIdPresent: true,
       appId: "1089",
       apiTokenConfigured: false,
       endpoint: "wss://ws.derivws.com/websockets/v3",
       accountType: "demo",
       allowOrderPlacement: false,
     };
+    vi.stubGlobal("fetch", vi.fn(async (url: string, init?: RequestInit) => {
+      const auth = init?.headers instanceof Headers
+        ? init.headers.get("Authorization")
+        : (init?.headers as Record<string, string> | undefined)?.Authorization;
+      if (auth === "Bearer demo-token" && url.endsWith("/trading/v1/options/accounts")) {
+        return new Response(JSON.stringify({ data: { accounts: [{ accountId: "VRTC123456", loginid: "VRTC123456", account_type: "demo" }] } }), { status: 200 });
+      }
+      if (auth === "Bearer real-token" && url.endsWith("/trading/v1/options/accounts")) {
+        return new Response(JSON.stringify({ data: { accounts: [{ accountId: "CR123456", loginid: "CR123456", account_type: "real" }] } }), { status: 200 });
+      }
+      if (auth === "Bearer demo-token" && url.endsWith("/trading/v1/options/accounts/VRTC123456/otp")) {
+        return new Response(JSON.stringify({ data: { url: "wss://api.derivws.com/trading/v1/options/ws/demo?otp=test-otp" } }), { status: 200 });
+      }
+      return new Response(JSON.stringify({ errors: [{ message: "Invalid token." }] }), { status: 401 });
+    }));
     const transport: DerivRequestTransport = async (_endpoint, payload) => {
-      if (payload.authorize === "demo-token") {
-        return { authorize: { loginid: "VRTC123456", is_virtual: 1 } };
-      }
-
-      if (payload.authorize === "real-token") {
-        return { authorize: { loginid: "CR123456", is_virtual: 0 } };
-      }
-
       if (payload.balance === 1 && payload.subscribe === 1) {
         return { balance: { balance: 10000, currency: "USD", loginid: "VRTC123456" } };
+      }
+
+      if (payload.ticks === "BOOM500" && payload.subscribe === 1) {
+        return { tick: { quote: 5248.129, epoch: 1781600000, symbol: "BOOM500" } };
+      }
+
+      if (payload.ticks_history === "BOOM500" && payload.style === "candles") {
+        return {
+          candles: [
+            { epoch: 1781599940, open: 5248, high: 5249, low: 5247, close: 5248.5 },
+            { epoch: 1781600000, open: 5248.5, high: 5249.2, low: 5248.1, close: 5248.9 },
+          ],
+        };
       }
 
       return { error: { code: "InvalidToken", message: "Invalid token." } };
@@ -205,10 +230,13 @@ describe("Market Data Observability runtime contracts", () => {
 
     expect(demo.ok).toBe(true);
     expect(demo.accountType).toBe("DEMO");
-    expect(demo.source).toBe("PERSONAL_DERIV_DEMO");
+    expect(demo.source).toBe("PERSONAL_DERIV_DEMO_OAUTH");
+    expect(demo.balanceAvailable).toBe(true);
+    expect(demo.tickReceived).toBe(true);
+    expect(demo.candleReceived).toBe(true);
     expect(real.ok).toBe(false);
     expect(real.accountType).toBe("REAL");
-    expect(real.message).toContain("Only Deriv DEMO tokens are allowed");
+    expect(real.message).toContain("Only Deriv DEMO accounts are allowed");
     expect(invalid.status).toBe("INVALID");
     expect(JSON.stringify({ demo, real, invalid })).not.toContain("demo-token");
   });
@@ -216,6 +244,8 @@ describe("Market Data Observability runtime contracts", () => {
   it("normalizes Deriv WebSocket endpoint and injects the configured app id", async () => {
     const config: DerivClientConfig = {
       enabled: true,
+      wsAppId: "1089",
+      wsAppIdPresent: true,
       appId: "1089",
       apiTokenConfigured: false,
       endpoint: "https://ws.derivws.com",
@@ -243,8 +273,73 @@ describe("Market Data Observability runtime contracts", () => {
     expect(endpointUrl.searchParams.get("app_id")).toBe("1089");
   });
 
+  it("uses numeric WebSocket app ids while keeping PAT app ids as metadata only", async () => {
+    const config: DerivClientConfig = {
+      enabled: true,
+      wsAppId: "1089",
+      wsAppIdPresent: true,
+      appId: "33zqe4Br9GlyBlnkDwxbC",
+      apiTokenConfigured: false,
+      endpoint: "wss://ws.derivws.com/websockets/v3?app_id=old",
+      accountType: "demo",
+      allowOrderPlacement: false,
+    };
+    let capturedEndpoint = "";
+    const transport: DerivRequestTransport = async (endpoint, payload) => {
+      capturedEndpoint = endpoint;
+
+      if (payload.ticks === "R_75") {
+        return { tick: { quote: 39400.25, epoch: 1781600000, symbol: "R_75" } };
+      }
+
+      return {};
+    };
+    const client = new DerivDemoReadOnlyClient(config, transport);
+    const tickerResult = await client.getTicker("R_75");
+    const endpointUrl = new URL(capturedEndpoint);
+    const diagnostics = client.getDiagnostics();
+
+    expect(tickerResult.price).toBe(39400.25);
+    expect(endpointUrl.toString()).toBe("wss://ws.derivws.com/websockets/v3?app_id=1089");
+    expect(endpointUrl.searchParams.getAll("app_id")).toHaveLength(1);
+    expect(diagnostics.wsAppIdPresent).toBe(true);
+    expect(diagnostics.wsAppIdFormat).toBe("NUMERIC");
+    expect(diagnostics.patAppIdPresent).toBe(true);
+    expect(diagnostics.patAppIdFormat).toBe("PAT");
+    expect(diagnostics.endpointValid).toBe(true);
+    expect(JSON.stringify(diagnostics)).not.toContain("33zqe4Br9GlyBlnkDwxbC");
+  });
+
+  it("falls back to public numeric app id 1089 when DERIV_WS_APP_ID is missing", async () => {
+    const config: DerivClientConfig = {
+      enabled: true,
+      wsAppId: "1089",
+      wsAppIdPresent: false,
+      appId: "33zqe4Br9GlyBlnkDwxbC",
+      apiTokenConfigured: false,
+      endpoint: "wss://ws.derivws.com/websockets/v3",
+      accountType: "demo",
+      allowOrderPlacement: false,
+    };
+    let capturedEndpoint = "";
+    const client = new DerivDemoReadOnlyClient(config, async (endpoint, payload) => {
+      capturedEndpoint = endpoint;
+      if (payload.ticks === "R_75") return { tick: { quote: 12, epoch: 1781600000, symbol: "R_75" } };
+      return {};
+    });
+
+    await client.getTicker("R_75");
+    const diagnostics = client.getDiagnostics();
+
+    expect(new URL(capturedEndpoint).searchParams.get("app_id")).toBe("1089");
+    expect(diagnostics.wsAppIdPresent).toBe(false);
+    expect(diagnostics.wsAppIdFormat).toBe("MISSING");
+    expect(diagnostics.endpointValid).toBe(true);
+  });
+
   it("uses MOCK_DATA fallback only when DATA_MODE=DEMO_DATA and Deriv is disabled", async () => {
     process.env.DERIV_ENABLED = "false";
+    process.env.DERIV_WS_APP_ID = "not-numeric";
     process.env.DERIV_APP_ID = "";
     process.env.DATA_MODE = "DEMO_DATA";
     vi.resetModules();
@@ -257,6 +352,8 @@ describe("Market Data Observability runtime contracts", () => {
     expect(demoSnapshot.observability.source).toBe("MOCK");
 
     process.env.DATA_MODE = "REAL_DATA";
+    process.env.DERIV_ENABLED = "false";
+    process.env.DERIV_WS_APP_ID = "not-numeric";
     vi.resetModules();
 
     const realModule = await import("../../server/services/market/marketAggregator");
@@ -265,5 +362,5 @@ describe("Market Data Observability runtime contracts", () => {
     expect(realSnapshot.fallback).toBe("NONE");
     expect(realSnapshot.ticker.source).not.toBe("MOCK_DATA");
     expect(realSnapshot.observability.sourceStatus).toBe("DISCONNECTED");
-  });
+  }, 15000);
 });

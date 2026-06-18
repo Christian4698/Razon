@@ -195,6 +195,39 @@ function timeframeMinutes(timeframe: MarketTimeframe) {
   return 1440;
 }
 
+function applyLiveTickToCurrentCandle(
+  candles: readonly NormalizedCandle[],
+  ticker: NormalizedTicker,
+  timeframe: MarketTimeframe
+): NormalizedCandle[] {
+  if (ticker.price === null || ticker.status !== "live" || candles.length === 0) return [...candles];
+
+  const last = candles.at(-1)!;
+  const tickTime = Date.parse(ticker.updatedAt);
+  const candleTime = Date.parse(last.timestamp);
+  const timeframeMs = timeframeMinutes(timeframe) * 60 * 1000;
+
+  if (Number.isNaN(tickTime) || Number.isNaN(candleTime) || tickTime < candleTime || tickTime - candleTime > timeframeMs * 2) {
+    return [...candles];
+  }
+
+  return [
+    ...candles.slice(0, -1),
+    {
+      ...last,
+      high: Math.max(last.high, ticker.price),
+      low: Math.min(last.low, ticker.price),
+      close: ticker.price,
+      source: ticker.source,
+    },
+  ];
+}
+
+async function resolveDerivProviderSymbol(symbol: NormalizedSymbol) {
+  if (symbol.category !== "derivSynthetic") return symbol.providerSymbol;
+  return derivDemoReadOnlyClient.resolveProviderSymbol(symbol.symbol, symbol.providerSymbol);
+}
+
 function createMockDerivCandles(symbol: NormalizedSymbol, timeframe: MarketTimeframe): NormalizedCandle[] {
   const seed = Array.from(symbol.providerSymbol).reduce((total, char) => total + char.charCodeAt(0), 0);
   const base = seed % 5 === 0 ? 320 : seed % 3 === 0 ? 4800 : 8200 + seed;
@@ -388,16 +421,31 @@ export const marketAggregator = {
     const token = personalDerivToken(user, symbol);
 
     if (token) {
-      return marketCache.getOrSet(`ticker:${user?.userId}:personal-deriv:${symbol.symbol}`, 15000, () =>
-        withFallback(
-          () => derivDemoReadOnlyClient.getTickerWithPersonalToken(token, symbol.providerSymbol).then(ticker => ({
+      return marketCache.getOrSet(`ticker:${user?.userId}:personal-deriv:${symbol.symbol}`, 1500, async () => {
+        const providerSymbol = await resolveDerivProviderSymbol(symbol);
+        return withFallback(
+          () => derivDemoReadOnlyClient.getTickerWithPersonalToken(token, providerSymbol).then(ticker => ({
             ...ticker,
             symbol: symbol.symbol,
             category: symbol.category,
           })),
           unavailableTicker(symbol, "Personal Deriv DEMO provider request failed.")
-        )
-      );
+        );
+      });
+    }
+
+    if (symbol.category === "derivSynthetic") {
+      return marketCache.getOrSet(`ticker:${symbol.symbol}`, 3000, async () => {
+        const providerSymbol = await resolveDerivProviderSymbol(symbol);
+        return withFallback(
+          () => derivDemoReadOnlyClient.getTicker(providerSymbol).then(ticker => ({
+            ...ticker,
+            symbol: symbol.symbol,
+            category: symbol.category,
+          })),
+          unavailableTicker(symbol, "Deriv DEMO provider request failed.")
+        );
+      });
     }
 
     return marketCache.getOrSet(`ticker:${symbol.symbol}`, 15000, () =>
@@ -417,17 +465,33 @@ export const marketAggregator = {
     const token = personalDerivToken(user, symbol);
 
     if (token) {
-      return marketCache.getOrSet(`candles:${user?.userId}:personal-deriv:${symbol.symbol}:${timeframe}`, 60000, () =>
-        withFallback(
-          () => derivDemoReadOnlyClient.getCandlesWithPersonalToken(token, symbol.providerSymbol, timeframe).then(candles =>
+      return marketCache.getOrSet(`candles:${user?.userId}:personal-deriv:${symbol.symbol}:${timeframe}`, 3000, async () => {
+        const providerSymbol = await resolveDerivProviderSymbol(symbol);
+        return withFallback(
+          () => derivDemoReadOnlyClient.getCandlesWithPersonalToken(token, providerSymbol, timeframe).then(candles =>
             candles.map(candle => ({
               ...candle,
               symbol: symbol.symbol,
             }))
           ),
           []
-        )
-      );
+        );
+      });
+    }
+
+    if (symbol.category === "derivSynthetic") {
+      return marketCache.getOrSet(`candles:${symbol.symbol}:${timeframe}`, 10000, async () => {
+        const providerSymbol = await resolveDerivProviderSymbol(symbol);
+        return withFallback(
+          () => derivDemoReadOnlyClient.getCandles(providerSymbol, timeframe).then(candles =>
+            candles.map(candle => ({
+              ...candle,
+              symbol: symbol.symbol,
+            }))
+          ),
+          []
+        );
+      });
     }
 
     return marketCache.getOrSet(`candles:${symbol.symbol}:${timeframe}`, 60000, () =>
@@ -475,12 +539,13 @@ export const marketAggregator = {
   async getSnapshot(symbolName = "EUR/USD", timeframe: MarketTimeframe = "5m", user?: CurrentUserScope): Promise<MarketSnapshot> {
     const symbol = resolveSymbol(symbolName);
     const startedAt = Date.now();
-    const [rawTicker, rawCandles, rawOrderBook, rawVolume] = await Promise.all([
+    const [rawTicker, loadedCandles, rawOrderBook, rawVolume] = await Promise.all([
       this.getTicker(symbolName, user),
       this.getCandles(symbolName, timeframe, user),
       this.getOrderBook(symbolName),
       this.getVolume(symbolName),
     ]);
+    const rawCandles = applyLiveTickToCurrentCandle(loadedCandles, rawTicker, timeframe);
     const fallback = symbol && shouldFallbackToMock(symbol, rawTicker, rawCandles) ? "MOCK_DATA" : "NONE";
     const candles = fallback === "MOCK_DATA" && symbol ? createMockDerivCandles(symbol, timeframe) : rawCandles;
     const ticker =

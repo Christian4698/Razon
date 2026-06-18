@@ -353,7 +353,7 @@ export interface ConnectorStatus {
   readonly lastTickAt?: string | null;
   readonly lastCandleAt?: string | null;
   readonly freshnessSeconds?: number | null;
-  readonly source: "LIVE" | "DEMO" | "MOCK" | "PERSONAL_DERIV_DEMO";
+  readonly source: "LIVE" | "DEMO" | "MOCK" | "PERSONAL_DERIV_DEMO" | "PERSONAL_DERIV_DEMO_OAUTH";
   readonly message: string;
   readonly secretLocation: "BACKEND_ONLY";
   readonly secretStatus?: ConnectorSecretStatus;
@@ -367,7 +367,9 @@ export interface ConnectorStatus {
   readonly loginid?: string | null;
   readonly brokerLoginId?: string | null;
   readonly status?: "CONNECTED" | "DISCONNECTED";
-  readonly personalSource?: "PERSONAL_DERIV_DEMO" | null;
+  readonly personalSource?: "PERSONAL_DERIV_DEMO" | "PERSONAL_DERIV_DEMO_OAUTH" | null;
+  readonly accountId?: string | null;
+  readonly authType?: "PAT" | "OAUTH" | "UNKNOWN";
   readonly readOnly?: true;
   readonly readOnlyStatus?: "READ_ONLY";
   readonly liveBlocked?: true;

@@ -35,8 +35,10 @@ export interface SafeSecretMetadata {
   readonly lastTestAt?: string | null;
   readonly accountType?: "DEMO" | "REAL" | "UNKNOWN" | null;
   readonly connectionStatus?: "CONNECTED" | "DISCONNECTED" | "INVALID";
-  readonly source?: "PERSONAL_DERIV_DEMO" | null;
+  readonly source?: "PERSONAL_DERIV_DEMO" | "PERSONAL_DERIV_DEMO_OAUTH" | null;
   readonly loginid?: string | null;
+  readonly accountId?: string | null;
+  readonly authType?: "PAT" | "OAUTH" | "UNKNOWN";
 }
 
 interface StoredSecretRecord {
@@ -54,12 +56,16 @@ const secretStore = new Map<string, StoredSecretRecord>();
 
 interface SecretPayload {
   readonly token: string;
+  readonly refreshToken?: string | null;
+  readonly expiresAt?: string | null;
   readonly connected: boolean;
   readonly lastTestAt: string | null;
   readonly accountType: "DEMO" | "REAL" | "UNKNOWN" | null;
   readonly status: "CONNECTED" | "DISCONNECTED" | "INVALID";
-  readonly source: "PERSONAL_DERIV_DEMO" | null;
+  readonly source: "PERSONAL_DERIV_DEMO" | "PERSONAL_DERIV_DEMO_OAUTH" | null;
   readonly loginid: string | null;
+  readonly accountId?: string | null;
+  readonly authType?: "PAT" | "OAUTH" | "UNKNOWN";
 }
 
 function now() {
@@ -118,12 +124,16 @@ function parsePayload(record: StoredSecretRecord): SecretPayload | null {
 
     return {
       token: parsed.token,
+      refreshToken: typeof parsed.refreshToken === "string" ? parsed.refreshToken : null,
+      expiresAt: typeof parsed.expiresAt === "string" ? parsed.expiresAt : null,
       connected: parsed.connected === true,
       lastTestAt: typeof parsed.lastTestAt === "string" ? parsed.lastTestAt : null,
       accountType: parsed.accountType === "DEMO" || parsed.accountType === "REAL" || parsed.accountType === "UNKNOWN" ? parsed.accountType : null,
       status: parsed.status === "CONNECTED" || parsed.status === "INVALID" ? parsed.status : "DISCONNECTED",
-      source: parsed.source === "PERSONAL_DERIV_DEMO" ? "PERSONAL_DERIV_DEMO" : null,
+      source: parsed.source === "PERSONAL_DERIV_DEMO_OAUTH" || parsed.source === "PERSONAL_DERIV_DEMO" ? parsed.source : null,
       loginid: typeof parsed.loginid === "string" ? parsed.loginid : null,
+      accountId: typeof parsed.accountId === "string" ? parsed.accountId : null,
+      authType: parsed.authType === "OAUTH" || parsed.authType === "PAT" ? parsed.authType : "UNKNOWN",
     };
   } catch {
     return {
@@ -134,6 +144,8 @@ function parsePayload(record: StoredSecretRecord): SecretPayload | null {
       status: "DISCONNECTED",
       source: null,
       loginid: null,
+      accountId: null,
+      authType: "UNKNOWN",
     };
   }
 }
@@ -203,6 +215,8 @@ export function getSecretMetadata(user: CurrentUserScope, connectorId: Connector
       connectionStatus: payload?.status ?? "DISCONNECTED",
       source: payload?.source ?? null,
       loginid: payload?.loginid ?? null,
+      accountId: payload?.accountId ?? null,
+      authType: payload?.authType ?? "UNKNOWN",
     };
   }
 
@@ -239,6 +253,8 @@ export function saveConnectorSecret(user: CurrentUserScope, connectorId: Connect
     status: "DISCONNECTED",
     source: connectorId === "deriv-demo" ? "PERSONAL_DERIV_DEMO" : null,
     loginid: null,
+    accountId: null,
+    authType: connectorId === "deriv-demo" ? "PAT" : "UNKNOWN",
   }));
   notifySaasMutation("connector-secret:save");
   return getSecretMetadata(user, connectorId);
@@ -251,6 +267,46 @@ export function readConnectorSecret(user: CurrentUserScope, connectorId: Connect
   return parsePayload(record)?.token ?? null;
 }
 
+export function saveConnectorOAuthSecret(
+  user: CurrentUserScope,
+  connectorId: ConnectorId,
+  token: string,
+  metadata: {
+    readonly refreshToken?: string | null;
+    readonly expiresAt?: string | null;
+    readonly connected?: boolean;
+    readonly accountType?: "DEMO" | "REAL" | "UNKNOWN" | null;
+    readonly status?: "CONNECTED" | "DISCONNECTED" | "INVALID";
+    readonly loginid?: string | null;
+    readonly accountId?: string | null;
+  } = {}
+): SafeSecretMetadata {
+  const trimmed = token.trim();
+  if (trimmed.length < 6) {
+    return {
+      status: "INVALID",
+      saved: false,
+      lastUpdatedAt: null,
+    };
+  }
+
+  secretStore.set(storeKey(user.userId, connectorId), encryptPayload({
+    token: trimmed,
+    refreshToken: metadata.refreshToken ?? null,
+    expiresAt: metadata.expiresAt ?? null,
+    connected: metadata.connected ?? false,
+    lastTestAt: metadata.connected ? now() : null,
+    accountType: metadata.accountType ?? null,
+    status: metadata.status ?? "DISCONNECTED",
+    source: connectorId === "deriv-demo" ? "PERSONAL_DERIV_DEMO_OAUTH" : null,
+    loginid: metadata.loginid ?? null,
+    accountId: metadata.accountId ?? null,
+    authType: "OAUTH",
+  }));
+  notifySaasMutation("connector-secret:oauth-save");
+  return getSecretMetadata(user, connectorId);
+}
+
 export function markConnectorSecretTest(
   user: CurrentUserScope,
   connectorId: ConnectorId,
@@ -258,21 +314,27 @@ export function markConnectorSecretTest(
     readonly connected: boolean;
     readonly accountType: "DEMO" | "REAL" | "UNKNOWN" | null;
     readonly status: "CONNECTED" | "DISCONNECTED" | "INVALID";
-    readonly source?: "PERSONAL_DERIV_DEMO" | null;
+    readonly source?: "PERSONAL_DERIV_DEMO" | "PERSONAL_DERIV_DEMO_OAUTH" | null;
     readonly loginid?: string | null;
+    readonly accountId?: string | null;
   }
 ): SafeSecretMetadata {
-  const token = readConnectorSecret(user, connectorId);
-  if (!token) return getSecretMetadata(user, connectorId);
+  const record = secretStore.get(storeKey(user.userId, connectorId));
+  const payload = record ? parsePayload(record) : null;
+  if (!payload?.token) return getSecretMetadata(user, connectorId);
 
   secretStore.set(storeKey(user.userId, connectorId), encryptPayload({
-    token,
+    token: payload.token,
+    refreshToken: payload.refreshToken ?? null,
+    expiresAt: payload.expiresAt ?? null,
     connected: result.connected,
     lastTestAt: now(),
     accountType: result.accountType,
     status: result.status,
-    source: result.source ?? (connectorId === "deriv-demo" ? "PERSONAL_DERIV_DEMO" : null),
+    source: result.source ?? payload.source ?? (connectorId === "deriv-demo" ? "PERSONAL_DERIV_DEMO" : null),
     loginid: result.loginid ?? null,
+    accountId: result.accountId ?? payload.accountId ?? null,
+    authType: payload.authType ?? "UNKNOWN",
   }));
   notifySaasMutation("connector-secret:test");
   return getSecretMetadata(user, connectorId);
@@ -285,12 +347,16 @@ export function disconnectConnectorSecret(user: CurrentUserScope, connectorId: C
 
   secretStore.set(storeKey(user.userId, connectorId), encryptPayload({
     token: payload.token,
+    refreshToken: payload.refreshToken ?? null,
+    expiresAt: payload.expiresAt ?? null,
     connected: false,
     lastTestAt: payload.lastTestAt,
     accountType: payload.accountType,
     status: "DISCONNECTED",
-    source: connectorId === "deriv-demo" ? "PERSONAL_DERIV_DEMO" : null,
+    source: payload.source ?? (connectorId === "deriv-demo" ? "PERSONAL_DERIV_DEMO" : null),
     loginid: payload.loginid ?? null,
+    accountId: payload.accountId ?? null,
+    authType: payload.authType ?? "UNKNOWN",
   }));
   notifySaasMutation("connector-secret:disconnect");
   return getSecretMetadata(user, connectorId);

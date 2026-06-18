@@ -19,7 +19,8 @@ describe("Deriv DEMO env and token validation", () => {
       envPath,
       [
         "DERIV_ENABLED=true",
-        "DERIV_APP_ID=1089",
+        "DERIV_WS_APP_ID=1089",
+        "DERIV_APP_ID=33zqe4Br9GlyBlnkDwxbC",
         "DERIV_API_TOKEN=pat_test_personal_access_token",
         "DERIV_ENDPOINT=wss://ws.derivws.com/websockets/v3",
         "DERIV_ACCOUNT_TYPE=demo",
@@ -28,6 +29,7 @@ describe("Deriv DEMO env and token validation", () => {
     );
 
     delete process.env.DERIV_ENABLED;
+    delete process.env.DERIV_WS_APP_ID;
     delete process.env.DERIV_APP_ID;
     delete process.env.DERIV_API_TOKEN;
     delete process.env.DERIV_ENDPOINT;
@@ -44,7 +46,9 @@ describe("Deriv DEMO env and token validation", () => {
 
     expect(isDerivApiTokenConfigured("pat_test_personal_access_token")).toBe(true);
     expect(config.enabled).toBe(true);
-    expect(config.appId).toBe("1089");
+    expect(config.wsAppId).toBe("1089");
+    expect(config.wsAppIdPresent).toBe(true);
+    expect(config.appId).toBe("33zqe4Br9GlyBlnkDwxbC");
     expect(config.apiTokenConfigured).toBe(true);
     expect(config.allowOrderPlacement).toBe(false);
 
@@ -68,7 +72,8 @@ describe("Deriv DEMO env and token validation", () => {
     );
 
     process.env.DERIV_ENABLED = "true";
-    process.env.DERIV_APP_ID = "1089";
+    delete process.env.DERIV_WS_APP_ID;
+    process.env.DERIV_APP_ID = "33zqe4Br9GlyBlnkDwxbC";
     process.env.DERIV_API_TOKEN = "pat_backend_only_secret";
     process.env.DERIV_ENDPOINT = "wss://ws.derivws.com/websockets/v3";
     process.env.DERIV_ACCOUNT_TYPE = "demo";
@@ -82,6 +87,7 @@ describe("Deriv DEMO env and token validation", () => {
     const serialized = JSON.stringify(health);
 
     expect(health.tokenConfigured).toBe(true);
+    expect(health.appIdConfigured).toBe(true);
     expect(health.tokenVisible).toBe(false);
     expect(health.orderPlacementAllowed).toBe(false);
     expect(serialized).not.toContain("pat_backend_only_secret");

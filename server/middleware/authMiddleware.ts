@@ -113,7 +113,11 @@ export function attachAuthContext(req: RequestWithAuth, res: Response, next: Nex
 }
 
 function wantsHtml(req: Request) {
-  return Boolean(req.accepts(["html", "json"]) === "html" && !req.path.startsWith("/api"));
+  return Boolean(
+    req.accepts(["html", "json"]) === "html" &&
+    !req.path.startsWith("/api") &&
+    !req.originalUrl.startsWith("/api")
+  );
 }
 
 export function requireAuth() {
@@ -134,6 +138,20 @@ export function requireAuth() {
         automaticTradingAllowed: false,
         secretsExposed: false,
       });
+      return;
+    }
+
+    req.auth = context;
+    next();
+  };
+}
+
+export function requireApiAuthJson() {
+  return (req: RequestWithAuth, res: Response, next: NextFunction) => {
+    const context = req.auth ?? authenticateRequest(req, res);
+    if (!context) {
+      clearAuthCookies(req, res);
+      res.status(401).json({ error: "AUTH_REQUIRED" });
       return;
     }
 

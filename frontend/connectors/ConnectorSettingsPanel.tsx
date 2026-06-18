@@ -1,4 +1,4 @@
-import { KeyRound, PlugZap, RefreshCw, RotateCcw, Save, Trash2, Unplug } from "lucide-react";
+import { ExternalLink, KeyRound, PlugZap, RefreshCw, RotateCcw, Save, Trash2, Unplug } from "lucide-react";
 import { useState } from "react";
 import type { ConnectorLicenseSnapshot, ConnectorStatus, ConnectorUserScope } from "../app/cockpit.types";
 import { StatusPill } from "../components/CockpitPrimitives";
@@ -35,7 +35,7 @@ function displayDate(value: string | null | undefined) {
 }
 
 function connectorSourceLabel(connector: ConnectorStatus) {
-  if (connector.id === "deriv-demo" && connector.connected === true) return "PERSONAL_DERIV_DEMO";
+  if (connector.id === "deriv-demo" && connector.connected === true) return connector.personalSource ?? "PERSONAL_DERIV_DEMO_OAUTH";
   if (connector.id === "deriv-demo" && connector.runtimeMode === "DEMO" && connector.state === "connected") return "DERIV DEMO";
   if (connector.runtimeMode === "REAL_DATA") return "REAL_DATA";
   return connector.source === "MOCK" ? "MOCK_DATA" : connector.source;
@@ -143,6 +143,10 @@ export function ConnectorSettingsPanel({
     } finally {
       setBusyAction(null);
     }
+  };
+
+  const startDerivOAuth = () => {
+    window.location.href = `${API_BASE_URL}/api/connectors/deriv-demo/oauth/start`;
   };
 
   return (
@@ -268,7 +272,7 @@ export function ConnectorSettingsPanel({
                 <div className="secret-settings-title">
                   <span>
                     <KeyRound size={14} aria-hidden="true" />
-                    {isDerivDemo ? "Token personnel Deriv DEMO" : t("connectors.secretSettings")}
+                    {isDerivDemo ? "Deriv DEMO OAuth" : t("connectors.secretSettings")}
                   </span>
                   <StatusPill tone={connector.secretStatus ?? "MISSING"}>{connector.secretStatus ?? "MISSING"}</StatusPill>
                 </div>
@@ -277,8 +281,10 @@ export function ConnectorSettingsPanel({
                     <strong>{derivConnected ? "Compte DEMO connecté" : "Compte DEMO déconnecté"}</strong>
                     <span>Token sauvegardé : <b>{connector.secretSaved ? "true" : "false"}</b></span>
                     <span>Dernier test : <b>{displayDate(connector.lastTestAt)}</b></span>
-                    <span>Source : <b>{connector.personalSource ?? "PERSONAL_DERIV_DEMO"}</b></span>
+                    <span>Source : <b>{connector.personalSource ?? "PERSONAL_DERIV_DEMO_OAUTH"}</b></span>
                     {brokerLoginLabel(connector) ? <span>Login ID : <b>{brokerLoginLabel(connector)}</b></span> : null}
+                    {connector.accountId ? <span>Account ID : <b>{connector.accountId}</b></span> : null}
+                    {connector.authType ? <span>Auth : <b>{connector.authType}</b></span> : null}
                   </div>
                 ) : null}
                 <div className="connector-secret-state">
@@ -286,12 +292,20 @@ export function ConnectorSettingsPanel({
                   <span>{t("connectors.lastUpdated")}: <b>{displayDate(connector.secretLastUpdatedAt)}</b></span>
                   <span>{t("connectors.preview")}: <b>{connector.secretMaskedPreview ?? "not returned"}</b></span>
                 </div>
+                {isDerivDemo ? (
+                  <div className="connector-action-row">
+                    <button onClick={startDerivOAuth} type="button">
+                      <ExternalLink size={14} aria-hidden="true" />
+                      Connecter Deriv DEMO via OAuth
+                    </button>
+                  </div>
+                ) : null}
                 <label className="connector-secret-input">
-                  <span>{t("connectors.enterNewToken")}</span>
+                  <span>{isDerivDemo ? "Token PAT legacy (secondaire)" : t("connectors.enterNewToken")}</span>
                   <input
                     autoComplete="new-password"
                     onChange={event => setDraftSecrets(current => ({ ...current, [connector.id]: event.target.value }))}
-                    placeholder={t("connectors.enterNewToken")}
+                    placeholder={isDerivDemo ? "Legacy uniquement - OAuth recommande" : t("connectors.enterNewToken")}
                     type="password"
                     value={draft}
                   />
@@ -299,7 +313,7 @@ export function ConnectorSettingsPanel({
                 <div className="connector-action-row">
                   <button disabled={busy("save-secret")} onClick={() => runAction(connector, "save-secret")} type="button">
                     <Save size={14} aria-hidden="true" />
-                    {isDerivDemo ? "Save token" : t("connectors.saveSecret")}
+                    {isDerivDemo ? "Save legacy token" : t("connectors.saveSecret")}
                   </button>
                   <button disabled={busy("save-secret")} onClick={() => runAction(connector, "save-secret")} type="button">
                     <RotateCcw size={14} aria-hidden="true" />
@@ -311,7 +325,7 @@ export function ConnectorSettingsPanel({
                   </button>
                   <button disabled={busy("test")} onClick={() => runAction(connector, "test")} type="button">
                     <RefreshCw size={14} aria-hidden="true" />
-                    {isDerivDemo ? "Test connection" : t("connectors.testConnection")}
+                    {isDerivDemo ? "Test OAuth connection" : t("connectors.testConnection")}
                   </button>
                   <button disabled={busy("reconnect")} onClick={() => runAction(connector, "reconnect")} type="button">
                     <PlugZap size={14} aria-hidden="true" />

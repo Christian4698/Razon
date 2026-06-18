@@ -1,3 +1,4 @@
+import crypto from "crypto";
 import type { Request, Response } from "express";
 import { accessCookieName, authenticateRequest, refreshCookieName, type RequestWithAuth } from "../middleware/authMiddleware";
 import { configuredOrigins, isAllowedOrigin } from "../middleware/corsMiddleware";
@@ -12,6 +13,7 @@ import {
   markConnectorSecretTest,
   readConnectorSecret,
   saveConnectorSecret,
+  saveConnectorOAuthSecret,
   type ConnectorId,
   type ConnectorSecretStatus,
   type CurrentUserScope,
@@ -21,6 +23,88 @@ import { sendJson } from "../utils/http";
 
 function now() {
   return new Date().toISOString();
+}
+
+interface DerivOAuthState {
+  readonly user: CurrentUserScope;
+  readonly codeVerifier: string;
+  readonly redirectUri: string;
+  readonly createdAt: number;
+}
+
+interface DerivOAuthTokenResponse {
+  readonly access_token?: string;
+  readonly refresh_token?: string;
+  readonly expires_in?: number;
+  readonly error?: string;
+  readonly error_description?: string;
+}
+
+const derivOAuthStates = new Map<string, DerivOAuthState>();
+const DERIV_OAUTH_AUTH_URL = "https://auth.deriv.com/oauth2/auth";
+const DERIV_OAUTH_TOKEN_URL = "https://auth.deriv.com/oauth2/token";
+
+function base64Url(input: Buffer) {
+  return input.toString("base64").replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function oauthClientId() {
+  const value = process.env.DERIV_OAUTH_CLIENT_ID?.trim() || process.env.DERIV_APP_ID?.trim() || "";
+  return /^[a-zA-Z0-9_-]+$/.test(value) ? value : "";
+}
+
+function publicBaseUrl(req: Request) {
+  const configured =
+    process.env.DERIV_OAUTH_PUBLIC_BASE_URL?.trim() ||
+    process.env.API_PUBLIC_URL?.trim() ||
+    process.env.API_BASE_URL?.trim() ||
+    process.env.APP_BASE_URL?.trim();
+  if (configured) return configured.replace(/\/+$/, "");
+  const protocol = req.header("x-forwarded-proto") || req.protocol || "http";
+  return `${protocol}://${req.get("host")}`;
+}
+
+function derivOAuthRedirectUri(req: Request) {
+  return process.env.DERIV_OAUTH_REDIRECT_URI?.trim() || `${publicBaseUrl(req)}/api/connectors/deriv-demo/oauth/callback`;
+}
+
+function pruneDerivOAuthStates() {
+  const cutoff = Date.now() - 10 * 60 * 1000;
+  for (const [state, value] of Array.from(derivOAuthStates.entries())) {
+    if (value.createdAt < cutoff) derivOAuthStates.delete(state);
+  }
+}
+
+async function exchangeDerivOAuthCode(params: {
+  readonly code: string;
+  readonly codeVerifier: string;
+  readonly redirectUri: string;
+  readonly clientId: string;
+}): Promise<DerivOAuthTokenResponse> {
+  const body = new URLSearchParams({
+    grant_type: "authorization_code",
+    code: params.code,
+    redirect_uri: params.redirectUri,
+    client_id: params.clientId,
+    code_verifier: params.codeVerifier,
+  });
+  const clientSecret = process.env.DERIV_OAUTH_CLIENT_SECRET?.trim();
+  if (clientSecret) body.set("client_secret", clientSecret);
+
+  const response = await fetch(DERIV_OAUTH_TOKEN_URL, {
+    method: "POST",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body,
+  });
+  const payload = (await response.json().catch(() => ({}))) as DerivOAuthTokenResponse;
+  if (!response.ok || !payload.access_token) {
+    const message = payload.error_description || payload.error || `Deriv OAuth token exchange returned ${response.status}`;
+    throw new Error(message);
+  }
+  return payload;
 }
 
 type RuntimeMode = "MOCK" | "DEMO" | "REAL_DATA";
@@ -69,16 +153,18 @@ interface ConnectorHealthCard {
   readonly state: "connected" | "disconnected" | "delayed";
   readonly safetyStatus: "DISCONNECTED" | "CONNECTED_DEMO" | "CONNECTED_REAL_READONLY" | "LIVE_BLOCKED";
   readonly accessMode: "DEMO" | "REAL";
-  readonly source: "DEMO" | "MOCK" | "LIVE" | "PERSONAL_DERIV_DEMO";
+  readonly source: "DEMO" | "MOCK" | "LIVE" | "PERSONAL_DERIV_DEMO" | "PERSONAL_DERIV_DEMO_OAUTH";
   readonly readonlyByDefault: true;
   readonly saved?: boolean;
   readonly connected?: boolean;
   readonly lastTestAt?: string | null;
   readonly accountType?: "DEMO" | "REAL" | "UNKNOWN" | null;
   readonly status?: "CONNECTED" | "DISCONNECTED";
-  readonly personalSource?: "PERSONAL_DERIV_DEMO" | null;
+  readonly personalSource?: "PERSONAL_DERIV_DEMO" | "PERSONAL_DERIV_DEMO_OAUTH" | null;
   readonly loginid?: string | null;
   readonly brokerLoginId?: string | null;
+  readonly accountId?: string | null;
+  readonly authType?: "PAT" | "OAUTH" | "UNKNOWN";
 }
 
 function legacyState(status: ConnectorStatus): ConnectorHealthCard["state"] {
@@ -230,6 +316,8 @@ function safeSecretFields(metadata: ReturnType<typeof getSecretMetadata>) {
     personalSource: metadata.source ?? null,
     loginid: metadata.loginid ?? null,
     brokerLoginId: metadata.loginid ?? null,
+    accountId: metadata.accountId ?? null,
+    authType: metadata.authType ?? "UNKNOWN",
   };
 }
 
@@ -332,7 +420,7 @@ async function derivDemoHealth(user: CurrentUserScope, license: LicenseSnapshot)
     }),
     appIdConfigured: deriv.appIdConfigured,
     endpointConfigured: deriv.endpointConfigured,
-    source: personalConnected ? "PERSONAL_DERIV_DEMO" : "DEMO",
+    source: personalConnected ? (personalSecret.source ?? "PERSONAL_DERIV_DEMO_OAUTH") : "DEMO",
   };
 }
 
@@ -394,6 +482,166 @@ export function getConnectorsDebugAuth(req: RequestWithAuth, res: Response) {
     automaticTradingAllowed: false as const,
     secretsExposed: false as const,
   });
+}
+
+export function getDerivDiagnostics(_req: Request, res: Response) {
+  return sendJson(res, derivDemoReadOnlyClient.getDiagnostics());
+}
+
+export function startDerivDemoOAuth(req: Request, res: Response) {
+  derivDemoReadOnlyClient.updateOAuthDiagnostics({
+    oauthStartReached: true,
+    authPassed: true,
+    lastError: null,
+  });
+  console.info("[RAZON Deriv] OAUTH_START_REACHED=true");
+  console.info("[RAZON Deriv] AUTH_PASSED=true");
+
+  const user = getCurrentUserScope(req);
+  const clientId = oauthClientId();
+
+  if (!clientId) {
+    derivDemoReadOnlyClient.updateOAuthDiagnostics({
+      oauthRedirectReady: false,
+      oauthRedirectIssued: false,
+      lastError: "OAUTH_REDIRECT_READY: DERIV_OAUTH_CLIENT_ID or DERIV_APP_ID is required.",
+    });
+    return res.status(400).json({
+      ok: false,
+      error: "DERIV_OAUTH_CLIENT_ID_MISSING",
+      message: "DERIV_OAUTH_CLIENT_ID or DERIV_APP_ID is required to start Deriv OAuth.",
+      liveExecutionEnabled: false,
+      orderPlacementAllowed: false,
+      secretsExposed: false,
+    });
+  }
+
+  pruneDerivOAuthStates();
+  const codeVerifier = base64Url(crypto.randomBytes(48));
+  const codeChallenge = base64Url(crypto.createHash("sha256").update(codeVerifier).digest());
+  const state = base64Url(crypto.randomBytes(32));
+  const redirectUri = derivOAuthRedirectUri(req);
+  derivOAuthStates.set(state, {
+    user,
+    codeVerifier,
+    redirectUri,
+    createdAt: Date.now(),
+  });
+  derivDemoReadOnlyClient.updateOAuthDiagnostics({ pkceGenerated: true });
+  console.info("[RAZON Deriv] PKCE_GENERATED=true");
+
+  const authorizationUrl = new URL(DERIV_OAUTH_AUTH_URL);
+  authorizationUrl.searchParams.set("response_type", "code");
+  authorizationUrl.searchParams.set("client_id", clientId);
+  authorizationUrl.searchParams.set("redirect_uri", redirectUri);
+  authorizationUrl.searchParams.set("scope", "trade");
+  authorizationUrl.searchParams.set("state", state);
+  authorizationUrl.searchParams.set("code_challenge", codeChallenge);
+  authorizationUrl.searchParams.set("code_challenge_method", "S256");
+
+  derivDemoReadOnlyClient.updateOAuthDiagnostics({
+    oauthRedirectReady: true,
+    oauthRedirectIssued: true,
+    lastError: null,
+  });
+  console.info("[RAZON Deriv] OAUTH_REDIRECT_READY=true");
+  console.info("[RAZON Deriv] OAUTH_REDIRECT_ISSUED=true");
+  res.redirect(302, authorizationUrl.toString());
+}
+
+export async function getDerivDemoOAuthCallback(req: Request, res: Response) {
+  const code = typeof req.query.code === "string" ? req.query.code : "";
+  const state = typeof req.query.state === "string" ? req.query.state : "";
+  const stored = state ? derivOAuthStates.get(state) : null;
+
+  if (!code || !stored) {
+    derivDemoReadOnlyClient.updateOAuthDiagnostics({
+      oauthCallbackOk: false,
+      oauthTokenExchangeOk: false,
+      lastError: "OAUTH_CALLBACK: missing or expired OAuth state/code.",
+    });
+    return res.status(400).json({
+      ok: false,
+      error: "DERIV_OAUTH_CALLBACK_INVALID",
+      message: "Deriv OAuth callback is missing a valid code/state. Start the connector again.",
+      liveExecutionEnabled: false,
+      orderPlacementAllowed: false,
+      secretsExposed: false,
+    });
+  }
+
+  derivOAuthStates.delete(state);
+  derivDemoReadOnlyClient.updateOAuthDiagnostics({ oauthCallbackOk: true });
+  console.info("[RAZON Deriv] OAUTH_CALLBACK_OK=true");
+
+  try {
+    const clientId = oauthClientId();
+    if (!clientId) throw new Error("DERIV_OAUTH_CLIENT_ID or DERIV_APP_ID is required for token exchange.");
+
+    const tokenPayload = await exchangeDerivOAuthCode({
+      code,
+      codeVerifier: stored.codeVerifier,
+      redirectUri: stored.redirectUri,
+      clientId,
+    });
+    derivDemoReadOnlyClient.updateOAuthDiagnostics({ oauthTokenExchangeOk: true, lastError: null });
+    console.info("[RAZON Deriv] OAUTH_TOKEN_EXCHANGE_OK=true");
+
+    const expiresAt = typeof tokenPayload.expires_in === "number"
+      ? new Date(Date.now() + tokenPayload.expires_in * 1000).toISOString()
+      : null;
+    saveConnectorOAuthSecret(stored.user, "deriv-demo", tokenPayload.access_token!, {
+      refreshToken: tokenPayload.refresh_token ?? null,
+      expiresAt,
+      connected: false,
+      accountType: null,
+      status: "DISCONNECTED",
+    });
+
+    const result = await derivDemoReadOnlyClient.testPersonalToken(tokenPayload.access_token!);
+    derivDemoReadOnlyClient.updateOAuthDiagnostics({
+      oauthCallbackOk: true,
+      oauthTokenExchangeOk: true,
+      lastError: result.ok ? null : derivDemoReadOnlyClient.getDiagnostics().lastError,
+    });
+    markConnectorSecretTest(stored.user, "deriv-demo", {
+      connected: result.connected,
+      accountType: result.accountType,
+      status: result.status,
+      source: "PERSONAL_DERIV_DEMO_OAUTH",
+      loginid: result.loginid,
+      accountId: result.accountId,
+    });
+
+    if (!result.ok) {
+      return res.status(result.accountType === "REAL" ? 403 : 400).json({
+        ok: false,
+        error: result.accountType === "REAL" ? "DERIV_REAL_ACCOUNT_REFUSED" : "DERIV_OAUTH_DEMO_TEST_FAILED",
+        message: result.message,
+        liveExecutionEnabled: false,
+        orderPlacementAllowed: false,
+        secretsExposed: false,
+      });
+    }
+
+    const redirectTo = process.env.DERIV_OAUTH_SUCCESS_REDIRECT?.trim() || `${process.env.APP_BASE_URL?.replace(/\/+$/, "") || "/"}`;
+    res.redirect(302, redirectTo.includes("?") ? `${redirectTo}&deriv_oauth=connected` : `${redirectTo}?deriv_oauth=connected`);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Deriv OAuth callback failed.";
+    derivDemoReadOnlyClient.updateOAuthDiagnostics({
+      oauthTokenExchangeOk: false,
+      lastError: `OAUTH_TOKEN_EXCHANGE: ${message}`,
+    });
+    console.info("[RAZON Deriv] OAUTH_TOKEN_EXCHANGE_OK=false");
+    return res.status(400).json({
+      ok: false,
+      error: "DERIV_OAUTH_CALLBACK_FAILED",
+      message,
+      liveExecutionEnabled: false,
+      orderPlacementAllowed: false,
+      secretsExposed: false,
+    });
+  }
 }
 
 function actionFromPath(path: string) {
@@ -461,13 +709,13 @@ export async function postConnectorSafeAction(req: Request, res: Response) {
         connected: false,
         accountType: null,
         status: "DISCONNECTED",
-        source: "PERSONAL_DERIV_DEMO",
+        source: "PERSONAL_DERIV_DEMO_OAUTH",
       });
       return res.status(400).json({
         ok: false,
         action,
         error: "DERIV_TOKEN_MISSING",
-        message: "Save your personal Deriv DEMO token before testing the read-only connector.",
+        message: "Connect Deriv DEMO with OAuth before testing the read-only connector.",
         readOnly: true,
         liveExecutionEnabled: false,
         automaticTradingAllowed: false,
@@ -481,8 +729,9 @@ export async function postConnectorSafeAction(req: Request, res: Response) {
       connected: result.connected,
       accountType: result.accountType,
       status: result.status,
-      source: "PERSONAL_DERIV_DEMO",
+      source: result.source,
       loginid: result.loginid,
+      accountId: result.accountId,
     });
 
     if (!result.ok) {
@@ -506,6 +755,17 @@ export async function postConnectorSafeAction(req: Request, res: Response) {
   return sendJson(res, {
     ok: true,
     action,
+    ...(connectorId === "deriv-demo" && (action === "TEST_CONNECTION" || action === "RECONNECT")
+      ? {
+          connected: connector?.connected === true,
+          loginid: connector?.loginid ?? null,
+          accountType: connector?.accountType ?? null,
+          balanceAvailable: derivDemoReadOnlyClient.getDiagnostics().balanceOk,
+          tickReceived: derivDemoReadOnlyClient.getDiagnostics().tickReceived,
+          source: "PERSONAL_DERIV_DEMO_OAUTH" as const,
+          dataQuality: connector?.dataQuality ?? "DISCONNECTED",
+        }
+      : {}),
     message: connectorId === "deriv-demo" && (action === "TEST_CONNECTION" || action === "RECONNECT")
       ? "Compte Deriv DEMO personnel connecté en lecture seule."
       : "Connector action completed. Secret value was not returned.",
