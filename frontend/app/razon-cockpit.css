@@ -182,6 +182,10 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.cockpit-grid.two > .cockpit-panel-wide {
+  grid-column: 1 / -1;
+}
+
 .cockpit-grid.three {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }

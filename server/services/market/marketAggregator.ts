@@ -1,5 +1,10 @@
 import { kalosEngine, type KalosOutput } from "../kalos/kalosEngine";
 import { calculateIndicators, type IndicatorSnapshot, type IndicatorSeries } from "../kalos/indicators";
+import { buildSignalHorizon } from "../kalos/signalHorizon";
+import { evaluateStatisticalRisk } from "../risk/statisticalRiskEngine";
+import { selectAdaptiveHorizon } from "../risk/adaptiveHorizonEngine";
+import { getBacktestMonteCarloSummary } from "../razonBacktestService";
+import { getBacktestMonteCarloReport } from "../razonBacktestService";
 import { derivDemoReadOnlyClient } from "../deriv/DerivDemoReadOnlyClient";
 import {
   getSecretMetadata,
@@ -235,8 +240,74 @@ function applyDataGuardToKalos(output: KalosOutput, guard: KalosDataGuardOutput)
 }
 
 function attachDataContextToKalos(output: KalosOutput, snapshot: MarketSnapshot): KalosOutput {
+  const entry = output.entryZone === null ? null : Number(((output.entryZone[0] + output.entryZone[1]) / 2).toFixed(8));
+  const signalHorizon = buildSignalHorizon({
+    decision: output.decision,
+    generatedAt: output.generatedAt,
+    timeframe: snapshot.timeframe,
+    currentPrice: snapshot.ticker.price,
+    entryZone: output.entryZone,
+    tp: output.tp,
+    sl: output.sl,
+    invalidationLevel: output.invalidationLevel,
+    candles: snapshot.candles,
+  });
+  const statisticalRisk = evaluateStatisticalRisk({
+    decision: output.decision,
+    confidence: output.confidence,
+    probability: output.probability,
+    entry,
+    entryZone: output.entryZone,
+    sl: output.sl,
+    tp: output.tp,
+    invalidation: output.invalidationLevel,
+    expiry: signalHorizon.expirationTime,
+    candles: snapshot.candles,
+  });
+  const backtestReport = getBacktestMonteCarloReport();
+  const adaptiveHorizon = selectAdaptiveHorizon({
+    market: snapshot.symbol,
+    fixedHorizon: signalHorizon.selected,
+    signalHorizon,
+    statisticalRisk,
+    backtest: backtestReport,
+    candles: snapshot.candles,
+    dataQuality: snapshot.observability.dataQuality,
+    freshnessSeconds: snapshot.observability.freshnessSeconds,
+  });
+  const blockedByStatistics = (statisticalRisk.action === "NO_TRADE" || adaptiveHorizon.noTrade) && (output.decision === "BUY" || output.decision === "SELL");
+  const statisticalReason = statisticalRisk.noTradeReason
+    ? [`Statistical risk block: ${statisticalRisk.noTradeReason}.`]
+    : [];
+  const adaptiveReason = adaptiveHorizon.noTradeReason
+    ? [`Adaptive no-trade: ${adaptiveHorizon.noTradeReason}.`]
+    : [];
+
   return {
     ...output,
+    decision: blockedByStatistics ? "NO_TRADE" : output.decision,
+    confidence: blockedByStatistics ? statisticalRisk.confidence : Math.min(output.confidence, statisticalRisk.confidence),
+    probability: blockedByStatistics ? 0 : output.probability,
+    entryZone: blockedByStatistics ? null : output.entryZone,
+    sl: blockedByStatistics ? null : output.sl,
+    tp: blockedByStatistics ? null : output.tp,
+    invalidationLevel: blockedByStatistics ? null : output.invalidationLevel,
+    explanation: blockedByStatistics
+      ? `${output.explanation} Risk intelligence blocked this directional signal.`
+      : output.explanation,
+    whyWait: [...adaptiveReason, ...statisticalReason, ...output.whyWait],
+    technicalReasons: [
+      `Adaptive horizon: ${adaptiveHorizon.selectedHorizon}`,
+      `Timeframe agreement: ${adaptiveHorizon.timeframeAgreement}`,
+      `Risk mode: ${adaptiveHorizon.riskMode}`,
+      `Expected value: ${statisticalRisk.expectedValue}`,
+      `Sharpe: ${statisticalRisk.sharpeRatio} (${statisticalRisk.sharpeStatus})`,
+      `Kelly fraction: ${statisticalRisk.kellyFraction}`,
+      `Volatility regime: ${statisticalRisk.volatilityRegime}`,
+      ...adaptiveReason,
+      ...statisticalReason,
+      ...output.technicalReasons,
+    ],
     source: snapshot.observability.sourceLabel,
     dataSource: snapshot.observability.source,
     sourceStatus: snapshot.observability.sourceStatus,
@@ -247,6 +318,10 @@ function attachDataContextToKalos(output: KalosOutput, snapshot: MarketSnapshot)
     lastTickAt: snapshot.observability.lastTickAt,
     lastCandleAt: snapshot.observability.lastCandleAt,
     dataGuard: snapshot.dataGuard,
+    signalHorizon,
+    statisticalRisk,
+    adaptiveHorizon,
+    backtestValidation: getBacktestMonteCarloSummary(),
   };
 }
 

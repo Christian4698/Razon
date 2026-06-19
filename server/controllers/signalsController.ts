@@ -90,8 +90,9 @@ export async function getSignals(req: Request, res: Response) {
       timeframe,
       source,
     });
+    const priceCheckedSignal = rejectInvalidPriceSignal(baseSignal, validation);
     const signal = {
-      ...rejectInvalidPriceSignal(baseSignal, validation),
+      ...priceCheckedSignal,
       direction: signalDirection(baseSignal.decision),
       currentPrice: validation.currentPrice,
       invalidation: validation.invalidation,
@@ -102,7 +103,26 @@ export async function getSignals(req: Request, res: Response) {
       TP: validation.tp,
       SL: validation.sl,
       expiry: expiryFor(timeframe),
+      expirationTime: analysis.signalHorizon?.expirationTime ?? expiryFor(timeframe),
+      signalHorizon: analysis.signalHorizon ?? null,
       priceValidation: validation,
+      action: analysis.statisticalRisk?.action ?? (validation.valid ? priceCheckedSignal.decision : "INVALID"),
+      calibratedConfidence: analysis.statisticalRisk?.calibratedConfidence,
+      expectedValue: analysis.statisticalRisk?.expectedValue,
+      sharpeRatio: analysis.statisticalRisk?.sharpeRatio,
+      sharpeStatus: analysis.statisticalRisk?.sharpeStatus,
+      drawdown: analysis.statisticalRisk?.drawdown,
+      kellyFraction: analysis.statisticalRisk?.kellyFraction,
+      recommendedStake: analysis.statisticalRisk?.recommendedStake,
+      riskReward: analysis.statisticalRisk?.riskReward,
+      volatilityRegime: analysis.statisticalRisk?.volatilityRegime,
+      calibrationStatus: analysis.statisticalRisk?.calibration.status,
+      calibrationError: analysis.statisticalRisk?.calibration.calibrationError,
+      brierScore: analysis.statisticalRisk?.calibration.brierScore,
+      stopLoss: analysis.statisticalRisk?.stopLoss ?? validation.sl,
+      takeProfit: analysis.statisticalRisk?.takeProfit ?? validation.tp,
+      noTradeReason: analysis.statisticalRisk?.noTradeReason ?? null,
+      statisticalRisk: analysis.statisticalRisk ?? null,
     };
     const input = {
       symbol: selectedSymbol,
@@ -133,6 +153,7 @@ export async function getSignals(req: Request, res: Response) {
       liveExecutionEnabled: false as const,
       disclaimer: "Probability-based analysis, not financial advice." as const,
       generatedAt: journalEntry.timestamp,
+      horizonValidation: analysis.signalHorizon?.validation ?? null,
     });
   } catch (error) {
     return res.status(502).json({

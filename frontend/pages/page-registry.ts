@@ -27,6 +27,12 @@ export const cockpitPages: readonly CockpitPageDefinition[] = [
     description: "Bougies OHLC, timeframe, prix, spread, volume, SL/TP et zones.",
   },
   {
+    id: "trade-center",
+    label: "Trade Center",
+    title: "Centre de Trading",
+    description: "Preparation DEMO/REAL en lecture seule, sans execution reelle.",
+  },
+  {
     id: "connectors",
     label: "Connectors",
     title: "Connectors",

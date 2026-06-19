@@ -6,6 +6,7 @@ export function getJournal(_req: Request, res: Response) {
   return sendJson(res, {
     mode: "demo" as const,
     entries: razonJournalService.listEntries(),
+    tradeProposals: razonJournalService.listTradeProposals(),
     decisionSummary: razonJournalService.getDecisionSummary(),
   });
 }

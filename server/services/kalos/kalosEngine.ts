@@ -11,6 +11,9 @@ import type {
   MarketDataSyncStatus,
 } from "../market/marketObservability";
 import { calculateIndicators, type IndicatorSnapshot, type IndicatorSeries } from "./indicators";
+import { buildSignalHorizon, type SignalHorizon } from "./signalHorizon";
+import type { StatisticalRiskOutput } from "../risk/statisticalRiskEngine";
+import type { AdaptiveHorizonOutput } from "../risk/adaptiveHorizonEngine";
 
 export type KalosDecision = "BUY" | "SELL" | "WAIT" | "NO_TRADE" | "DATA_LOW" | "INVALID";
 export type KalosRisk = "low" | "medium" | "high";
@@ -43,6 +46,31 @@ export interface KalosOutput {
   lastTickAt?: string | null;
   lastCandleAt?: string | null;
   dataGuard?: KalosDataGuardOutput;
+  signalHorizon?: SignalHorizon;
+  statisticalRisk?: StatisticalRiskOutput;
+  adaptiveHorizon?: AdaptiveHorizonOutput;
+  backtestValidation?: {
+    backtestScore: number;
+    monteCarloScore: number;
+    riskOfRuin: number;
+    recommendedMode: string;
+    recommendedHorizon: string;
+    realReadiness: "READY" | "NOT_READY";
+    realReadinessLabel: string;
+    reasons: readonly string[];
+    totalSignals: number;
+    sharpe: number;
+    maxDrawdown: number;
+    productionConfidence?: {
+      productionConfidence: "LOW" | "MEDIUM" | "HIGH";
+      overfitRisk: string;
+      generalizationGap: number;
+      trainScore: number;
+      validationScore: number;
+      testScore: number;
+      realReadiness: "NOT_READY";
+    };
+  };
   disclaimer: "Probability-based analysis, not financial advice.";
   generatedAt: string;
 }
@@ -120,7 +148,8 @@ export const kalosEngine = {
       whyWait.push("Provider data is insufficient for a high-quality probability reading.");
       whyWait.push("RAZON needs live price and enough candles before producing directional analysis.");
 
-      return {
+      const generatedAt = new Date().toISOString();
+      const waitingOutput: Omit<KalosOutput, "signalHorizon"> = {
         symbol: ticker.symbol,
         decision: "WAIT",
         confidence: 0,
@@ -137,7 +166,22 @@ export const kalosEngine = {
         indicatorSeries,
         status: ticker.status,
         disclaimer: "Probability-based analysis, not financial advice.",
-        generatedAt: new Date().toISOString(),
+        generatedAt,
+      };
+
+      return {
+        ...waitingOutput,
+        signalHorizon: buildSignalHorizon({
+          decision: waitingOutput.decision,
+          generatedAt,
+          timeframe: "5m",
+          currentPrice: price,
+          entryZone: waitingOutput.entryZone,
+          tp: waitingOutput.tp,
+          sl: waitingOutput.sl,
+          invalidationLevel: waitingOutput.invalidationLevel,
+          candles,
+        }),
       };
     }
 
@@ -232,7 +276,8 @@ export const kalosEngine = {
       technicalReasons.push(`Candlestick patterns: ${indicators.candlestickPatterns.join(", ")}`);
     }
 
-    return {
+    const generatedAt = new Date().toISOString();
+    const output: Omit<KalosOutput, "signalHorizon"> = {
       symbol: ticker.symbol,
       decision,
       confidence,
@@ -251,7 +296,22 @@ export const kalosEngine = {
       indicatorSeries,
       status: ticker.status,
       disclaimer: "Probability-based analysis, not financial advice.",
-      generatedAt: new Date().toISOString(),
+      generatedAt,
+    };
+
+    return {
+      ...output,
+      signalHorizon: buildSignalHorizon({
+        decision: output.decision,
+        generatedAt,
+        timeframe: "5m",
+        currentPrice: price,
+        entryZone: output.entryZone,
+        tp: output.tp,
+        sl: output.sl,
+        invalidationLevel: output.invalidationLevel,
+        candles,
+      }),
     };
   },
 };

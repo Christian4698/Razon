@@ -157,6 +157,29 @@ export interface RazonSignalOutput {
     readonly source: string;
     readonly decimals: number;
   };
+  action?: RazonSignalDecision;
+  calibratedConfidence?: number;
+  expectedValue?: number;
+  sharpeRatio?: number;
+  sharpeStatus?: "POOR" | "ACCEPTABLE" | "GOOD" | "EXCELLENT";
+  drawdown?: {
+    readonly currentDrawdown: number;
+    readonly maxDrawdown: number;
+    readonly dailyDrawdown: number;
+    readonly sessionDrawdown: number;
+    readonly riskLock: boolean;
+  };
+  kellyFraction?: number;
+  recommendedStake?: number;
+  riskReward?: number;
+  volatilityRegime?: "TREND" | "RANGE" | "CHAOS" | "SPIKE";
+  calibrationStatus?: "UNCALIBRATED" | "CALIBRATED" | "DEGRADED";
+  calibrationError?: number | null;
+  brierScore?: number | null;
+  stopLoss?: number | null;
+  takeProfit?: number | null;
+  noTradeReason?: string | null;
+  statisticalRisk?: unknown;
 }
 
 export interface RazonFrappeDollarVisualMarker {
@@ -314,10 +337,10 @@ export interface RazonRiskState {
 
 export interface RazonBacktestState {
   mode: "backtest";
-  status: "ready_no_dataset";
+  status: "ready_no_dataset" | "validated_simulation";
   verifiedPerformance: false;
   performanceMessage: "No verified performance yet";
-  results: null;
+  results: unknown | null;
   message: string;
 }
 

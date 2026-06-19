@@ -1,5 +1,5 @@
 import type { ReactElement } from "react";
-import { BarChart3, BookOpen, Cable, Eye, LineChart, Settings, Shield } from "lucide-react";
+import { BarChart3, BookOpen, Cable, Eye, LineChart, Settings, Shield, WalletCards } from "lucide-react";
 import type { CockpitPage } from "../app/cockpit.types";
 import type { CockpitPageDefinition } from "../pages/page-registry";
 import { useLanguage } from "@/i18n/useLanguage";
@@ -8,6 +8,7 @@ const mobileIcons: Record<CockpitPage, ReactElement> = {
   dashboard: <BarChart3 size={18} />,
   "kalos": <Eye size={18} />,
   "market-chart": <LineChart size={18} />,
+  "trade-center": <WalletCards size={18} />,
   connectors: <Cable size={18} />,
   journal: <BookOpen size={18} />,
   risk: <Shield size={18} />,
@@ -28,6 +29,7 @@ export function MobileBottomNav({
     if (page === "dashboard") return t("nav.dashboard");
     if (page === "kalos") return t("nav.kalos");
     if (page === "market-chart") return t("nav.marketChart");
+    if (page === "trade-center") return "Trade";
     if (page === "connectors") return t("nav.connectors");
     if (page === "journal") return t("nav.journal");
     if (page === "risk") return t("nav.risk");

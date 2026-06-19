@@ -2,6 +2,7 @@ export type CockpitPage =
   | "dashboard"
   | "kalos"
   | "market-chart"
+  | "trade-center"
   | "connectors"
   | "journal"
   | "risk"
@@ -332,6 +333,250 @@ export interface KalosSignal {
   readonly dataQuality?: "HEALTHY" | "DEGRADED" | "STALE" | "INVALID" | "DISCONNECTED";
   readonly lastTickAt?: string | null;
   readonly lastCandleAt?: string | null;
+  readonly signalHorizon?: SignalHorizon | null;
+  readonly statisticalRisk?: StatisticalRisk | null;
+  readonly adaptiveHorizon?: AdaptiveHorizon | null;
+  readonly backtestValidation?: BacktestMonteCarloSummary | null;
+}
+
+export type TimeframeAgreement = "ALIGNED" | "PARTIAL" | "CONFLICT" | "STRONG_CONFLICT";
+export type AdaptiveRiskMode = "NORMAL" | "CAUTION" | "DEFENSIVE" | "NO_TRADE";
+export type AdaptiveRecommendedAction = "TRADE_ALLOWED_SIMULATION" | "TAKE_PROFIT_QUICKLY" | "HOLD_CAUTIOUSLY" | "NO_TRADE";
+
+export interface AdaptiveHorizon {
+  readonly selectedHorizon: SignalHorizonName;
+  readonly reason: string;
+  readonly validForSeconds: number;
+  readonly profitWindowSeconds: number;
+  readonly recommendedAction: AdaptiveRecommendedAction;
+  readonly noTrade: boolean;
+  readonly noTradeReason: string | null;
+  readonly timeframeAgreement: TimeframeAgreement;
+  readonly riskMode: AdaptiveRiskMode;
+  readonly confidenceAdjustment: number;
+  readonly fixedHorizon: SignalHorizonName;
+  readonly comparison: {
+    readonly accuracyBefore: number;
+    readonly accuracyAfter: number;
+    readonly noTradeRate: number;
+    readonly drawdownBefore: number;
+    readonly drawdownAfter: number;
+    readonly pnlBefore: number;
+    readonly pnlAfter: number;
+    readonly recommendedDefault: SignalHorizonName;
+  };
+  readonly liveExecutionAllowed: false;
+}
+
+export interface BacktestMonteCarloSummary {
+  readonly backtestScore: number;
+  readonly monteCarloScore: number;
+  readonly riskOfRuin: number;
+  readonly recommendedMode: string;
+  readonly recommendedHorizon: SignalHorizonName;
+  readonly realReadiness: "READY" | "NOT_READY";
+  readonly realReadinessLabel: string;
+  readonly reasons: readonly string[];
+  readonly totalSignals: number;
+  readonly sharpe: number;
+  readonly maxDrawdown: number;
+  readonly productionConfidence?: {
+    readonly productionConfidence: "LOW" | "MEDIUM" | "HIGH";
+    readonly overfitRisk: string;
+    readonly generalizationGap: number;
+    readonly trainScore: number;
+    readonly validationScore: number;
+    readonly testScore: number;
+    readonly realReadiness: "NOT_READY";
+  };
+}
+
+export type SharpeStatus = "POOR" | "ACCEPTABLE" | "GOOD" | "EXCELLENT";
+export type CalibrationStatus = "UNCALIBRATED" | "CALIBRATED" | "DEGRADED";
+export type VolatilityRegime = "TREND" | "RANGE" | "CHAOS" | "SPIKE";
+
+export interface StatisticalRisk {
+  readonly action: SignalDecision;
+  readonly direction: "UP" | "DOWN" | "WAIT";
+  readonly confidence: number;
+  readonly calibratedConfidence: number;
+  readonly expectedValue: number;
+  readonly sharpeRatio: number;
+  readonly sharpeStatus: SharpeStatus;
+  readonly drawdown: {
+    readonly currentDrawdown: number;
+    readonly maxDrawdown: number;
+    readonly dailyDrawdown: number;
+    readonly sessionDrawdown: number;
+    readonly riskLock: boolean;
+  };
+  readonly kellyFraction: number;
+  readonly recommendedStake: number;
+  readonly riskReward: number;
+  readonly volatilityRegime: VolatilityRegime;
+  readonly calibration: {
+    readonly announcedConfidence: number;
+    readonly calibratedConfidence: number;
+    readonly observedWinRate: number | null;
+    readonly calibrationError: number | null;
+    readonly brierScore: number | null;
+    readonly status: CalibrationStatus;
+  };
+  readonly noTradeReason: string | null;
+  readonly sampleSize: number;
+  readonly liveExecutionAllowed: false;
+}
+
+export type SignalHorizonName = "SCALPING" | "SHORT" | "LONG";
+
+export type SignalLifecycleStatus = "ACTIVE" | "EXPIRED" | "INVALIDATED" | "REFRESHED" | "NO_TRADE";
+export type ShadowLifecycleStatus = "CREATED" | "ACTIVE" | "EXPIRED" | "CLOSED" | "INVALIDATED";
+
+export interface SignalHorizonStats {
+  readonly horizon: SignalHorizonName;
+  readonly score: number;
+  readonly sampleSize: number;
+  readonly survives: number;
+  readonly expires: number;
+  readonly invalidated: number;
+  readonly refreshed: number;
+  readonly avgPredictionLifeSeconds: number;
+  readonly avgDrawdown: number;
+  readonly avgProfitDurationSeconds: number;
+}
+
+export interface SignalHorizonValidation {
+  readonly sampleSize: number;
+  readonly avgPredictionLifeSeconds: number;
+  readonly bestHorizon: SignalHorizonName;
+  readonly worstHorizon: SignalHorizonName;
+  readonly avgDrawdown: number;
+  readonly avgProfitDurationSeconds: number;
+  readonly horizons: Record<SignalHorizonName, SignalHorizonStats>;
+}
+
+export interface SignalHorizon {
+  readonly selected: SignalHorizonName;
+  readonly generatedAt: string;
+  readonly firstEntryTime: string | null;
+  readonly expirationTime: string;
+  readonly invalidationTime: string | null;
+  readonly durationAliveSeconds: number;
+  readonly maxProfitWindowSeconds: number;
+  readonly maxDrawdown: number;
+  readonly updateFrequencySeconds: number;
+  readonly remainingSeconds: number;
+  readonly status: SignalLifecycleStatus;
+  readonly validation: SignalHorizonValidation;
+}
+
+export interface ShadowSignalRecord {
+  readonly id: string;
+  readonly timestamp: string;
+  readonly market: string;
+  readonly direction: "UP" | "DOWN" | "WAIT";
+  readonly confidence: number;
+  readonly entry: number;
+  readonly virtualExit: number;
+  readonly TP: number;
+  readonly SL: number;
+  readonly expiry: string;
+  readonly expectedValue: number;
+  readonly riskReward: number;
+  readonly signalHorizon: SignalHorizonName;
+  readonly capitalModel: "FIXED_FRACTION_SIMULATION";
+  readonly pnlSimulated: number;
+  readonly result: "WIN" | "LOSS" | "EXPIRED" | "INVALIDATED";
+  readonly lifecycle: ShadowLifecycleStatus;
+}
+
+export interface ShadowTradingReport {
+  readonly generatedAt: string;
+  readonly mode: "SHADOW_TRADING";
+  readonly pipeline: readonly string[];
+  readonly modes: readonly SignalHorizonName[];
+  readonly minimumLiveSignalsRequired: 500;
+  readonly signalsObserved: number;
+  readonly todayPnl: number;
+  readonly weeklyPnl: number;
+  readonly virtualBalance: number;
+  readonly winrate: number;
+  readonly avgDurationSeconds: number;
+  readonly drawdown: number;
+  readonly sharpe: number;
+  readonly noTradeRate: number;
+  readonly profitFactor: number;
+  readonly rollingSharpe: number;
+  readonly rollingDrawdown: number;
+  readonly signalDecay: number;
+  readonly confidenceStability: number;
+  readonly marketStability: number;
+  readonly regimeChanges: number;
+  readonly rules: {
+    readonly rollingSharpeOk: boolean;
+    readonly drawdownOk: boolean;
+    readonly signalDecayOk: boolean;
+    readonly confidenceDriftOk: boolean;
+  };
+  readonly realReadiness: "NOT_READY";
+  readonly realReadinessReasons: readonly string[];
+  readonly liveExecutionEnabled: false;
+  readonly orderPlacementAllowed: false;
+  readonly autoExecution: false;
+  readonly forbiddenRoutes: readonly string[];
+  readonly journal: readonly ShadowSignalRecord[];
+}
+
+export type DemoObservationGateStatus =
+  | "DEMO_OBSERVATION_RUNNING"
+  | "DEMO_STABLE"
+  | "DEMO_UNSTABLE"
+  | "REAL_PREP_LOCKED";
+
+export interface DemoObservationDailyMetrics {
+  readonly date: string;
+  readonly signalsCount: number;
+  readonly virtualPnL: number;
+  readonly realisticPnL: number;
+  readonly realisticSharpe: number;
+  readonly realisticDrawdown: number;
+  readonly winrate: number;
+  readonly noTradeRate: number;
+  readonly simulationBias: number;
+  readonly confidenceDrift: number;
+  readonly bestMarket: string;
+  readonly worstMarket: string;
+  readonly disabledMarkets: readonly string[];
+  readonly feedUptime: number;
+  readonly incidentCount: number;
+}
+
+export interface DemoObservationGateReport {
+  readonly generatedAt: string;
+  readonly gate: "14_DAY_DEMO_OBSERVATION";
+  readonly daysObserved: number;
+  readonly daysCompleted: number;
+  readonly daysRemaining: number;
+  readonly minimumSignals: number;
+  readonly observedSignals: number;
+  readonly gateStatus: DemoObservationGateStatus;
+  readonly blockers: readonly string[];
+  readonly trend: "IMPROVING" | "STABLE" | "DEGRADING";
+  readonly readinessScore: number;
+  readonly dailyMetrics: readonly DemoObservationDailyMetrics[];
+  readonly incidentSummary: {
+    readonly feedInterruption: number;
+    readonly latencySpike: number;
+    readonly shadowPnlAnomaly: number;
+    readonly drawdownSpike: number;
+    readonly confidenceDrift: number;
+    readonly missingTicksCandles: number;
+  };
+  readonly realReadiness: "NOT_READY";
+  readonly liveExecutionEnabled: false;
+  readonly orderPlacementAllowed: false;
+  readonly autoExecution: false;
+  readonly confirmRealStatus: 403;
 }
 
 export interface ConnectorStatus {

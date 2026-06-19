@@ -7,6 +7,7 @@ import {
   Eye,
   LineChart,
   LogOut,
+  WalletCards,
   Settings,
   Shield,
   UserCircle,
@@ -34,6 +35,8 @@ import type {
   LicenseStatusSnapshot,
   MarketStatus,
   OhlcCandle,
+  DemoObservationGateReport,
+  ShadowTradingReport,
   SignalDecision,
   StrategyMode,
   SyntheticIndexSymbol,
@@ -47,6 +50,7 @@ import { MarketChartPage } from "../dashboard/MarketChartPage";
 import { ConnectorsPage } from "../connectors/ConnectorsPage";
 import { JournalPage } from "../journal/JournalPage";
 import { RiskStatusPage } from "../trading/RiskStatusPage";
+import { TradeCenterPage } from "../trade/TradeCenterPage";
 import { SettingsPage } from "../settings/SettingsPage";
 import { EmergencyStopButton } from "../components/EmergencyStopButton";
 import { MobileBottomNav } from "../components/MobileBottomNav";
@@ -64,6 +68,7 @@ const navIcons: Record<CockpitPage, ReactElement> = {
   dashboard: <BarChart3 size={17} />,
   "kalos": <Eye size={17} />,
   "market-chart": <LineChart size={17} />,
+  "trade-center": <WalletCards size={17} />,
   connectors: <Cable size={17} />,
   journal: <BookOpen size={17} />,
   risk: <Shield size={17} />,
@@ -143,6 +148,10 @@ interface BackendKalosOutput {
   readonly dataQuality?: "HEALTHY" | "DEGRADED" | "STALE" | "INVALID" | "DISCONNECTED";
   readonly lastTickAt?: string | null;
   readonly lastCandleAt?: string | null;
+  readonly signalHorizon?: KalosSignal["signalHorizon"];
+  readonly statisticalRisk?: KalosSignal["statisticalRisk"];
+  readonly adaptiveHorizon?: KalosSignal["adaptiveHorizon"];
+  readonly backtestValidation?: KalosSignal["backtestValidation"];
 }
 
 interface BackendConnectorsHealth {
@@ -182,6 +191,11 @@ function pageText(page: CockpitPage, t: (key: string) => string) {
       label: t("nav.marketChart"),
       title: t("page.marketChart.title"),
       description: t("page.marketChart.description"),
+    },
+    "trade-center": {
+      label: "Trade Center",
+      title: "Centre de Trading",
+      description: "Preparation DEMO/REAL en lecture seule, sans execution reelle.",
     },
     connectors: {
       label: t("nav.connectors"),
@@ -341,6 +355,10 @@ function signalFromBackend(kalos: BackendKalosOutput | null, snapshot: BackendMa
     dataQuality,
     lastTickAt: kalos.lastTickAt ?? snapshot.observability.lastTickAt,
     lastCandleAt: kalos.lastCandleAt ?? snapshot.observability.lastCandleAt,
+    signalHorizon: kalos.signalHorizon ?? fallback.signalHorizon ?? null,
+    statisticalRisk: kalos.statisticalRisk ?? fallback.statisticalRisk ?? null,
+    adaptiveHorizon: kalos.adaptiveHorizon ?? fallback.adaptiveHorizon ?? null,
+    backtestValidation: kalos.backtestValidation ?? fallback.backtestValidation ?? null,
     marketBrain: {
       ...fallback.marketBrain,
       signal: decision,
@@ -443,6 +461,8 @@ export default function RazonCockpit({
   const [backendSnapshot, setBackendSnapshot] = useState<BackendMarketSnapshot | null>(null);
   const [backendKalos, setBackendKalos] = useState<BackendKalosOutput | null>(null);
   const [backendHealth, setBackendHealth] = useState<BackendConnectorsHealth | null>(null);
+  const [shadowTrading, setShadowTrading] = useState<ShadowTradingReport | null>(null);
+  const [demoObservationGate, setDemoObservationGate] = useState<DemoObservationGateReport | null>(null);
   const [licenseSnapshot, setLicenseSnapshot] = useState<LicenseStatusSnapshot | null>(null);
   const refreshConnectors = useCallback(async () => {
     const response = await fetch(`${API_BASE_URL}/api/connectors/health`, { credentials: "include", headers: { Accept: "application/json" } });
@@ -626,6 +646,39 @@ export default function RazonCockpit({
       window.clearInterval(timer);
     };
   }, [selectedSyntheticSymbol]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadValidation = async () => {
+      try {
+        const [shadowResponse, gateResponse] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/shadow-trading`, { credentials: "include", headers: { Accept: "application/json" } }),
+          fetch(`${API_BASE_URL}/api/demo-observation-gate`, { credentials: "include", headers: { Accept: "application/json" } }),
+        ]);
+        if (!shadowResponse.ok || !gateResponse.ok) throw new Error("validation request failed");
+        const shadowPayload = (await shadowResponse.json()) as ShadowTradingReport;
+        const gatePayload = (await gateResponse.json()) as DemoObservationGateReport;
+        if (!cancelled) {
+          setShadowTrading(shadowPayload);
+          setDemoObservationGate(gatePayload);
+        }
+      } catch {
+        if (!cancelled) {
+          setShadowTrading(null);
+          setDemoObservationGate(null);
+        }
+      }
+    };
+
+    void loadValidation();
+    const timer = window.setInterval(() => void loadValidation(), 30000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(timer);
+    };
+  }, []);
 
   const setLastAction = (lastAction: string) => {
     setState(current => ({ ...current, lastAction }));
@@ -834,6 +887,17 @@ export default function RazonCockpit({
                 signal={activeSnapshot.signal}
                 actionDisplayMode={actionDisplayMode}
                 watchlist={activeSnapshot.watchlist}
+              />
+            ) : null}
+            {activePage === "trade-center" ? (
+              <TradeCenterPage
+                connectors={activeConnectors}
+                market={activeSnapshot.market}
+                risk={activeSnapshot.risk}
+                demoObservationGate={demoObservationGate}
+                shadowTrading={shadowTrading}
+                signal={activeSnapshot.signal}
+                tradingMode={state.tradingMode}
               />
             ) : null}
             {activePage === "connectors" ? (

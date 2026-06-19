@@ -1872,6 +1872,20 @@ export function LiveMarketChart({
   const actionLabel = displayAction(signal.decision, actionDisplayMode);
   const equivalent = equivalentActionLabel(signal.decision, actionDisplayMode);
   const derivExecutionPreview = toDerivAction(signal.decision);
+  const horizonLife =
+    signal.signalHorizon === null || signal.signalHorizon === undefined
+      ? "n/a"
+      : signal.signalHorizon.durationAliveSeconds < 60
+        ? `${Math.round(signal.signalHorizon.durationAliveSeconds)} sec`
+        : `${Math.round(signal.signalHorizon.durationAliveSeconds / 60)} min`;
+  const horizonRemaining =
+    signal.signalHorizon === null || signal.signalHorizon === undefined
+      ? "n/a"
+      : signal.signalHorizon.remainingSeconds < 60
+        ? `${Math.round(signal.signalHorizon.remainingSeconds)} sec`
+        : `${Math.round(signal.signalHorizon.remainingSeconds / 60)} min`;
+  const statisticalRisk = signal.statisticalRisk;
+  const adaptiveHorizon = signal.adaptiveHorizon;
 
   return (
     <section className="cockpit-panel">
@@ -1888,6 +1902,25 @@ export function LiveMarketChart({
           <StatusPill tone={signal.decision}>ACTION: {actionLabel}</StatusPill>
           <span className="cockpit-muted">{equivalent.label}: {equivalent.value}</span>
           <span className="cockpit-muted">Would execute: {derivExecutionPreview}</span>
+          <span className="cockpit-muted">Signal valid for: {horizonLife}</span>
+          <span className="cockpit-muted">Remaining time: {horizonRemaining}</span>
+          <span className="cockpit-muted">EV: {statisticalRisk?.expectedValue.toFixed(4) ?? "n/a"}</span>
+          <span className="cockpit-muted">Sharpe: {statisticalRisk?.sharpeRatio.toFixed(2) ?? "n/a"}</span>
+          <span className="cockpit-muted">Drawdown: {statisticalRisk?.drawdown.dailyDrawdown.toFixed(2) ?? "n/a"}%</span>
+          <span className="cockpit-muted">Kelly: {(((statisticalRisk?.kellyFraction ?? 0) * 100)).toFixed(2)}%</span>
+          <span className="cockpit-muted">Stake: {statisticalRisk?.recommendedStake.toFixed(2) ?? "n/a"} USD</span>
+          <span className="cockpit-muted">Volatility: {statisticalRisk?.volatilityRegime ?? "n/a"}</span>
+          <span className="cockpit-muted">Calibration: {statisticalRisk?.calibration.status ?? "n/a"}</span>
+          <span className="cockpit-muted">Backtest score: {signal.backtestValidation?.backtestScore ?? "n/a"}</span>
+          <span className="cockpit-muted">Monte Carlo: {signal.backtestValidation?.monteCarloScore ?? "n/a"}</span>
+          <span className="cockpit-muted">Risk of ruin: {signal.backtestValidation?.riskOfRuin.toFixed(2) ?? "n/a"}%</span>
+          <span className="cockpit-muted">{signal.backtestValidation?.realReadinessLabel ?? "REAL NOT READY"}</span>
+          <span className="cockpit-muted">Selected horizon: {adaptiveHorizon?.selectedHorizon ?? "n/a"}</span>
+          <span className="cockpit-muted">Best profit window: {adaptiveHorizon?.profitWindowSeconds ? `${Math.round(adaptiveHorizon.profitWindowSeconds / 60)} min` : "n/a"}</span>
+          <span className="cockpit-muted">Timeframe agreement: {adaptiveHorizon?.timeframeAgreement ?? "n/a"}</span>
+          <span className="cockpit-muted">Risk mode: {adaptiveHorizon?.riskMode ?? "n/a"}</span>
+          {adaptiveHorizon?.noTradeReason ? <span className="cockpit-muted">Adaptive no-trade: {adaptiveHorizon.noTradeReason}</span> : null}
+          {statisticalRisk?.noTradeReason ? <span className="cockpit-muted">No-trade reason: {statisticalRisk.noTradeReason}</span> : null}
         </div>
       </div>
 

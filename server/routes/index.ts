@@ -4,10 +4,14 @@ import { requireApiAuthJson, requireLicense } from "../middleware/authMiddleware
 import { authRoutes } from "./authRoutes";
 import { backtestRoutes } from "./backtestRoutes";
 import { connectorsRoutes } from "./connectorsRoutes";
+import { demoObservationGateRoutes } from "./demoObservationGateRoutes";
+import { executionRoutes } from "./executionRoutes";
 import { journalRoutes } from "./journalRoutes";
 import { licensesRoutes } from "./licensesRoutes";
 import { marketDataRoutes } from "./marketDataRoutes";
+import { realismAuditRoutes } from "./realismAuditRoutes";
 import { riskRoutes } from "./riskRoutes";
+import { shadowTradingRoutes } from "./shadowTradingRoutes";
 import { signalsRoutes } from "./signalsRoutes";
 import { statusRoutes } from "./statusRoutes";
 
@@ -25,4 +29,8 @@ apiRoutes.use(marketDataRoutes);
 apiRoutes.use(signalsRoutes);
 apiRoutes.use(riskRoutes);
 apiRoutes.use(backtestRoutes);
+apiRoutes.use(executionRoutes);
+apiRoutes.use(shadowTradingRoutes);
+apiRoutes.use(realismAuditRoutes);
+apiRoutes.use(demoObservationGateRoutes);
 apiRoutes.use(journalRoutes);

@@ -8,6 +8,7 @@ import type {
 } from "../types/razon";
 
 const entries: RazonJournalEntry[] = [];
+const tradeProposals: unknown[] = [];
 const MAX_ENTRIES = 100;
 
 const decisions: Array<{
@@ -41,6 +42,27 @@ export const razonJournalService = {
 
   listEntries(): RazonJournalEntry[] {
     return [...entries];
+  },
+
+  recordTradeProposal(proposal: unknown) {
+    const entry = {
+      id: randomUUID(),
+      timestamp: new Date().toISOString(),
+      type: "TRADE_PROPOSAL",
+      proposal,
+    };
+
+    tradeProposals.unshift(entry);
+
+    if (tradeProposals.length > MAX_ENTRIES) {
+      tradeProposals.length = MAX_ENTRIES;
+    }
+
+    return entry;
+  },
+
+  listTradeProposals() {
+    return [...tradeProposals];
   },
 
   getDecisionSummary(): RazonJournalDecisionSummary[] {
