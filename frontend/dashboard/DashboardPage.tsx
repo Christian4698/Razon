@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import type {
+  ActionDisplayMode,
   AlertItem,
   BacktestSummary,
   CockpitState,
@@ -14,6 +15,7 @@ import type {
   WatchlistItem,
 } from "../app/cockpit.types";
 import { chartContextActions, syntheticIndexSymbols } from "../app/cockpit-data";
+import { displayAction, equivalentActionLabel, toDerivAction } from "../app/actionDisplay";
 import { MarketStatusCard } from "../components/MarketStatusCard";
 import { KalosSignalCard } from "../components/KalosSignalCard";
 import { RiskScoreCard } from "../components/RiskScoreCard";
@@ -22,7 +24,7 @@ import { WatchlistPanel } from "../components/WatchlistPanel";
 import { AlertPanel } from "../components/AlertPanel";
 import { JournalTable } from "../components/JournalTable";
 import { ConnectionStatusCard } from "../components/ConnectionStatusCard";
-import { formatDecision, formatPrice, StatusPill } from "../components/CockpitPrimitives";
+import { formatPrice, StatusPill } from "../components/CockpitPrimitives";
 import { KalosFuturePathPanel } from "../kalos/KalosFuturePathPanel";
 import { KalosMarketBrainPanel } from "../kalos/KalosMarketBrainPanel";
 import { KalosMarketReplayPanel } from "../kalos/KalosMarketReplayPanel";
@@ -167,11 +169,13 @@ function KalosDashboardSummary({
   selectedSymbol,
   signal,
   state,
+  actionDisplayMode,
 }: {
   market: MarketStatus;
   selectedSymbol: SyntheticIndexSymbol;
   signal: KalosSignal;
   state: CockpitState;
+  actionDisplayMode: ActionDisplayMode;
 }) {
   const { t } = useLanguage();
   const status = feedStatus(state, market);
@@ -180,6 +184,9 @@ function KalosDashboardSummary({
   const dataQuality = signal.dataQuality ?? market.dataQuality;
   const freshnessSeconds = signal.freshnessSeconds ?? market.freshnessSeconds;
   const latencyMs = signal.latencyMs ?? market.latencyMs;
+  const actionLabel = displayAction(signal.decision, actionDisplayMode);
+  const equivalent = equivalentActionLabel(signal.decision, actionDisplayMode);
+  const derivPreview = toDerivAction(signal.decision);
 
   return (
     <section className="cockpit-panel dashboard-summary-panel">
@@ -212,7 +219,15 @@ function KalosDashboardSummary({
         </span>
         <span>
           <b>{t("common.decision")}</b>
-          <strong>{formatDecision(signal.decision)}</strong>
+          <strong>ACTION: {actionLabel}</strong>
+        </span>
+        <span>
+          <b>{equivalent.label}</b>
+          <strong>{equivalent.value}</strong>
+        </span>
+        <span>
+          <b>Execution preview</b>
+          <strong>Would execute: {derivPreview}</strong>
         </span>
         <span>
           <b>{t("common.confidence")}</b>
@@ -403,6 +418,7 @@ export function DashboardPage({
   alerts,
   backtests,
   selectedSyntheticSymbol,
+  actionDisplayMode,
   onSyntheticSymbolChange,
   onToggleKalos,
   onTradingModeChange,
@@ -420,6 +436,7 @@ export function DashboardPage({
   alerts: readonly AlertItem[];
   backtests: readonly BacktestSummary[];
   selectedSyntheticSymbol: SyntheticIndexSymbol;
+  actionDisplayMode: ActionDisplayMode;
   onSyntheticSymbolChange: (symbol: SyntheticIndexSymbol) => void;
   onToggleKalos: () => void;
   onTradingModeChange: Parameters<typeof TradingModeSelector>[0]["onTradingModeChange"];
@@ -467,7 +484,7 @@ export function DashboardPage({
 
       <div className="dashboard-main-grid">
         <div className="dashboard-chart-column">
-          <LiveMarketChart candles={candles} market={market} signal={signal} />
+          <LiveMarketChart actionDisplayMode={actionDisplayMode} candles={candles} market={market} signal={signal} />
         </div>
         <aside className="dashboard-summary-column" aria-label="KALOS and risk summaries">
           <KalosDashboardSummary
@@ -475,6 +492,7 @@ export function DashboardPage({
             selectedSymbol={selectedSyntheticSymbol}
             signal={signal}
             state={state}
+            actionDisplayMode={actionDisplayMode}
           />
           <RiskDashboardSummary risk={risk} />
         </aside>
@@ -519,7 +537,7 @@ export function DashboardPage({
 
           {activeTab === "kalos" ? (
             <div className="dashboard-tab-grid">
-              <KalosSignalCard enabled={state.kalosEnabled} onToggle={onToggleKalos} signal={signal} />
+              <KalosSignalCard actionDisplayMode={actionDisplayMode} enabled={state.kalosEnabled} onToggle={onToggleKalos} signal={signal} />
               <KalosMarketBrainPanel brain={signal.marketBrain} />
               <KalosVisualIntelligencePanel signal={signal} />
               <KalosFuturePathPanel futurePath={signal.futurePath} />

@@ -27,6 +27,14 @@ function clientIp(req: Request) {
   return req.ip || req.socket.remoteAddress || "local";
 }
 
+function userAgent(req: Request) {
+  return req.header("user-agent") ?? "";
+}
+
+function deviceId(req: Request) {
+  return req.header("x-razon-device-id") ?? "";
+}
+
 export function login(req: Request, res: Response) {
   const payload = body(req);
   const identifier = stringField(payload.identifier || payload.email || payload.username);
@@ -47,6 +55,8 @@ export function login(req: Request, res: Response) {
     password,
     rememberMe: booleanField(payload.rememberMe),
     ip: clientIp(req),
+    userAgent: userAgent(req),
+    deviceId: deviceId(req),
   });
   if (!result.ok) {
     return res.status(result.status).json({
@@ -121,6 +131,38 @@ export function logoutGlobal(req: RequestWithAuth, res: Response) {
     ok: true,
     authenticated: false,
     message: "All sessions were logged out.",
+    liveExecutionEnabled: false,
+    automaticTradingAllowed: false,
+    secretsExposed: false,
+  });
+}
+
+export function heartbeat(req: RequestWithAuth, res: Response) {
+  if (!req.auth) {
+    return res.status(401).json({
+      ok: false,
+      error: "AUTH_REQUIRED",
+      liveExecutionEnabled: false,
+      automaticTradingAllowed: false,
+      secretsExposed: false,
+    });
+  }
+
+  const activity = authSessionService.heartbeat(req.auth.userId, req.auth.sessionId);
+  if (!activity) {
+    clearAuthCookies(req, res);
+    return res.status(401).json({
+      ok: false,
+      error: "SESSION_EXPIRED",
+      liveExecutionEnabled: false,
+      automaticTradingAllowed: false,
+      secretsExposed: false,
+    });
+  }
+
+  return res.json({
+    ok: true,
+    session: activity,
     liveExecutionEnabled: false,
     automaticTradingAllowed: false,
     secretsExposed: false,

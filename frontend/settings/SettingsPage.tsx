@@ -1,4 +1,4 @@
-import type { CockpitState, ConnectorLicenseSnapshot, ConnectorStatus, ConnectorUserScope, DataMode, LicenseStatusSnapshot } from "../app/cockpit.types";
+import type { ActionDisplayMode, CockpitState, ConnectorLicenseSnapshot, ConnectorStatus, ConnectorUserScope, DataMode, LicenseStatusSnapshot } from "../app/cockpit.types";
 import { StatusPill } from "../components/CockpitPrimitives";
 import { TradingModeSelector } from "../components/TradingModeSelector";
 import { ConnectorSettingsPanel } from "../connectors/ConnectorSettingsPanel";
@@ -16,6 +16,8 @@ export function SettingsPage({
   state,
   user,
   onDataModeChange,
+  actionDisplayMode,
+  onActionDisplayModeChange,
   onTradingModeChange,
   onStrategyModeChange,
 }: {
@@ -27,6 +29,8 @@ export function SettingsPage({
   state: CockpitState;
   user?: ConnectorUserScope;
   onDataModeChange: (targetMode: DataMode, status: "APPLIED" | "BLOCKED", reason: string) => void;
+  actionDisplayMode: ActionDisplayMode;
+  onActionDisplayModeChange: (mode: ActionDisplayMode) => void;
   onTradingModeChange: Parameters<typeof TradingModeSelector>[0]["onTradingModeChange"];
   onStrategyModeChange: Parameters<typeof TradingModeSelector>[0]["onStrategyModeChange"];
 }) {
@@ -68,6 +72,29 @@ export function SettingsPage({
           onStrategyModeChange={onStrategyModeChange}
           onTradingModeChange={onTradingModeChange}
         />
+        <div className="setting-row action-display-setting">
+          <strong>Deriv action display</strong>
+          <div className="chart-control-group" role="radiogroup" aria-label="Deriv action display">
+            <button
+              aria-checked={actionDisplayMode === "standard"}
+              className={`cockpit-control ${actionDisplayMode === "standard" ? "is-active" : ""}`}
+              onClick={() => onActionDisplayModeChange("standard")}
+              role="radio"
+              type="button"
+            >
+              Standard: BUY/SELL
+            </button>
+            <button
+              aria-checked={actionDisplayMode === "deriv"}
+              className={`cockpit-control ${actionDisplayMode === "deriv" ? "is-active" : ""}`}
+              onClick={() => onActionDisplayModeChange("deriv")}
+              role="radio"
+              type="button"
+            >
+              Deriv: UP/DOWN
+            </button>
+          </div>
+        </div>
       </section>
       <div className="settings-connectors-span">
         <ThemeLanguageSettingsPanel />

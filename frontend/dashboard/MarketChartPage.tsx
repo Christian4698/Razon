@@ -1,4 +1,4 @@
-import type { AlertItem, KalosSignal, MarketStatus, OhlcCandle, WatchlistItem } from "../app/cockpit.types";
+import type { ActionDisplayMode, AlertItem, KalosSignal, MarketStatus, OhlcCandle, WatchlistItem } from "../app/cockpit.types";
 import { chartContextActions, kalosOverlayItems, syntheticIndexSymbols } from "../app/cockpit-data";
 import { AlertPanel } from "../components/AlertPanel";
 import { StatusPill } from "../components/CockpitPrimitives";
@@ -16,19 +16,21 @@ export function MarketChartPage({
   signal,
   watchlist,
   alerts,
+  actionDisplayMode,
 }: {
   candles: readonly OhlcCandle[];
   market: MarketStatus;
   signal: KalosSignal;
   watchlist: readonly WatchlistItem[];
   alerts: readonly AlertItem[];
+  actionDisplayMode: ActionDisplayMode;
 }) {
   const { t } = useLanguage();
   const derivConnected = isDerivDemoConnected(market);
 
   return (
     <div className="cockpit-grid dashboard">
-      <LiveMarketChart candles={candles} market={market} signal={signal} />
+      <LiveMarketChart actionDisplayMode={actionDisplayMode} candles={candles} market={market} signal={signal} />
       <div className="cockpit-stack">
         <WatchlistPanel items={watchlist} />
         <AlertPanel alerts={alerts} />
@@ -46,8 +48,8 @@ export function MarketChartPage({
         <section className="cockpit-panel">
           <div className="cockpit-panel-header">
             <h2>{t("chart.syntheticEngine")}</h2>
-            <StatusPill tone={derivConnected ? "connected" : "MOCK"}>
-              {derivConnected ? "DERIV DEMO CONNECTED" : "MOCK_DATA FALLBACK"}
+            <StatusPill tone={derivConnected ? "connected" : "disconnected"}>
+              {derivConnected ? "DERIV DEMO CONNECTED" : "DERIV DEMO DISCONNECTED"}
             </StatusPill>
           </div>
           <div className="overlay-chip-grid">

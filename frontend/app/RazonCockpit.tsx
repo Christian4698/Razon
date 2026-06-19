@@ -22,6 +22,7 @@ import {
   syntheticIndexProviderSymbols,
 } from "./cockpit-data";
 import type {
+  ActionDisplayMode,
   CockpitPage,
   CockpitState,
   ConnectorLicenseSnapshot,
@@ -68,6 +69,13 @@ const navIcons: Record<CockpitPage, ReactElement> = {
   risk: <Shield size={17} />,
   settings: <Settings size={17} />,
 };
+
+const ACTION_DISPLAY_MODE_STORAGE_KEY = "razon-action-display-mode";
+
+function readInitialActionDisplayMode(): ActionDisplayMode {
+  if (typeof window === "undefined") return "standard";
+  return window.localStorage.getItem(ACTION_DISPLAY_MODE_STORAGE_KEY) === "deriv" ? "deriv" : "standard";
+}
 
 interface BackendMarketSnapshot {
   readonly symbol: string;
@@ -430,6 +438,7 @@ export default function RazonCockpit({
     lastAction: "Cockpit initialise",
   });
   const [demoTick, setDemoTick] = useState(0);
+  const [actionDisplayMode, setActionDisplayMode] = useState<ActionDisplayMode>(readInitialActionDisplayMode);
   const [selectedSyntheticSymbol, setSelectedSyntheticSymbol] = useState<SyntheticIndexSymbol>("Boom 500");
   const [backendSnapshot, setBackendSnapshot] = useState<BackendMarketSnapshot | null>(null);
   const [backendKalos, setBackendKalos] = useState<BackendKalosOutput | null>(null);
@@ -457,6 +466,10 @@ export default function RazonCockpit({
   useEffect(() => {
     setActivePage(initialPage);
   }, [initialPage]);
+
+  useEffect(() => {
+    window.localStorage.setItem(ACTION_DISPLAY_MODE_STORAGE_KEY, actionDisplayMode);
+  }, [actionDisplayMode]);
 
   useEffect(() => {
     const pausePolling = (event: Event) => {
@@ -690,6 +703,7 @@ export default function RazonCockpit({
     alerts,
     backtests: backtestExamples,
     selectedSyntheticSymbol,
+    actionDisplayMode,
     onSyntheticSymbolChange: setSelectedSyntheticSymbol,
     onToggleKalos: handleToggleKalos,
     onTradingModeChange: handleTradingModeChange,
@@ -783,6 +797,7 @@ export default function RazonCockpit({
             {activePage === "dashboard" ? (
               <div className="mobile-only mobile-priority-stack">
                 <MobileKalosCard
+                  actionDisplayMode={actionDisplayMode}
                   enabled={state.kalosEnabled}
                   signal={activeSnapshot.signal}
                   onToggle={handleToggleKalos}
@@ -806,6 +821,7 @@ export default function RazonCockpit({
                 market={activeSnapshot.market}
                 state={state}
                 signal={activeSnapshot.signal}
+                actionDisplayMode={actionDisplayMode}
                 risk={activeSnapshot.risk}
                 onToggleKalos={handleToggleKalos}
               />
@@ -816,6 +832,7 @@ export default function RazonCockpit({
                 candles={activeSnapshot.candles}
                 market={activeSnapshot.market}
                 signal={activeSnapshot.signal}
+                actionDisplayMode={actionDisplayMode}
                 watchlist={activeSnapshot.watchlist}
               />
             ) : null}
@@ -846,6 +863,8 @@ export default function RazonCockpit({
                 state={state}
                 user={backendHealth?.user}
                 onDataModeChange={handleDataModeChange}
+                actionDisplayMode={actionDisplayMode}
+                onActionDisplayModeChange={setActionDisplayMode}
                 onStrategyModeChange={handleStrategyModeChange}
                 onTradingModeChange={handleTradingModeChange}
               />

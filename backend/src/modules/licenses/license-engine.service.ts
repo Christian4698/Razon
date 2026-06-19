@@ -26,6 +26,7 @@ const PLAN_DEFINITIONS: Readonly<Record<LicensePlan, LicensePlanDefinition>> = {
   ELITE: { plan: "ELITE", label: "Elite", deviceLimit: 5, sessionLimit: 8 },
   LIFETIME: { plan: "LIFETIME", label: "Lifetime", deviceLimit: 10, sessionLimit: 20 },
 };
+const ACTIVE_SESSION_WINDOW_MS = Number(process.env.AUTH_ACTIVE_SESSION_WINDOW_MS ?? 5 * 60 * 1000);
 
 const DURATION_MONTHS: Readonly<Record<Exclude<LicenseDuration, "LIFETIME">, number>> = {
   "1_MONTH": 1,
@@ -54,6 +55,12 @@ function createId(prefix: string) {
 
 function sha256(value: string) {
   return crypto.createHash("sha256").update(value).digest("hex");
+}
+
+function safeUserAgent(value: string | null | undefined) {
+  const trimmed = String(value ?? "").trim();
+  if (!trimmed) return null;
+  return trimmed.slice(0, 180);
 }
 
 function generateLicenseKey(plan: LicensePlan) {
@@ -91,6 +98,10 @@ function toSafeLicense(license: License): SafeLicense {
 
 function isExpired(license: License, at = nowDate()) {
   return Boolean(license.expiresAt && new Date(license.expiresAt).getTime() <= at.getTime());
+}
+
+function isRecentlySeen(lastSeenAt: string, at = nowDate()) {
+  return new Date(lastSeenAt).getTime() > at.getTime() - ACTIVE_SESSION_WINDOW_MS;
 }
 
 export class LicenseEngineService {
@@ -189,16 +200,17 @@ export class LicenseEngineService {
 
     const plan = PLAN_DEFINITIONS[current.plan];
     const existingDevices = this.devices.listByLicense(current.id);
+    const activeExistingDevices = existingDevices.filter(device => isRecentlySeen(device.lastSeenAt));
     const requestedDeviceId = input.deviceId?.trim() || `${user.id}:default-device`;
     const deviceAlreadyRegistered = existingDevices.some(device => device.fingerprintHash === sha256(requestedDeviceId));
-    if (!deviceAlreadyRegistered && existingDevices.length >= plan.deviceLimit) {
+    if (!deviceAlreadyRegistered && activeExistingDevices.length >= plan.deviceLimit) {
       this.audit.log({
         userId: user.id,
         licenseId: current.id,
         event: "DEVICE_LIMIT_REACHED",
         status: current.status,
         message: "Device limit reached during license activation.",
-        metadata: { deviceLimit: plan.deviceLimit, activeDevices: existingDevices.length },
+        metadata: { deviceLimit: plan.deviceLimit, activeDevices: activeExistingDevices.length },
       });
       return this.actionResult(user.id, current, false, "Device limit reached.");
     }
@@ -210,16 +222,17 @@ export class LicenseEngineService {
       label: input.deviceLabel,
     });
     const existingSessions = this.sessions.listByLicense(current.id);
+    const activeExistingSessions = existingSessions.filter(session => isRecentlySeen(session.lastSeenAt));
     const requestedSessionId = input.sessionId?.trim() || `${user.id}:default-session`;
     const sessionAlreadyRegistered = existingSessions.some(session => session.id === sha256(`${user.id}:${current.id}:${device.id}:${requestedSessionId}`).slice(0, 24));
-    if (!sessionAlreadyRegistered && existingSessions.length >= plan.sessionLimit) {
+    if (!sessionAlreadyRegistered && activeExistingSessions.length >= plan.sessionLimit) {
       this.audit.log({
         userId: user.id,
         licenseId: current.id,
         event: "SESSION_LIMIT_REACHED",
         status: current.status,
         message: "Session limit reached during license activation.",
-        metadata: { sessionLimit: plan.sessionLimit, activeSessions: existingSessions.length },
+        metadata: { sessionLimit: plan.sessionLimit, activeSessions: activeExistingSessions.length },
       });
       return this.actionResult(user.id, current, false, "Session limit reached.");
     }
@@ -261,6 +274,60 @@ export class LicenseEngineService {
     const license = this.currentLicenseForUser(user.id);
     if (!license) return this.snapshot(user.id, null, "License required.");
     return this.snapshot(user.id, this.refreshLicenseStatus(license));
+  }
+
+  bindAuthSession(input: {
+    readonly userId: string;
+    readonly sessionId: string;
+    readonly deviceId?: string;
+    readonly userAgent?: string | null;
+    readonly ipHash?: string | null;
+  }) {
+    const user = this.users.getOrCreate({ userId: input.userId });
+    const license = this.currentLicenseForUser(user.id);
+    const refreshed = license ? this.refreshLicenseStatus(license) : null;
+    if (!refreshed || refreshed.status === "REVOKED" || refreshed.status === "SUSPENDED") {
+      return { licenseId: null, deviceId: null };
+    }
+
+    const rawDeviceId = input.deviceId?.trim() || `${user.id}:${safeUserAgent(input.userAgent) ?? "unknown-device"}`;
+    const device = this.devices.register({
+      userId: user.id,
+      licenseId: refreshed.id,
+      deviceId: rawDeviceId,
+      label: safeUserAgent(input.userAgent) ?? "Current device",
+      userAgent: safeUserAgent(input.userAgent),
+      ipHash: input.ipHash ?? null,
+    });
+    this.sessions.start({
+      userId: user.id,
+      licenseId: refreshed.id,
+      deviceId: device.id,
+      sessionId: input.sessionId,
+      userAgent: safeUserAgent(input.userAgent),
+      ipHash: input.ipHash ?? null,
+    });
+
+    return { licenseId: refreshed.id, deviceId: device.id };
+  }
+
+  heartbeatAuthSession(userId: string, sessionId: string, deviceId?: string | null) {
+    const license = this.currentLicenseForUser(userId);
+    const refreshed = license ? this.refreshLicenseStatus(license) : null;
+    if (!refreshed || !deviceId) return false;
+    this.devices.touch(deviceId);
+    return Boolean(this.sessions.touchByRawSessionId({ userId, licenseId: refreshed.id, deviceId, sessionId }));
+  }
+
+  revokeAuthSession(userId: string, sessionId: string, deviceId?: string | null) {
+    const license = this.currentLicenseForUser(userId);
+    const refreshed = license ? this.refreshLicenseStatus(license) : null;
+    if (!refreshed || !deviceId) return false;
+    return this.sessions.revokeByRawSessionId({ userId, licenseId: refreshed.id, deviceId, sessionId });
+  }
+
+  revokeUserSessions(userId: string) {
+    return this.sessions.revokeByUser(userId);
   }
 
   renew(input: LicenseActionInput): LicenseActionResult {
@@ -439,6 +506,8 @@ export class LicenseEngineService {
     const plan = refreshed ? PLAN_DEFINITIONS[refreshed.plan] : null;
     const devices = refreshed ? this.devices.listByLicense(refreshed.id) : [];
     const sessions = refreshed ? this.sessions.listByLicense(refreshed.id) : [];
+    const activeDevices = devices.filter(device => isRecentlySeen(device.lastSeenAt));
+    const activeSessions = sessions.filter(session => isRecentlySeen(session.lastSeenAt));
     const status = refreshed?.status ?? "MISSING";
     const dashboardBlocked = status === "MISSING" || status === "EXPIRED" || status === "SUSPENDED" || status === "REVOKED";
     const warnings: string[] = [];
@@ -447,8 +516,8 @@ export class LicenseEngineService {
     if (status === "EXPIRED") warnings.push("LICENSE EXPIRED");
     if (status === "SUSPENDED") warnings.push("LICENSE SUSPENDED");
     if (status === "REVOKED") warnings.push("LICENSE REVOKED");
-    if (plan && devices.length >= plan.deviceLimit) warnings.push("DEVICE LIMIT REACHED");
-    if (plan && sessions.length >= plan.sessionLimit) warnings.push("SESSION LIMIT REACHED");
+    if (plan && activeDevices.length >= plan.deviceLimit) warnings.push("DEVICE LIMIT REACHED");
+    if (plan && activeSessions.length >= plan.sessionLimit) warnings.push("SESSION LIMIT REACHED");
 
     return {
       userId,
@@ -458,9 +527,9 @@ export class LicenseEngineService {
       status,
       expiryDate: refreshed?.expiresAt ?? null,
       deviceLimit: plan?.deviceLimit ?? null,
-      activeDevices: devices.length,
+      activeDevices: activeDevices.length,
       sessionLimit: plan?.sessionLimit ?? null,
-      activeSessions: sessions.length,
+      activeSessions: activeSessions.length,
       devices,
       sessions,
       dashboardBlocked,

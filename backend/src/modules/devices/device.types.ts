@@ -6,6 +6,8 @@ export interface Device {
   readonly fingerprintHash: string;
   readonly firstSeenAt: string;
   readonly lastSeenAt: string;
+  readonly userAgent?: string | null;
+  readonly ipHash?: string | null;
   readonly revoked: boolean;
 }
 
@@ -14,4 +16,6 @@ export interface RegisterDeviceInput {
   readonly licenseId: string;
   readonly deviceId?: string;
   readonly label?: string;
+  readonly userAgent?: string | null;
+  readonly ipHash?: string | null;
 }

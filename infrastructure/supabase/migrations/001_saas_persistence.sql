@@ -72,8 +72,13 @@ create table if not exists devices (
   fingerprint_hash text not null,
   first_seen_at timestamptz not null default now(),
   last_seen_at timestamptz not null default now(),
+  user_agent text,
+  ip_hash text,
   revoked boolean not null default false
 );
+
+alter table devices add column if not exists user_agent text;
+alter table devices add column if not exists ip_hash text;
 
 create table if not exists sessions (
   id text primary key,
@@ -86,8 +91,13 @@ create table if not exists sessions (
   expires_at timestamptz,
   created_at timestamptz not null default now(),
   last_seen_at timestamptz not null default now(),
+  user_agent text,
+  ip_hash text,
   revoked_at timestamptz
 );
+
+alter table sessions add column if not exists user_agent text;
+alter table sessions add column if not exists ip_hash text;
 
 create table if not exists connector_secrets (
   id text primary key,

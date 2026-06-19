@@ -77,6 +77,21 @@ interface AuthContextValue {
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
+const DEVICE_ID_STORAGE_KEY = "razon_device_id";
+
+function randomDeviceId() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
+  return `device-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+}
+
+function getDeviceId() {
+  if (typeof window === "undefined") return "server-device";
+  const existing = window.localStorage.getItem(DEVICE_ID_STORAGE_KEY);
+  if (existing) return existing;
+  const next = randomDeviceId();
+  window.localStorage.setItem(DEVICE_ID_STORAGE_KEY, next);
+  return next;
+}
 
 async function parseResponse<T>(response: Response): Promise<T> {
   const payload = await response.json().catch(() => ({}));
@@ -91,7 +106,7 @@ async function postJson<T>(url: string, body: Record<string, unknown>): Promise<
   const response = await fetch(`${API_BASE_URL}${url}`, {
     body: JSON.stringify(body),
     credentials: "include",
-    headers: { "Content-Type": "application/json", Accept: "application/json" },
+    headers: { "Content-Type": "application/json", Accept: "application/json", "X-Razon-Device-Id": getDeviceId() },
     method: "POST",
   });
   return parseResponse<T>(response);
@@ -128,6 +143,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       cancelled = true;
     };
   }, [refreshMe]);
+
+  useEffect(() => {
+    if (!session) return undefined;
+
+    const heartbeat = () => {
+      void fetch(`${API_BASE_URL}/api/sessions/heartbeat`, {
+        credentials: "include",
+        headers: { Accept: "application/json", "X-Razon-Device-Id": getDeviceId() },
+        method: "POST",
+      }).catch(() => undefined);
+    };
+
+    heartbeat();
+    const timer = window.setInterval(heartbeat, 45000);
+    return () => window.clearInterval(timer);
+  }, [session]);
 
   const login = useCallback(async (input: { identifier: string; password: string; rememberMe: boolean }) => {
     const payload = await postJson<AuthSession>("/api/auth/login", input);

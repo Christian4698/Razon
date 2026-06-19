@@ -267,9 +267,15 @@ export function forceLogoutAdminUser(req: Request, res: Response) {
 
 export function listAdminDevices(_req: Request, res: Response) {
   const snapshot = licenseEngineService.exportPersistence();
+  const authActivity = authSessionService.listSessionActivity();
   return sendJson(res, {
     devices: snapshot.devices,
     sessions: snapshot.licenseSessions,
+    authActivity,
+    globalActiveUsers: authActivity.activeUsers,
+    globalActiveDevices: authActivity.activeDevices,
+    globalActiveSessions: authActivity.activeSessions,
+    perUserSessions: authActivity.byUser,
     liveExecutionEnabled: false as const,
     automaticTradingAllowed: false as const,
     secretsExposed: false as const,

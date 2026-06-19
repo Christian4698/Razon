@@ -1,4 +1,5 @@
-import type { CockpitState, KalosSignal, MarketStatus, RiskStatus } from "../app/cockpit.types";
+import type { ActionDisplayMode, CockpitState, KalosSignal, MarketStatus, RiskStatus } from "../app/cockpit.types";
+import { displayAction } from "../app/actionDisplay";
 import { frappeDollarChecklist, syntheticIndexSymbols } from "../app/cockpit-data";
 import { KalosSignalCard } from "../components/KalosSignalCard";
 import { KalosFuturePathPanel } from "./KalosFuturePathPanel";
@@ -13,12 +14,14 @@ export function KalosPanelPage({
   market,
   state,
   signal,
+  actionDisplayMode,
   risk,
   onToggleKalos,
 }: {
   market: MarketStatus;
   state: CockpitState;
   signal: KalosSignal;
+  actionDisplayMode: ActionDisplayMode;
   risk: RiskStatus;
   onToggleKalos: () => void;
 }) {
@@ -27,7 +30,8 @@ export function KalosPanelPage({
     market.source === "DEMO" &&
     market.sourceStatus === "CONNECTED" &&
     market.session.toLowerCase().includes("deriv");
-  const syntheticStatus = derivConnected ? "DERIV DEMO CONNECTED" : "MOCK_DATA FALLBACK";
+  const syntheticStatus = derivConnected ? "DERIV DEMO CONNECTED" : "DERIV DEMO DISCONNECTED";
+  const actionLabel = displayAction(signal.decision, actionDisplayMode);
   const layers = [
     { label: "HTF", value: signal.htf },
     { label: "MTF", value: signal.mtf },
@@ -55,7 +59,7 @@ export function KalosPanelPage({
   return (
     <div className="cockpit-grid two">
       <div className="cockpit-stack">
-        <KalosSignalCard enabled={state.kalosEnabled} onToggle={onToggleKalos} signal={signal} />
+        <KalosSignalCard actionDisplayMode={actionDisplayMode} enabled={state.kalosEnabled} onToggle={onToggleKalos} signal={signal} />
         <KalosVisualIntelligencePanel signal={signal} />
         <KalosMarketBrainPanel brain={signal.marketBrain} />
         <KalosFuturePathPanel futurePath={signal.futurePath} />
@@ -63,7 +67,7 @@ export function KalosPanelPage({
         <section className="cockpit-panel">
           <div className="cockpit-panel-header">
             <h2>HTF / MTF / LTF</h2>
-            <StatusPill tone={signal.decision}>{signal.decision}</StatusPill>
+            <StatusPill tone={signal.decision}>ACTION: {actionLabel}</StatusPill>
           </div>
           <div className="cockpit-grid three">
             {layers.map(layer => (
@@ -114,7 +118,7 @@ export function KalosPanelPage({
         <section className="cockpit-panel">
           <div className="cockpit-panel-header">
             <h2>{t("kalos.syntheticIndices")}</h2>
-            <StatusPill tone={derivConnected ? "connected" : "MOCK"}>{syntheticStatus}</StatusPill>
+            <StatusPill tone={derivConnected ? "connected" : "disconnected"}>{syntheticStatus}</StatusPill>
           </div>
           <div className="overlay-chip-grid">
             {syntheticIndexSymbols.map(symbol => (

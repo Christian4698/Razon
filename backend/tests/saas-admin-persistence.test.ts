@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createLicenseEngineService } from "../src/modules/licenses";
+import { createLicenseEngineService, licenseEngineService } from "../src/modules/licenses";
 import { authSessionService } from "../src/modules/security/auth-session.service";
 import {
   deleteConnectorSecret,
@@ -13,6 +13,32 @@ import {
 } from "../../server/services/connectors/connectorSecretsRepository";
 
 describe("SaaS admin persistence contracts", () => {
+  function provisionLicensedUser(userId: string, password: string, role: "OWNER" | "ADMIN" | "USER" = "USER") {
+    const created = licenseEngineService.createLicense({
+      userId,
+      email: `${userId}@example.com`,
+      displayName: userId,
+      plan: "LIFETIME",
+      duration: "LIFETIME",
+    });
+    authSessionService.provisionUser({
+      userId,
+      email: `${userId}@example.com`,
+      username: userId,
+      displayName: userId,
+      role,
+      temporaryPassword: password,
+      mustChangePassword: false,
+      firstLoginCompleted: true,
+    });
+    expect(licenseEngineService.activate({
+      userId,
+      licenseKey: created.oneTimeLicenseKey,
+      deviceId: `${userId}-activation-device`,
+      sessionId: `${userId}-activation-session`,
+    }).ok).toBe(true);
+  }
+
   it("exports and restores licenses, subscriptions, devices, sessions and audit logs", () => {
     const source = createLicenseEngineService();
     const created = source.createLicense({
@@ -204,5 +230,95 @@ describe("SaaS admin persistence contracts", () => {
     expect(snapshot.status).toBe("EXPIRED");
     expect(snapshot.limitedReadOnly).toBe(true);
     expect(snapshot.liveExecutionEnabled).toBe(false);
+  });
+
+  it("tracks admin and Zeus auth sessions globally while keeping current-user license counts scoped", () => {
+    const suffix = Date.now();
+    const adminId = `session-admin-${suffix}`;
+    const zeusId = `session-zeus-${suffix}`;
+    provisionLicensedUser(adminId, "AdminPass1234", "ADMIN");
+    provisionLicensedUser(zeusId, "ZeusPass1234", "USER");
+
+    const before = authSessionService.listSessionActivity();
+    const adminLogin = authSessionService.login({
+      identifier: adminId,
+      password: "AdminPass1234",
+      rememberMe: false,
+      ip: "203.0.113.10",
+      userAgent: "Admin Test Browser",
+      deviceId: "admin-device-a",
+    });
+    const zeusLogin = authSessionService.login({
+      identifier: zeusId,
+      password: "ZeusPass1234",
+      rememberMe: false,
+      ip: "203.0.113.11",
+      userAgent: "Zeus Test Browser",
+      deviceId: "zeus-device-b",
+    });
+
+    expect(adminLogin.ok).toBe(true);
+    expect(zeusLogin.ok).toBe(true);
+
+    const activity = authSessionService.listSessionActivity();
+    expect(activity.activeSessions).toBeGreaterThanOrEqual(before.activeSessions + 2);
+    expect(activity.activeDevices).toBeGreaterThanOrEqual(before.activeDevices + 2);
+    expect(activity.byUser.find(user => user.userId === adminId)?.activeSessions).toBe(1);
+    expect(activity.byUser.find(user => user.userId === zeusId)?.activeSessions).toBe(1);
+    expect(JSON.stringify(activity)).not.toContain("203.0.113.10");
+    expect(JSON.stringify(activity)).toContain("Admin Test Browser");
+    expect(activity.byUser.find(user => user.userId === adminId)?.sessions[0]?.ipHash).toMatch(/^[a-f0-9]{12}\.\.\.$/);
+
+    const adminLicense = licenseEngineService.status(adminId);
+    const zeusLicense = licenseEngineService.status(zeusId);
+    expect(adminLicense.userId).toBe(adminId);
+    expect(zeusLicense.userId).toBe(zeusId);
+    expect(adminLicense.activeDevices).toBeGreaterThanOrEqual(1);
+    expect(zeusLicense.activeDevices).toBeGreaterThanOrEqual(1);
+  });
+
+  it("expires inactive sessions after five minutes and heartbeat restores current activity", () => {
+    const userId = `session-timeout-${Date.now()}`;
+    provisionLicensedUser(userId, "TimeoutPass1234");
+    const login = authSessionService.login({
+      identifier: userId,
+      password: "TimeoutPass1234",
+      rememberMe: false,
+      ip: "198.51.100.20",
+      userAgent: "Timeout Test Browser",
+      deviceId: "timeout-device",
+    });
+    expect(login.ok).toBe(true);
+    if (!login.ok) return;
+
+    const stale = new Date(Date.now() - 6 * 60 * 1000).toISOString();
+    expect(authSessionService.setSessionLastSeenForTest(login.snapshot.session.id, stale)).toBe(true);
+    const expired = authSessionService.listSessionActivity().sessions.find(session => session.id === login.snapshot.session.id);
+    expect(expired?.status).toBe("EXPIRED");
+
+    const heartbeat = authSessionService.heartbeat(userId, login.snapshot.session.id);
+    expect(heartbeat?.status).toBe("ACTIVE");
+  });
+
+  it("force logout revokes user auth sessions and license sessions", () => {
+    const userId = `session-revoke-${Date.now()}`;
+    provisionLicensedUser(userId, "RevokePass1234");
+    const login = authSessionService.login({
+      identifier: userId,
+      password: "RevokePass1234",
+      rememberMe: false,
+      ip: "198.51.100.30",
+      userAgent: "Revoke Test Browser",
+      deviceId: "revoke-device",
+    });
+    expect(login.ok).toBe(true);
+    if (!login.ok) return;
+
+    authSessionService.logoutGlobal(userId);
+    const activity = authSessionService.listSessionActivity();
+    const session = activity.sessions.find(item => item.id === login.snapshot.session.id);
+    expect(session?.status).toBe("REVOKED");
+    expect(activity.byUser.find(user => user.userId === userId)?.activeSessions).toBe(0);
+    expect(licenseEngineService.status(userId).sessions.every(item => item.revoked)).toBe(true);
   });
 });

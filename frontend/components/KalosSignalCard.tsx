@@ -1,6 +1,7 @@
 import { Eye, Target, XCircle } from "lucide-react";
-import type { KalosSignal } from "../app/cockpit.types";
-import { formatDecision, formatPrice, Panel, StatusPill } from "./CockpitPrimitives";
+import type { ActionDisplayMode, KalosSignal } from "../app/cockpit.types";
+import { displayAction, equivalentActionLabel, toDerivAction } from "../app/actionDisplay";
+import { formatPrice, Panel, StatusPill } from "./CockpitPrimitives";
 import { ConfidenceGauge } from "./ConfidenceGauge";
 import { useLanguage } from "@/i18n/useLanguage";
 
@@ -14,16 +15,21 @@ function kalosSourceLabel(signal: KalosSignal) {
 }
 
 export function KalosSignalCard({
+  actionDisplayMode = "standard",
   signal,
   enabled,
   onToggle,
 }: {
+  actionDisplayMode?: ActionDisplayMode;
   signal: KalosSignal;
   enabled: boolean;
   onToggle: () => void;
 }) {
   const { t } = useLanguage();
   const sourceLabel = kalosSourceLabel(signal);
+  const actionLabel = displayAction(signal.decision, actionDisplayMode);
+  const equivalent = equivalentActionLabel(signal.decision, actionDisplayMode);
+  const derivPreview = toDerivAction(signal.decision);
 
   return (
     <Panel
@@ -37,7 +43,9 @@ export function KalosSignalCard({
     >
       <div className="cockpit-row" style={{ alignItems: "flex-start" }}>
         <div className="cockpit-stack">
-          <StatusPill tone={signal.decision}>{formatDecision(signal.decision)}</StatusPill>
+          <StatusPill tone={signal.decision}>ACTION: {actionLabel}</StatusPill>
+          <span className="cockpit-muted">{equivalent.label}: {equivalent.value}</span>
+          <span className="cockpit-muted">Would execute: {derivPreview}</span>
           <div>
             <div className="cockpit-label">{t("common.symbol")}</div>
             <div className="cockpit-value">{signal.symbol}</div>

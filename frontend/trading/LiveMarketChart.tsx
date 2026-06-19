@@ -46,8 +46,9 @@ import {
   type MouseEvent,
   type PointerEvent as ReactPointerEvent,
 } from "react";
-import type { KalosSignal, MarketStatus, OhlcCandle } from "../app/cockpit.types";
-import { formatDecision, formatPrice, StatusPill } from "../components/CockpitPrimitives";
+import type { ActionDisplayMode, KalosSignal, MarketStatus, OhlcCandle } from "../app/cockpit.types";
+import { displayAction, equivalentActionLabel, toDerivAction } from "../app/actionDisplay";
+import { formatPrice, StatusPill } from "../components/CockpitPrimitives";
 import {
   computeIndicators,
   createIndicatorConfig,
@@ -542,10 +543,12 @@ function publishChartNavigationPause(durationMs = 10000) {
 }
 
 export function LiveMarketChart({
+  actionDisplayMode = "standard",
   candles,
   market,
   signal,
 }: {
+  actionDisplayMode?: ActionDisplayMode;
   candles: readonly OhlcCandle[];
   market: MarketStatus;
   signal: KalosSignal;
@@ -1128,7 +1131,7 @@ export function LiveMarketChart({
         }
 
         if (!compactLabels) {
-          drawLabel(overlayContext, signal.decision, Math.min(signalX + 12, width - 28), signalY + 2, overlayColor);
+          drawLabel(overlayContext, displayAction(signal.decision, actionDisplayMode), Math.min(signalX + 12, width - 28), signalY + 2, overlayColor);
         }
       }
       overlayContext.restore();
@@ -1148,7 +1151,7 @@ export function LiveMarketChart({
       overlayContext.stroke();
       overlayContext.restore();
     }
-  }, [computedIndicators, draftDrawing, drawingPointToCanvas, drawings, kalosVisible, market.price, overlaysVisible, selectedDrawingId, signal, virtualCandles]);
+  }, [actionDisplayMode, computedIndicators, draftDrawing, drawingPointToCanvas, drawings, kalosVisible, market.price, overlaysVisible, selectedDrawingId, signal, virtualCandles]);
 
   const scheduleDraw = useCallback(() => {
     if (rafRef.current !== null) return;
@@ -1866,6 +1869,9 @@ export function LiveMarketChart({
     : undefined;
   const tooltipMomentum = tooltip ? `${tooltip.candle.momentum >= 0 ? "+" : ""}${formatPrice(tooltip.candle.momentum)}` : "";
   const contextDrawing = contextMenu?.drawingId ? drawings.find(drawing => drawing.id === contextMenu.drawingId) : null;
+  const actionLabel = displayAction(signal.decision, actionDisplayMode);
+  const equivalent = equivalentActionLabel(signal.decision, actionDisplayMode);
+  const derivExecutionPreview = toDerivAction(signal.decision);
 
   return (
     <section className="cockpit-panel">
@@ -1878,7 +1884,11 @@ export function LiveMarketChart({
             {market.volume.toLocaleString("en-US")}
           </p>
         </div>
-        <StatusPill tone={signal.decision}>{formatDecision(signal.decision)}</StatusPill>
+        <div className="chart-decision-card" aria-label="Decision card">
+          <StatusPill tone={signal.decision}>ACTION: {actionLabel}</StatusPill>
+          <span className="cockpit-muted">{equivalent.label}: {equivalent.value}</span>
+          <span className="cockpit-muted">Would execute: {derivExecutionPreview}</span>
+        </div>
       </div>
 
       <div className="chart-engine-toolbar" aria-label="Chart engine controls">

@@ -603,6 +603,20 @@
   min-width: 0;
 }
 
+.chart-decision-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  min-width: 172px;
+  text-align: right;
+}
+
+.action-display-setting {
+  align-items: flex-start;
+  margin-top: 12px;
+}
+
 .indicator-panel {
   display: grid;
   gap: 9px;

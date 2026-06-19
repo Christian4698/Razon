@@ -9,6 +9,8 @@ export type CockpitPage =
 
 export type SignalDecision = "BUY" | "SELL" | "WAIT" | "NO_TRADE" | "DATA_LOW" | "INVALID";
 
+export type ActionDisplayMode = "standard" | "deriv";
+
 export type TradingMode = "ANALYSE_SEULEMENT" | "MANUEL" | "SEMI_AUTO" | "AUTO";
 
 export type StrategyMode = "SCALPING" | "SHORT_TERM" | "LONG_TERM";

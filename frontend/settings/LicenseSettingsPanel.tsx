@@ -55,6 +55,44 @@ interface AdminDevicesPayload {
     readonly lastSeenAt: string;
     readonly revoked: boolean;
   }[];
+  readonly authActivity?: {
+    readonly activeUsers: number;
+    readonly activeDevices: number;
+    readonly activeSessions: number;
+    readonly totalSessions: number;
+    readonly activeWindowSeconds: number;
+    readonly byUser: readonly AdminUserSessionGroup[];
+    readonly secretsExposed: false;
+  };
+  readonly globalActiveUsers?: number;
+  readonly globalActiveDevices?: number;
+  readonly globalActiveSessions?: number;
+  readonly perUserSessions?: readonly AdminUserSessionGroup[];
+}
+
+interface AdminSafeSession {
+  readonly id: string;
+  readonly userId: string;
+  readonly displayName: string;
+  readonly email: string;
+  readonly licenseId: string | null;
+  readonly deviceId: string | null;
+  readonly userAgent: string | null;
+  readonly ipHash: string | null;
+  readonly createdAt: string;
+  readonly lastSeenAt: string;
+  readonly expiresAt: string;
+  readonly status: "ACTIVE" | "EXPIRED" | "REVOKED";
+}
+
+interface AdminUserSessionGroup {
+  readonly userId: string;
+  readonly displayName: string;
+  readonly email: string;
+  readonly role: "OWNER" | "ADMIN" | "USER";
+  readonly activeSessions: number;
+  readonly totalSessions: number;
+  readonly sessions: readonly AdminSafeSession[];
 }
 
 interface AdminAuditPayload {
@@ -104,6 +142,10 @@ export function LicenseSettingsPanel({
   const [adminUsers, setAdminUsers] = useState<AdminUsersPayload["users"]>([]);
   const [adminDevices, setAdminDevices] = useState<AdminDevicesPayload["devices"]>([]);
   const [adminSessions, setAdminSessions] = useState<AdminDevicesPayload["sessions"]>([]);
+  const [globalActiveUsers, setGlobalActiveUsers] = useState(0);
+  const [globalActiveDevices, setGlobalActiveDevices] = useState(0);
+  const [globalActiveSessions, setGlobalActiveSessions] = useState(0);
+  const [perUserSessions, setPerUserSessions] = useState<readonly AdminUserSessionGroup[]>([]);
   const [adminAuditLogs, setAdminAuditLogs] = useState<AdminAuditPayload["auditLogs"]>([]);
   const [createUserId, setCreateUserId] = useState("");
   const [createUsername, setCreateUsername] = useState("client");
@@ -154,6 +196,10 @@ export function LicenseSettingsPanel({
       const payload = (await devicesResponse.json()) as AdminDevicesPayload;
       setAdminDevices(payload.devices);
       setAdminSessions(payload.sessions);
+      setGlobalActiveUsers(payload.globalActiveUsers ?? payload.authActivity?.activeUsers ?? 0);
+      setGlobalActiveDevices(payload.globalActiveDevices ?? payload.authActivity?.activeDevices ?? 0);
+      setGlobalActiveSessions(payload.globalActiveSessions ?? payload.authActivity?.activeSessions ?? 0);
+      setPerUserSessions(payload.perUserSessions ?? payload.authActivity?.byUser ?? []);
     }
     if (auditResponse.ok) {
       const payload = (await auditResponse.json()) as AdminAuditPayload;
@@ -292,11 +338,11 @@ export function LicenseSettingsPanel({
           <strong>{formatDate(license?.expiryDate, locale)}</strong>
         </span>
         <span>
-          <b>{t("license.devices")}</b>
+          <b>{t("license.devices")} (current user only)</b>
           <strong>{limitLabel(license?.activeDevices ?? 0, license?.deviceLimit ?? null)}</strong>
         </span>
         <span>
-          <b>{t("license.sessions")}</b>
+          <b>{t("license.sessions")} (current user only)</b>
           <strong>{limitLabel(license?.activeSessions ?? 0, license?.sessionLimit ?? null)}</strong>
         </span>
         <span>
@@ -434,6 +480,51 @@ export function LicenseSettingsPanel({
                 {user.status === "DISABLED" ? "Reactivate" : "Suspend"}
               </button>
               <button onClick={() => actOnUser("logout-global", user.id)} type="button">Force logout</button>
+            </div>
+          ))}
+        </div>
+      </div> : null}
+
+      {canManageLicenses ? <div className="license-admin-list">
+        <div>
+          <h3>Global active sessions</h3>
+          <div className="license-grid compact">
+            <span>
+              <b>Global active users</b>
+              <strong>{globalActiveUsers}</strong>
+            </span>
+            <span>
+              <b>Global active devices</b>
+              <strong>{globalActiveDevices}</strong>
+            </span>
+            <span>
+              <b>Global active sessions</b>
+              <strong>{globalActiveSessions}</strong>
+            </span>
+          </div>
+          <p className="cockpit-muted">
+            Counts are based on authenticated sessions seen in the last 5 minutes. Raw IP addresses are never displayed.
+          </p>
+        </div>
+        <div>
+          <h3>Per-user active sessions</h3>
+          {perUserSessions.length === 0 ? <p className="cockpit-muted">No authenticated sessions yet.</p> : null}
+          {perUserSessions.slice(0, 8).map(group => (
+            <div className="license-admin-row user" key={group.userId}>
+              <span>
+                <strong>{group.displayName}</strong>
+                <small>
+                  {group.email || group.userId} | {group.role} | active {group.activeSessions} / total {group.totalSessions}
+                </small>
+                {group.sessions.slice(0, 3).map(item => (
+                  <small key={item.id}>
+                    {item.status} | device {item.deviceId ? item.deviceId.slice(0, 8) : "n/a"} | {formatDate(item.lastSeenAt, locale)} | {item.userAgent ?? "unknown agent"}
+                  </small>
+                ))}
+              </span>
+              <StatusPill tone={group.activeSessions > 0 ? "connected" : "critical"}>
+                {group.activeSessions > 0 ? "ACTIVE" : "INACTIVE"}
+              </StatusPill>
             </div>
           ))}
         </div>

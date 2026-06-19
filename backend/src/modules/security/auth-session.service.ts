@@ -67,12 +67,16 @@ export interface PasswordRecord {
 export interface RefreshRecord {
   readonly id: string;
   readonly userId: string;
+  readonly licenseId?: string | null;
+  readonly deviceId?: string | null;
   readonly tokenHash: string;
   readonly createdAt: string;
   readonly expiresAt: string;
   readonly lastSeenAt: string;
   readonly revokedAt: string | null;
   readonly rememberMe: boolean;
+  readonly userAgent?: string | null;
+  readonly ipHash?: string | null;
 }
 
 export interface ResetRecord {
@@ -112,6 +116,7 @@ const rememberRefreshTtlSeconds = Number(process.env.AUTH_REMEMBER_REFRESH_TTL_S
 const resetTtlSeconds = Number(process.env.AUTH_RESET_TTL_SECONDS ?? 15 * 60);
 const loginWindowMs = Number(process.env.AUTH_LOGIN_WINDOW_MS ?? 5 * 60 * 1000);
 const loginMaxAttempts = Number(process.env.AUTH_LOGIN_MAX_ATTEMPTS ?? 8);
+const activeSessionWindowMs = Number(process.env.AUTH_ACTIVE_SESSION_WINDOW_MS ?? 5 * 60 * 1000);
 
 function nowMs() {
   return Date.now();
@@ -131,6 +136,12 @@ function randomToken(bytes = 32) {
 
 function sha256(value: string) {
   return crypto.createHash("sha256").update(value).digest("hex");
+}
+
+function safeUserAgent(value: string | null | undefined) {
+  const trimmed = String(value ?? "").trim();
+  if (!trimmed) return null;
+  return trimmed.slice(0, 180);
 }
 
 function base64UrlJson(value: unknown) {
@@ -273,7 +284,14 @@ export class AuthSessionService {
     };
   }
 
-  login(input: { readonly identifier: string; readonly password: string; readonly rememberMe?: boolean; readonly ip?: string }): LoginResult {
+  login(input: {
+    readonly identifier: string;
+    readonly password: string;
+    readonly rememberMe?: boolean;
+    readonly ip?: string;
+    readonly userAgent?: string;
+    readonly deviceId?: string;
+  }): LoginResult {
     const attempt = this.checkLoginRate(input.ip ?? "local", input.identifier);
     if (!attempt.allowed) {
       return {
@@ -310,15 +328,26 @@ export class AuthSessionService {
     const sessionId = randomToken(18);
     const refreshToken = randomToken(36);
     const refreshExpiresAt = addSeconds(input.rememberMe ? rememberRefreshTtlSeconds : refreshTtlSeconds);
+    const licenseBinding = licenseEngineService.bindAuthSession({
+      userId: user.id,
+      sessionId,
+      deviceId: input.deviceId,
+      userAgent: input.userAgent,
+      ipHash: input.ip ? sha256(input.ip) : null,
+    });
     const record: RefreshRecord = {
       id: sessionId,
       userId: user.id,
+      licenseId: licenseBinding.licenseId,
+      deviceId: licenseBinding.deviceId,
       tokenHash: sha256(refreshToken),
       createdAt: nowIso(),
       expiresAt: refreshExpiresAt,
       lastSeenAt: nowIso(),
       revokedAt: null,
       rememberMe: Boolean(input.rememberMe),
+      userAgent: safeUserAgent(input.userAgent),
+      ipHash: input.ip ? sha256(input.ip) : null,
     };
 
     this.refreshTokens.set(sessionId, record);
@@ -361,6 +390,7 @@ export class AuthSessionService {
     if (!user || user.status !== "ACTIVE") return null;
     const nextRecord: RefreshRecord = { ...record, lastSeenAt: nowIso() };
     this.refreshTokens.set(nextRecord.id, nextRecord);
+    licenseEngineService.heartbeatAuthSession(record.userId, record.id, record.deviceId ?? undefined);
     const access = this.issueAccessToken(user.id, user.role, record.id);
     notifySaasMutation("auth:refresh");
 
@@ -380,6 +410,7 @@ export class AuthSessionService {
     const record = this.refreshTokens.get(parsed.sessionId);
     if (record) {
       this.refreshTokens.set(record.id, { ...record, revokedAt: nowIso() });
+      licenseEngineService.revokeAuthSession(record.userId, record.id, record.deviceId ?? undefined);
       notifySaasMutation("auth:logout");
     }
   }
@@ -390,7 +421,50 @@ export class AuthSessionService {
         this.refreshTokens.set(id, { ...record, revokedAt: nowIso() });
       }
     }
+    licenseEngineService.revokeUserSessions(userId);
     notifySaasMutation("auth:logout-global");
+  }
+
+  heartbeat(userId: string, sessionId: string) {
+    const record = this.refreshTokens.get(sessionId);
+    if (!record || record.userId !== userId || record.revokedAt || new Date(record.expiresAt).getTime() <= Date.now()) return null;
+    const nextRecord: RefreshRecord = { ...record, lastSeenAt: nowIso() };
+    this.refreshTokens.set(sessionId, nextRecord);
+    licenseEngineService.heartbeatAuthSession(userId, sessionId, record.deviceId ?? undefined);
+    notifySaasMutation("auth:heartbeat");
+    return this.sessionActivityFor(nextRecord);
+  }
+
+  listSessionActivity(now = new Date()) {
+    const sessions = Array.from(this.refreshTokens.values()).map(record => this.sessionActivityFor(record, now));
+    const active = sessions.filter(session => session.status === "ACTIVE");
+    const activeUsers = new Set(active.map(session => session.userId));
+    const activeDevices = new Set(active.map(session => session.deviceId).filter(Boolean));
+    const byUser = Array.from(new Set(sessions.map(session => session.userId))).map(userId => {
+      const userSessions = sessions.filter(session => session.userId === userId);
+      const activeSessions = userSessions.filter(session => session.status === "ACTIVE");
+      const user = usersService.findById(userId);
+      return {
+        userId,
+        displayName: user?.displayName ?? userId,
+        email: user?.email ?? "",
+        role: user?.role ?? "USER",
+        activeSessions: activeSessions.length,
+        totalSessions: userSessions.length,
+        sessions: userSessions,
+      };
+    });
+
+    return {
+      activeUsers: activeUsers.size,
+      activeDevices: activeDevices.size,
+      activeSessions: active.length,
+      totalSessions: sessions.length,
+      activeWindowSeconds: Math.floor(activeSessionWindowMs / 1000),
+      sessions,
+      byUser,
+      secretsExposed: false as const,
+    };
   }
 
   changePassword(userId: string, currentPassword: string, nextPassword: string) {
@@ -466,6 +540,13 @@ export class AuthSessionService {
     for (const reset of input.resetTokens) this.resetTokens.set(reset.tokenHash, reset);
   }
 
+  setSessionLastSeenForTest(sessionId: string, lastSeenAt: string) {
+    const record = this.refreshTokens.get(sessionId);
+    if (!record) return false;
+    this.refreshTokens.set(sessionId, { ...record, lastSeenAt });
+    return true;
+  }
+
   snapshot(userId: string, sessionId: string, accessExpiresAt: string, refreshExpiresAt: string): AuthSessionSnapshot {
     const user = usersService.findById(userId) ?? usersService.getOrCreate({ userId });
     const license = licenseEngineService.status(user.id);
@@ -507,6 +588,29 @@ export class AuthSessionService {
       token,
       expiresAt: new Date(expiresAtSeconds * 1000).toISOString(),
     };
+  }
+
+  private sessionActivityFor(record: RefreshRecord, now = new Date()) {
+    const expiresAtMs = new Date(record.expiresAt).getTime();
+    const lastSeenAtMs = new Date(record.lastSeenAt).getTime();
+    const revoked = Boolean(record.revokedAt);
+    const expired = expiresAtMs <= now.getTime() || lastSeenAtMs <= now.getTime() - activeSessionWindowMs;
+    const status = revoked ? "REVOKED" : expired ? "EXPIRED" : "ACTIVE";
+    const user = usersService.findById(record.userId);
+    return {
+      id: record.id,
+      userId: record.userId,
+      displayName: user?.displayName ?? record.userId,
+      email: user?.email ?? "",
+      licenseId: record.licenseId ?? null,
+      deviceId: record.deviceId ?? null,
+      userAgent: record.userAgent ?? null,
+      ipHash: record.ipHash ? `${record.ipHash.slice(0, 12)}...` : null,
+      createdAt: record.createdAt,
+      lastSeenAt: record.lastSeenAt,
+      expiresAt: record.expiresAt,
+      status,
+    } as const;
   }
 
   private setPassword(userId: string, password: string) {

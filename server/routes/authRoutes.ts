@@ -3,6 +3,7 @@ import {
   authCookieNames,
   changePassword,
   forgotPassword,
+  heartbeat,
   login,
   logout,
   logoutGlobal,
@@ -19,6 +20,7 @@ authRoutes.post("/auth/login", login);
 authRoutes.post("/auth/refresh", refresh);
 authRoutes.post("/auth/logout", logout);
 authRoutes.post("/auth/logout-global", requireAuth(), logoutGlobal);
+authRoutes.post("/sessions/heartbeat", requireAuth(), heartbeat);
 authRoutes.post("/auth/change-password", requireAuth(), changePassword);
 authRoutes.post("/auth/forgot-password", forgotPassword);
 authRoutes.post("/auth/reset-password", resetPassword);

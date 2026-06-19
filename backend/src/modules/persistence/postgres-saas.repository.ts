@@ -197,6 +197,8 @@ function rowToDevice(row: Record<string, unknown>): Device {
     fingerprintHash: String(row.fingerprint_hash),
     firstSeenAt: iso(row.first_seen_at) ?? new Date().toISOString(),
     lastSeenAt: iso(row.last_seen_at) ?? new Date().toISOString(),
+    userAgent: row.user_agent ? String(row.user_agent) : null,
+    ipHash: row.ip_hash ? String(row.ip_hash) : null,
     revoked: Boolean(row.revoked),
   };
 }
@@ -209,6 +211,8 @@ function rowToLicenseSession(row: Record<string, unknown>): UserSession {
     deviceId: String(row.device_id),
     createdAt: iso(row.created_at) ?? new Date().toISOString(),
     lastSeenAt: iso(row.last_seen_at) ?? new Date().toISOString(),
+    userAgent: row.user_agent ? String(row.user_agent) : null,
+    ipHash: row.ip_hash ? String(row.ip_hash) : null,
     revoked: Boolean(row.revoked_at),
   };
 }
@@ -217,12 +221,16 @@ function rowToRefreshToken(row: Record<string, unknown>): RefreshRecord {
   return {
     id: String(row.id),
     userId: String(row.user_id),
+    licenseId: row.license_id ? String(row.license_id) : null,
+    deviceId: row.device_id ? String(row.device_id) : null,
     tokenHash: String(row.refresh_token_hash),
     createdAt: iso(row.created_at) ?? new Date().toISOString(),
     expiresAt: iso(row.expires_at) ?? new Date().toISOString(),
     lastSeenAt: iso(row.last_seen_at) ?? new Date().toISOString(),
     revokedAt: iso(row.revoked_at),
     rememberMe: Boolean(row.remember_me),
+    userAgent: row.user_agent ? String(row.user_agent) : null,
+    ipHash: row.ip_hash ? String(row.ip_hash) : null,
   };
 }
 
@@ -372,36 +380,80 @@ async function upsertSubscription(client: PoolClient, subscription: Subscription
 
 async function upsertDevice(client: PoolClient, device: Device) {
   await client.query(
-    `insert into devices (id, user_id, license_id, label, fingerprint_hash, first_seen_at, last_seen_at, revoked)
-     values ($1,$2,$3,$4,$5,$6,$7,$8)
+    `insert into devices (id, user_id, license_id, label, fingerprint_hash, first_seen_at, last_seen_at, user_agent, ip_hash, revoked)
+     values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
      on conflict (id) do update set
        label = excluded.label,
        last_seen_at = excluded.last_seen_at,
+       user_agent = excluded.user_agent,
+       ip_hash = excluded.ip_hash,
        revoked = excluded.revoked`,
-    [device.id, device.userId, device.licenseId, device.label, device.fingerprintHash, device.firstSeenAt, device.lastSeenAt, device.revoked],
+    [
+      device.id,
+      device.userId,
+      device.licenseId,
+      device.label,
+      device.fingerprintHash,
+      device.firstSeenAt,
+      device.lastSeenAt,
+      device.userAgent ?? null,
+      device.ipHash ?? null,
+      device.revoked,
+    ],
   );
 }
 
 async function upsertLicenseSession(client: PoolClient, session: UserSession) {
   await client.query(
-    `insert into sessions (id, user_id, license_id, device_id, session_kind, created_at, last_seen_at, revoked_at)
-     values ($1,$2,$3,$4,'LICENSE',$5,$6,$7)
-     on conflict (id) do update set last_seen_at = excluded.last_seen_at, revoked_at = excluded.revoked_at`,
-    [session.id, session.userId, session.licenseId, session.deviceId, session.createdAt, session.lastSeenAt, session.revoked ? session.lastSeenAt : null],
+    `insert into sessions (id, user_id, license_id, device_id, session_kind, created_at, last_seen_at, user_agent, ip_hash, revoked_at)
+     values ($1,$2,$3,$4,'LICENSE',$5,$6,$7,$8,$9)
+     on conflict (id) do update set
+       last_seen_at = excluded.last_seen_at,
+       user_agent = excluded.user_agent,
+       ip_hash = excluded.ip_hash,
+       revoked_at = excluded.revoked_at`,
+    [
+      session.id,
+      session.userId,
+      session.licenseId,
+      session.deviceId,
+      session.createdAt,
+      session.lastSeenAt,
+      session.userAgent ?? null,
+      session.ipHash ?? null,
+      session.revoked ? session.lastSeenAt : null,
+    ],
   );
 }
 
 async function upsertRefreshSession(client: PoolClient, refresh: RefreshRecord) {
   await client.query(
-    `insert into sessions (id, user_id, session_kind, refresh_token_hash, remember_me, expires_at, created_at, last_seen_at, revoked_at)
-     values ($1,$2,'AUTH',$3,$4,$5,$6,$7,$8)
+    `insert into sessions (id, user_id, license_id, device_id, session_kind, refresh_token_hash, remember_me, expires_at, created_at, last_seen_at, user_agent, ip_hash, revoked_at)
+     values ($1,$2,$3,$4,'AUTH',$5,$6,$7,$8,$9,$10,$11,$12)
      on conflict (id) do update set
+       license_id = excluded.license_id,
+       device_id = excluded.device_id,
        refresh_token_hash = excluded.refresh_token_hash,
        remember_me = excluded.remember_me,
        expires_at = excluded.expires_at,
        last_seen_at = excluded.last_seen_at,
+       user_agent = excluded.user_agent,
+       ip_hash = excluded.ip_hash,
        revoked_at = excluded.revoked_at`,
-    [refresh.id, refresh.userId, refresh.tokenHash, refresh.rememberMe, refresh.expiresAt, refresh.createdAt, refresh.lastSeenAt, refresh.revokedAt],
+    [
+      refresh.id,
+      refresh.userId,
+      refresh.licenseId ?? null,
+      refresh.deviceId ?? null,
+      refresh.tokenHash,
+      refresh.rememberMe,
+      refresh.expiresAt,
+      refresh.createdAt,
+      refresh.lastSeenAt,
+      refresh.userAgent ?? null,
+      refresh.ipHash ?? null,
+      refresh.revokedAt,
+    ],
   );
 }
 

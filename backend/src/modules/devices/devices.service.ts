@@ -20,7 +20,12 @@ export class DevicesService {
     const timestamp = now();
 
     if (existing) {
-      const updated: Device = { ...existing, lastSeenAt: timestamp };
+      const updated: Device = {
+        ...existing,
+        lastSeenAt: timestamp,
+        userAgent: input.userAgent ?? existing.userAgent ?? null,
+        ipHash: input.ipHash ?? existing.ipHash ?? null,
+      };
       this.devices.set(id, updated);
       notifySaasMutation("devices:update");
       return updated;
@@ -34,6 +39,8 @@ export class DevicesService {
       fingerprintHash: hash(rawDeviceId),
       firstSeenAt: timestamp,
       lastSeenAt: timestamp,
+      userAgent: input.userAgent ?? null,
+      ipHash: input.ipHash ?? null,
       revoked: false,
     };
 
@@ -44,6 +51,20 @@ export class DevicesService {
 
   listByLicense(licenseId: string): readonly Device[] {
     return Array.from(this.devices.values()).filter(device => device.licenseId === licenseId && !device.revoked);
+  }
+
+  touch(id: string, input: { readonly userAgent?: string | null; readonly ipHash?: string | null } = {}) {
+    const existing = this.devices.get(id);
+    if (!existing || existing.revoked) return null;
+    const updated: Device = {
+      ...existing,
+      lastSeenAt: now(),
+      userAgent: input.userAgent ?? existing.userAgent ?? null,
+      ipHash: input.ipHash ?? existing.ipHash ?? null,
+    };
+    this.devices.set(id, updated);
+    notifySaasMutation("devices:heartbeat");
+    return updated;
   }
 
   reset() {
